@@ -25,5 +25,7 @@
  - Controller
 5. 파라미터 유효성 검사: @Valid
 6. Logging: @Aspect
+7. 비지니스 로직 처리
+8. Response
 
  - Error: @RestControllerAdvice -> @ExceptionHandler
