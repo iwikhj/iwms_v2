@@ -26,5 +26,4 @@
 5. 파라미터 유효성 검사: @Valid
 6. Logging: @Aspect
 
- - Error
- @RestControllerAdvice -> @ExceptionHandler
+ - Error: @RestControllerAdvice -> @ExceptionHandler
