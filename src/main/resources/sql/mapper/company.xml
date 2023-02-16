@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwi.iwms.api.comp.mapper.CompMapper">
+
+	<sql id="selectComp">
+		SELECT 
+			COMP.COMP_SEQ AS compSeq
+			, COMP.COMP_NM AS compNm
+			, COMP.COMP_GB_CD AS compGbCd
+			, COMP.COMP_TEL AS compTel
+			, COMP.USE_YN AS useYn
+			, DATE_FORMAT(COMP.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+			, REG_USER.USER_NM AS regNm
+			, DATE_FORMAT(COMP.UPDT_DT, "%Y-%m-%d %H:%i:%s") AS updtDt
+			, UPDT_USER.USER_NM AS updtNm
+		FROM TB_COMPANY COMP
+		LEFT JOIN TB_USER REG_USER ON COMP.REG_SEQ = REG_USER.USER_SEQ
+		LEFT JOIN TB_USER UPDT_USER ON COMP.UPDT_SEQ = UPDT_USER.USER_SEQ 
+		WHERE COMP.USE_YN = 'Y'
+	</sql>
+	
+	<select id="findAll" parameterType="hashMap"
+		resultType="com.iwi.iwms.api.comp.domain.CompInfo">
+		<include refid="selectComp"></include>
+		<if test='search != null and search != ""'>
+			AND COMP.COMP_NM LIKE CONCAT('%', #{search}, '%') 
+			OR COMP.COMP_GB_CD LIKE CONCAT('%', #{search}, '%')
+			OR COMP.COMP_TEL LIKE CONCAT('%', #{search}, '%') 
+		</if>			
+		ORDER BY COMP.COMP_SEQ DESC
+		<if test='pagination != null and pagination != ""'>
+			LIMIT #{pagination.limitPerPage} OFFSET #{pagination.offset}
+		</if>
+	</select>	
+	
+	<select id="count" parameterType="hashMap"
+		resultType="int">
+		SELECT 
+			COUNT(COMP_SEQ)
+		FROM TB_COMPANY
+		WHERE USE_YN = 'Y'
+		<if test='search != null and search != ""'>
+			AND COMP_NM LIKE CONCAT('%', #{search}, '%') 
+			OR COMP_GB_CD LIKE CONCAT('%', #{search}, '%')
+			OR COMP_TEL LIKE CONCAT('%', #{search}, '%') 
+		</if>			
+	</select>	
+	
+	<select id="findBySeq" parameterType="long"
+		resultType="com.iwi.iwms.api.comp.domain.CompInfo">
+		<include refid="selectComp"></include>
+		AND COMP.COMP_SEQ = #{compSeq}
+	</select>	
+	
+	<insert id="save" parameterType="com.iwi.iwms.api.comp.domain.Comp"
+		useGeneratedKeys="true" keyProperty="compSeq">
+		INSERT INTO TB_COMPANY
+		(
+		    COMP_NM
+		    , COMP_GB_CD
+			, COMP_TEL
+			, USE_YN
+			, REG_DT
+			, REG_SEQ
+		) VALUES (
+		    #{compNm}
+			, #{compGbCd}
+			, #{compTel}
+			, #{useYn}
+			, CURRENT_TIMESTAMP
+			, #{regSeq}
+		)		
+	</insert>		
+
+	<update id="update" parameterType="com.iwi.iwms.api.comp.domain.Comp">
+		UPDATE TB_COMPANY 
+		SET
+		    COMP_NM = #{compNm}
+			, COMP_GB_CD = #{compGbCd}
+			, COMP_TEL = #{compTel}
+			, USE_YN = #{useYn}
+			, UPDT_DT = CURRENT_TIMESTAMP
+			, UPDT_SEQ = #{updtSeq}
+		WHERE COMP_SEQ = #{compSeq}	
+	</update>	
+	
+	<delete id="delete" parameterType="com.iwi.iwms.api.comp.domain.Comp">
+		DELETE 
+		FROM TB_COMPANY
+		WHERE COMP_SEQ = #{compSeq}	 
+	</delete>
+		
+</mapper>

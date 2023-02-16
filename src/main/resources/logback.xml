@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+    <encoder>
+		<!-- 로그시간 + 패키지 및 클래스명 + 메소드명 + 메소드내에 로그위치 + 로깅메시지 -->
+		<pattern>%d{HH:mm:ss.SSS} %-5level %logger[%method:%line] - %msg%n</pattern>
+    </encoder>
+  </appender>
+
+  <logger name="jdbc.sqlonly"        level="INFO"/>
+  <logger name="jdbc.sqltiming"      level="ERROR"/>
+  <logger name="jdbc.audit"          level="WARN"/>
+  <logger name="jdbc.resultset"      level="ERROR"/>
+  <logger name="jdbc.resultsettable" level="INFO"/>
+  <logger name="jdbc.connection"     level="WARN"/>
+  <logger name="log4jdbc.debug"		level="WARN"/>
+  <logger name="org.mybatis.spring"	level="ERROR" additivity="false"/>
+  
+  <logger name="org.springframework" level="WARN"/>
+  <logger name="org.springframework.web" level="WARN"/>
+  <logger name="org.springframework.security" level="WARN"/>
+  <logger name="org.springframework.cache" level="WARN"/>
+  <logger name="org.springframework.jdbc" level="ERROR" additivity="false"/>
+  <logger name="org.springframework.boot.context.web" level="WARN"/>
+  <logger name="org.springframework.beans.factory.support" level="WARN"/>
+  <logger name="org.thymeleaf" level="WARN"/>
+
+<!-- <logger name="com.megamart.mobileweb.repository" level="error" additivity="false"/> -->
+
+<!--
+  <springProfile name="dev">
+      <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+          <file>${catalina.home}/logs/bvdr-web-pc.log</file>
+          <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+              <fileNamePattern>${catalina.home}/logs/bvdr-web-pc.log.%d{yyyy-MM-dd}</fileNamePattern>
+              <maxHistory>30</maxHistory>
+          </rollingPolicy>
+          <encoder>
+              <charset>utf-8</charset>
+              <Pattern>${FILE_LOG_PATTERN}</Pattern>
+          </encoder>
+      </appender>
+
+      <appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+          <queueSize>1024</queueSize>
+          <appender-ref ref="FILE"/>
+      </appender>
+  </springProfile>
+-->
+
+  <!-- 
+    <springProfile name="local">
+        <root level="@logback.loglevel@">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="dev">
+        <root level="@logback.loglevel@">
+            <appender-ref ref="ASYNC_FILE"/>
+        </root>
+    </springProfile>
+   -->
+
+  <!-- 
+  <root level="@logback.loglevel@">
+    <appender-ref ref="STDOUT" />
+  </root>
+  -->
+  
+  <root level="INFO">
+    <appender-ref ref="STDOUT" />
+  </root>  
+  
+</configuration>

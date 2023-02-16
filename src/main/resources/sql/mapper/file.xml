@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwi.iwms.api.file.mapper.FileMapper">
+
+	<sql id="selectFile">
+		SELECT 
+			FILE.FILE_SEQ AS fileSeq
+			, FILE.FILE_REF_TB AS fileRefTb
+			, FILE.FILE_REF_COL AS fileRefCol
+			, FILE.FILE_REF_VAL AS fileRefVal
+			, FILE.FILE_GB_CD AS fileGbCd
+			, FILE.FILE_ORD_NUM AS fileOrdNum
+			, FILE.FILE_ORG_NM AS fileOrgNm
+			, FILE.FILE_REAL_NM AS fileRealNm
+			, FILE.FILE_REAL_PATH AS fileRealPath
+			, FILE.DEL_YN AS delYn
+			, DATE_FORMAT(FILE.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+			, REG_USER.USER_NM AS regNm
+		FROM TB_FILE FILE
+		LEFT JOIN TB_USER REG_USER ON FILE.REG_SEQ = REG_USER.USER_SEQ
+		WHERE FILE.DEL_YN = 'N'
+	</sql>
+	
+	<select id="findAll" parameterType="hashMap"
+		resultType="com.iwi.iwms.api.file.domain.UploadFileInfo">
+		<include refid="selectFile"></include>
+		<if test='search != null and search != ""'>
+			AND FILE.FILE_REF_TB LIKE CONCAT('%', #{search}, '%') 
+			OR FILE.FILE_REF_COL LIKE CONCAT('%', #{search}, '%')
+			OR FILE.FILE_REF_VAL LIKE CONCAT('%', #{search}, '%')
+			OR FILE.FILE_GB_CD LIKE CONCAT('%', #{search}, '%') 
+		</if>			
+		ORDER BY FILE.FILE_REF_TB, FILE.FILE_REF_COL, FILE.FILE_REF_VAL DESC, FILE.FILE_ORD_NUM ASC
+		<if test='pagination != null and pagination != ""'>
+			LIMIT #{pagination.limitPerPage} OFFSET #{pagination.offset}
+		</if>
+	</select>	
+	
+	<select id="count" parameterType="hashMap"
+		resultType="int">
+		SELECT 
+			COUNT(FILE_SEQ)
+		FROM TB_FILE
+		WHERE DEL_YN = 'N'
+		<if test='search != null and search != ""'>
+			AND FILE_REF_TB LIKE CONCAT('%', #{search}, '%') 
+			OR FILE_REF_COL LIKE CONCAT('%', #{search}, '%')
+			OR FILE_REF_VAL LIKE CONCAT('%', #{search}, '%')
+			OR FILE_GB_CD LIKE CONCAT('%', #{search}, '%') 
+		</if>				
+	</select>	
+	
+	<select id="findBySeq" parameterType="long"
+		resultType="com.iwi.iwms.api.file.domain.UploadFileInfo">
+		<include refid="selectFile"></include>
+		AND FILE.FILE_SEQ = #{fileSeq}
+	</select>	
+	
+	<insert id="save" parameterType="com.iwi.iwms.api.file.domain.UploadFile"
+		useGeneratedKeys="true" keyProperty="fileSeq">
+		INSERT INTO TB_FILE
+		(
+		    FILE_REF_TB
+		    , FILE_REF_COL
+			, FILE_REF_VAL
+			, FILE_GB_CD
+			, FILE_ORD_NUM
+			, FILE_ORG_NM
+			, FILE_REAL_NM
+			, FILE_REAL_PATH
+			, REG_DT
+			, REG_SEQ
+		) VALUES (
+		    #{fileRefTb}
+			, #{fileRefCol}
+			, #{fileRefVal}
+			, #{fileGbCd}
+			, #{fileOrdNum}
+			, #{fileOrgNm}
+			, #{fileRealNm}
+			, #{fileRealPath}
+			, CURRENT_TIMESTAMP
+			, #{regSeq}
+		)		
+	</insert>		
+
+	<update id="update" parameterType="com.iwi.iwms.api.file.domain.UploadFile">
+		UPDATE TB_FILE 
+		SET
+		    USE_YN = 'Y'
+		WHERE FILE_SEQ = #{fileSeq}	
+	</update>	
+	
+	<delete id="delete" parameterType="com.iwi.iwms.api.file.domain.UploadFile">
+		DELETE 
+		FROM TB_FILE
+		WHERE FILE_SEQ = #{fileSeq}	 
+	</delete>
+	
+	<update id="updateOrderNum" parameterType="com.iwi.iwms.api.file.domain.UploadFile">
+		UPDATE TB_FILE FILE,
+			(SELECT 
+				@ROWNUM:=@ROWNUM + 1 AS ROWNUM
+				, FILE_ORD.FILE_REF_TB
+				, FILE_ORD.FILE_REF_COL
+				, FILE_ORD.FILE_REF_VAL 
+				, FILE_ORD.FILE_SEQ
+			FROM TB_FILE FILE_ORD, (SELECT @ROWNUM := 0) RN 
+			WHERE FILE_ORD.FILE_REF_TB = #{fileRefTb}
+			AND FILE_ORD.FILE_REF_COL = #{fileRefCol}
+			AND FILE_ORD.FILE_REF_VAL = #{fileRefVal}
+			ORDER BY FILE_ORD.FILE_SEQ) AS R
+		SET 
+			FILE.FILE_ORD_NUM = R.ROWNUM
+		WHERE FILE.FILE_REF_TB = R.FILE_REF_TB
+		AND FILE.FILE_REF_COL = R.FILE_REF_COL
+		AND FILE.FILE_REF_VAL = R.FILE_REF_VAL
+		AND FILE.FILE_SEQ = R.FILE_SEQ
+	</update>		
+	
+		
+</mapper>

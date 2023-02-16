@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwi.iwms.api.comp.mapper.SiteMapper">
+
+	<sql id="selectSite">
+		SELECT 
+			SITE.SITE_SEQ AS siteSeq
+			, SITE.COMP_SEQ AS compSeq
+			, COMP.COMP_NM AS compNm
+			, SITE.PROJ_SEQ AS projSeq
+			, PROJ.PROJ_NM AS projNm
+			, PROJ.PROJ_SW_NM AS projSwNm
+			, PROJ.PROJ_STD_YMD AS projStdYmd
+			, PROJ.PROJ_END_YMD AS projEndYmd			
+			, SITE.SITE_NM AS siteNm
+			, SITE.SITE_SW_NM AS siteSwNm
+			, SITE.SITE_GB_CD AS siteGbCd
+			, SITE.USE_YN AS useYn
+			, DATE_FORMAT(SITE.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+			, REG_USER.USER_NM AS regNm
+			, DATE_FORMAT(SITE.UPDT_DT, "%Y-%m-%d %H:%i:%s") AS updtDt
+			, UPDT_USER.USER_NM AS updtNm
+		FROM TB_SITE SITE
+		INNER JOIN TB_COMPANY COMP ON SITE.COMP_SEQ = COMP.COMP_SEQ
+		INNER JOIN TB_PROJ PROJ ON SITE.PROJ_SEQ = PROJ.PROJ_SEQ
+		LEFT JOIN TB_CODE CODE ON SITE.SITE_GB_CD = CODE.CODE_CD AND CODE.UP_CODE_CD = 'SITE_GB_CD'    
+		LEFT JOIN TB_USER REG_USER ON SITE.REG_SEQ = REG_USER.USER_SEQ
+		LEFT JOIN TB_USER UPDT_USER ON SITE.UPDT_SEQ = UPDT_USER.USER_SEQ 
+		WHERE SITE.USE_YN = 'Y'
+		<if test='compSeq != null and compSeq != ""'>
+			AND PROJ.COMP_SEQ = #{compSeq}
+		</if>
+		<if test='projSeq != null and projSeq != ""'>
+			AND PROJ.PROJ_SEQ = #{projSeq}
+		</if>		
+	</sql>
+	
+	<select id="findAll" parameterType="hashMap"
+		resultType="com.iwi.iwms.api.comp.domain.SiteInfo">
+		<include refid="selectSite"></include>
+		<if test='search != null and search != ""'>
+			AND SITE.SITE_NM LIKE CONCAT('%', #{search}, '%') 
+			OR SITE.SITE_SW_NM LIKE CONCAT('%', #{search}, '%') 
+			OR COMP.COMP_NM LIKE CONCAT('%', #{search}, '%') 
+		</if>			
+		ORDER BY SITE.SITE_SEQ DESC
+		<if test='pagination != null and pagination != ""'>
+			LIMIT #{pagination.limitPerPage} OFFSET #{pagination.offset}
+		</if>
+	</select>	
+	
+	<select id="count" parameterType="hashMap"
+		resultType="int">
+		SELECT 
+			COUNT(SITE.SITE_SEQ)
+		FROM TB_SITE SITE
+		INNER JOIN TB_COMPANY COMP ON SITE.COMP_SEQ = COMP.COMP_SEQ
+		INNER JOIN TB_PROJ PROJ ON SITE.PROJ_SEQ = PROJ.PROJ_SEQ
+		WHERE SITE.USE_YN = 'Y'
+		<if test='compSeq != null and compSeq != ""'>
+			AND PROJ.COMP_SEQ = #{compSeq}
+		</if>
+		<if test='projSeq != null and projSeq != ""'>
+			AND PROJ.PROJ_SEQ = #{projSeq}
+		</if>	
+		<if test='search != null and search != ""'>
+			AND SITE.SITE_NM LIKE CONCAT('%', #{search}, '%') 
+			OR SITE.SITE_SW_NM LIKE CONCAT('%', #{search}, '%') 
+			OR COMP.COMP_NM LIKE CONCAT('%', #{search}, '%') 
+		</if>				
+	</select>		
+	
+	<select id="findBySeq" parameterType="com.iwi.iwms.api.comp.domain.Site"
+		resultType="com.iwi.iwms.api.comp.domain.SiteInfo">
+		<include refid="selectSite"></include>
+		AND SITE.SITE_SEQ = #{siteSeq}
+	</select>	
+
+	<insert id="save" parameterType="com.iwi.iwms.api.comp.domain.Site"
+		useGeneratedKeys="true" keyProperty="siteSeq">
+		INSERT INTO TB_SITE
+		(
+		    COMP_SEQ
+		    , PROJ_SEQ
+		    , SITE_NM
+		    , SITE_SW_NM
+		    , SITE_GB_CD
+			, USE_YN
+			, REG_DT
+			, REG_SEQ
+		) VALUES (
+		    #{compSeq}
+			, #{projSeq}
+			, #{siteNm}
+			, #{siteSwNm}
+			, #{siteGbCd}
+			, #{useYn}
+			, CURRENT_TIMESTAMP
+			, #{regSeq}
+		)		
+	</insert>		
+
+	<update id="update" parameterType="com.iwi.iwms.api.comp.domain.Site">
+		UPDATE TB_SITE 
+		SET
+		    SITE_NM = #{siteNm}
+			, SITE_SW_NM = #{siteSwNm}
+			, SITE_GB_CD = #{siteGbCd}
+			, USE_YN = #{useYn}
+			, UPDT_DT = CURRENT_TIMESTAMP
+			, UPDT_SEQ = #{updtSeq}
+		WHERE PROJ_SEQ = #{projSeq}	
+	</update>	
+	
+	<delete id="delete" parameterType="com.iwi.iwms.api.comp.domain.Site">
+		DELETE 
+		FROM TB_SITE
+		WHERE SITE_SEQ = #{siteSeq}	 
+	</delete>
+		
+</mapper>

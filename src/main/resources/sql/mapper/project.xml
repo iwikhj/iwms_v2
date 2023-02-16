@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwi.iwms.api.comp.mapper.ProjMapper">
+
+	<sql id="selectProj">
+		SELECT 
+			PROJ.PROJ_SEQ AS projSeq
+			, PROJ.COMP_SEQ AS compSeq
+			, COMP.COMP_NM AS compNm
+			, PROJ.PROJ_NM AS projNm
+			, PROJ.PROJ_SW_NM AS projSwNm
+			, PROJ.PROJ_STD_YMD AS projStdYmd
+			, PROJ.PROJ_END_YMD AS projEndYmd
+			, PROJ.USE_YN AS useYn
+			, DATE_FORMAT(PROJ.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+			, REG_USER.USER_NM AS regNm
+			, DATE_FORMAT(PROJ.UPDT_DT, "%Y-%m-%d %H:%i:%s") AS updtDt
+			, UPDT_USER.USER_NM AS updtNm
+		FROM TB_PROJ PROJ
+		INNER JOIN TB_COMPANY COMP ON PROJ.COMP_SEQ = COMP.COMP_SEQ
+		LEFT JOIN TB_USER REG_USER ON PROJ.REG_SEQ = REG_USER.USER_SEQ
+		LEFT JOIN TB_USER UPDT_USER ON PROJ.UPDT_SEQ = UPDT_USER.USER_SEQ 
+		WHERE PROJ.USE_YN = 'Y'
+		<if test='compSeq != null and compSeq != ""'>
+			AND PROJ.COMP_SEQ = #{compSeq}
+		</if>
+	</sql>
+	
+	<select id="findAll" parameterType="hashMap"
+		resultType="com.iwi.iwms.api.comp.domain.ProjInfo">
+		<include refid="selectProj"></include>
+		<if test='search != null and search != ""'>
+			AND PROJ.PROJ_NM LIKE CONCAT('%', #{search}, '%') 
+			OR PROJ.PROJ_SW_NM LIKE CONCAT('%', #{search}, '%') 
+			OR COMP.COMP_NM LIKE CONCAT('%', #{search}, '%') 
+		</if>			
+		ORDER BY PROJ.PROJ_SEQ DESC
+		<if test='pagination != null and pagination != ""'>
+			LIMIT #{pagination.limitPerPage} OFFSET #{pagination.offset}
+		</if>
+	</select>	
+	
+	<select id="count" parameterType="hashMap"
+		resultType="int">
+		SELECT 
+			COUNT(PROJ.PROJ_SEQ)
+		FROM TB_PROJ PROJ
+		INNER JOIN TB_COMPANY COMP ON PROJ.COMP_SEQ = COMP.COMP_SEQ
+		WHERE PROJ.USE_YN = 'Y'
+		<if test='compSeq != null and compSeq != ""'>
+			AND PROJ.COMP_SEQ = #{compSeq}
+		</if>
+		<if test='search != null and search != ""'>
+			AND PROJ.PROJ_NM LIKE CONCAT('%', #{search}, '%') 
+			OR PROJ.PROJ_SW_NM LIKE CONCAT('%', #{search}, '%') 
+			OR COMP.COMP_NM LIKE CONCAT('%', #{search}, '%') 
+		</if>				
+	</select>		
+	
+	<select id="findBySeq" parameterType="com.iwi.iwms.api.comp.domain.Proj"
+		resultType="com.iwi.iwms.api.comp.domain.ProjInfo">
+		<include refid="selectProj"></include>
+		AND PROJ.PROJ_SEQ = #{projSeq}
+	</select>	
+
+	<insert id="save" parameterType="com.iwi.iwms.api.comp.domain.Proj"
+		useGeneratedKeys="true" keyProperty="projSeq">
+		INSERT INTO TB_PROJ
+		(
+		    COMP_SEQ
+		    , PROJ_NM
+		    , PROJ_SW_NM
+		    , PROJ_STD_YMD
+		    , PROJ_END_YMD
+			, USE_YN
+			, REG_DT
+			, REG_SEQ
+		) VALUES (
+		    #{compSeq}
+			, #{projNm}
+			, #{projSwNm}
+			, #{projStdYmd}
+			, #{projEndYmd}
+			, #{useYn}
+			, CURRENT_TIMESTAMP
+			, #{regSeq}
+		)		
+	</insert>		
+
+	<update id="update" parameterType="com.iwi.iwms.api.comp.domain.Proj">
+		UPDATE TB_PROJ 
+		SET
+		    PROJ_NM = #{projNm}
+			, PROJ_SW_NM = #{projSwNm}
+			, PROJ_STD_YMD = #{projStdYmd}
+			, PROJ_END_YMD = #{projEndYmd}
+			, USE_YN = #{useYn}
+			, UPDT_DT = CURRENT_TIMESTAMP
+			, UPDT_SEQ = #{updtSeq}
+		WHERE PROJ_SEQ = #{projSeq}	
+	</update>	
+	
+	<delete id="delete" parameterType="com.iwi.iwms.api.comp.domain.Proj">
+		DELETE 
+		FROM TB_PROJ
+		WHERE PROJ_SEQ = #{projSeq}	 
+	</delete>
+		
+</mapper>
