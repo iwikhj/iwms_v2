@@ -9,7 +9,7 @@
 
  - java: 11
  - mariaDB: 10.10.2
- - tomcat: 9.0.71 (embed tomcat)
+ - tomcat: 9.0.71 (embed)
 
 ## API DOCS
  - http://localhost/apidocs
