@@ -27,4 +27,4 @@
 6. Logging: @Aspect
 
  - Error
-   - @RestControllerAdvice -> @ExceptionHandler
+ @RestControllerAdvice -> @ExceptionHandler
