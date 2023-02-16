@@ -31,8 +31,8 @@
 
  - Error: @RestControllerAdvice -> @ExceptionHandler
 
-## 설명
- - 로그인 요청
+## 기타
+ - 로그인(성공)
 1. 로그인 요청: ID, PWD
 2. IWMS DB 서버에 등록된 ID인지 확인
 3. 인증 서버(Keycloak)에 인증 토큰 발급 요청
