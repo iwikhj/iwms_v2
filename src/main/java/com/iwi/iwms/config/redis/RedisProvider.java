@@ -56,15 +56,9 @@ public class RedisProvider {
 		return false;
     }
 	
-	public boolean setHash(String key, String hashKey, Object value, long timeout) {
-		try {
-			redisTemplate.opsForHash().put(key, hashKey, value);
-			return redisTemplate.expire(key, timeout, TimeUnit.MILLISECONDS);
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-		
-		return false;
+	public void setHash(String key, String hashKey, Object value, long timeout) {
+		redisTemplate.opsForHash().put(key, hashKey, value);
+		redisTemplate.expire(key, timeout, TimeUnit.MILLISECONDS);
 	}
 	
 	public Object getHash(String key, String hashKey) {

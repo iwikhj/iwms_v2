@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.keycloak.representations.AccessTokenResponse;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -53,15 +54,16 @@ public class LoginServiceImpl implements LoginService{
 			if(redis.hasKey(ssoId)) {
 				redis.delete(ssoId);
 			}
+			
 			long timeout = Duration.ofSeconds(accessTokenResponse.getRefreshExpiresIn()).toMillis();
 			redis.setHash(ssoId, "user", loginUserInfo, timeout);
 			
 			// 액세스 토큰 및 리프레시 토큰을 응답 헤더에 담아서 클라이언트에 제공한다.
-			//response.setHeader("access_token", accessTokenResponse.getToken());
-			//response.setHeader("refresh_token", accessTokenResponse.getRefreshToken());
+			response.setHeader("access_token", accessTokenResponse.getToken());
+			response.setHeader("refresh_token", accessTokenResponse.getRefreshToken());
 			
 			// 리프레시 토큰은 쿠키에 담아서 저장한다.
-			CookieUtil.setCookie(response, "refresh_token", accessTokenResponse.getRefreshToken(), true);
+			//CookieUtil.setCookie(response, "refresh_token", accessTokenResponse.getRefreshToken(), false);
 
 			// 로그인한 사용자의 접속IP를 저장 및 LOGIN_ERR_CNT 초기화. 
 			String accessIp = request.getRemoteAddr().toString();
@@ -69,6 +71,8 @@ public class LoginServiceImpl implements LoginService{
 			userMapper.updateLoginSuccess(userInfo.asUser());
 			
 			return accessTokenResponse;
+		} catch(RedisConnectionFailureException e) {
+			throw new ResponseStatusException(HttpStatus.GATEWAY_TIMEOUT, "Unable to connect to Redis");
 		} catch(Exception e) {
 			userMapper.updateLoginFailure(userInfo.asUser());
 			log.info("USERNAME: [{}], LOGIN ERROR COUNT: [{}]", userInfo.getUserId(), userInfo.getLoginErrCnt() + 1);

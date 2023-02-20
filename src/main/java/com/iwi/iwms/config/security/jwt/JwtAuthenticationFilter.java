@@ -64,9 +64,9 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         
         JwtCode accessTokenStatus = tokenValidation(accessToken);
         
-        log.info("======================================================================================================================");
-        log.info("============== REFRESH TOKEN: {}", CookieUtil.getCookie(request, "refresh_token"));
-        log.info("======================================================================================================================");
+        //log.info("======================================================================================================================");
+        //log.info("============== REFRESH TOKEN: {}", CookieUtil.getCookie(request, "refresh_token"));
+        //log.info("======================================================================================================================");
         
         if(JwtCode.EXPIRED.equals(accessTokenStatus)) {
         	
@@ -80,7 +80,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     		 * 6. 해당 호출에 한해서 passAuthentication으로 임시로 인증받기
     		 */
         	
-        	String refreshToken = CookieUtil.getCookie(request, "refresh_token");
+        	String refreshToken = "refresh_token";//CookieUtil.getCookie(request, "refresh_token");
         	JwtCode refreshTokenStatus = tokenValidation(refreshToken);
         	
         	if(JwtCode.EXPIRED.equals(refreshTokenStatus)) {
@@ -94,7 +94,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         		LoginUserInfo loginUserInfo = objectMapper.convertValue(redis.getHash(ssoId, "user"), LoginUserInfo.class);
         		
         		if(loginUserInfo != null && refreshToken.equals(loginUserInfo.getRefreshToken())) {
-        			log.info("reissue: {}", "리프레시 토큰은 확인했지만 재발급 로직은 없음~~"); 
+        			log.info("reissue: {}", "리프레시 토큰은 확인했지만 재발급 로직 없음~~"); 
         			//AccessTokenResponse accessTokenResponse = keycloakProvidor.reissue(ssoId);
         			
         			//List<String> roles = new ArrayList<>();

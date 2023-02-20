@@ -4,16 +4,17 @@
 <html>
 <head>
 <meta charset="EUC-KR">
-<title>Insert title here</title>
+<title>hello test!</title>
 </head>
 <body>
-hello
+hello test!
 
 	<script>
-		var name = 'access_token';
-		var value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
-		var cookie = value? value[2] : null;
-		console.log("///", cookie)
+		var name = 'refresh_token';
+		var cookie = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+		console.log("cookie: ", cookie);
+		var value = cookie ? cookie[2] : null;
+		console.log("cookie value: ", value);
 	</script>
 </body>
 </html>

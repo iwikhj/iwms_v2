@@ -91,8 +91,7 @@ public class SecurityConfig {
 		http
 		 	.authorizeRequests()
 		 	.antMatchers(HttpMethod.GET, "/v1/user/me").hasRole("IWMS_ADMIN")
-		 	.antMatchers(HttpMethod.GET, "/v1/staff").hasAuthority("ROLE_IWMS_USER")
-		 	.antMatchers(HttpMethod.GET, "/v1/test3").hasRole("IWMS_ADMIN");
+		 	.antMatchers(HttpMethod.GET, "/v1/staff").hasAuthority("ROLE_IWMS_USER");
 	}
 	
 	@Bean
