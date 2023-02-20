@@ -13,6 +13,7 @@ hello test!
 		var name = 'refresh_token';
 		var cookie = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
 		console.log("cookie: ", cookie);
+		
 		var value = cookie ? cookie[2] : null;
 		console.log("cookie value: ", value);
 	</script>
