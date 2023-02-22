@@ -7,9 +7,9 @@
 			FILE.FILE_SEQ AS fileSeq
 			, FILE.FILE_REF_TB AS fileRefTb
 			, FILE.FILE_REF_COL AS fileRefCol
-			, FILE.FILE_REF_VAL AS fileRefVal
+			, FILE.FILE_REF_SEQ AS fileRefSeq
 			, FILE.FILE_GB_CD AS fileGbCd
-			, FILE.FILE_ORD_NUM AS fileOrdNum
+			, FILE.FILE_ORD_ORDER AS fileOrdOrder
 			, FILE.FILE_ORG_NM AS fileOrgNm
 			, FILE.FILE_REAL_NM AS fileRealNm
 			, FILE.FILE_REAL_PATH AS fileRealPath
@@ -21,39 +21,19 @@
 		WHERE FILE.DEL_YN = 'N'
 	</sql>
 	
-	<select id="findAll" parameterType="hashMap"
+	<select id="findAll" parameterType="com.iwi.iwms.api.file.domain.UploadFile"
 		resultType="com.iwi.iwms.api.file.domain.UploadFileInfo">
 		<include refid="selectFile"></include>
-		<if test='search != null and search != ""'>
-			AND FILE.FILE_REF_TB LIKE CONCAT('%', #{search}, '%') 
-			OR FILE.FILE_REF_COL LIKE CONCAT('%', #{search}, '%')
-			OR FILE.FILE_REF_VAL LIKE CONCAT('%', #{search}, '%')
-			OR FILE.FILE_GB_CD LIKE CONCAT('%', #{search}, '%') 
-		</if>			
-		ORDER BY FILE.FILE_REF_TB, FILE.FILE_REF_COL, FILE.FILE_REF_VAL DESC, FILE.FILE_ORD_NUM ASC
-		<if test='pagination != null and pagination != ""'>
-			LIMIT #{pagination.limitPerPage} OFFSET #{pagination.offset}
-		</if>
-	</select>	
-	
-	<select id="count" parameterType="hashMap"
-		resultType="int">
-		SELECT 
-			COUNT(FILE_SEQ)
-		FROM TB_FILE
-		WHERE DEL_YN = 'N'
-		<if test='search != null and search != ""'>
-			AND FILE_REF_TB LIKE CONCAT('%', #{search}, '%') 
-			OR FILE_REF_COL LIKE CONCAT('%', #{search}, '%')
-			OR FILE_REF_VAL LIKE CONCAT('%', #{search}, '%')
-			OR FILE_GB_CD LIKE CONCAT('%', #{search}, '%') 
-		</if>				
+			AND FILE.FILE_REF_TB = #{fileRefTb}
+			AND FILE.FILE_REF_COL = #{fileRefCol}
+			AND FILE.FILE_REF_SEQ = #{fileRefSeq}
+		ORDER BY FILE.FILE_ORD_ORDER
 	</select>	
 	
 	<select id="findBySeq" parameterType="long"
 		resultType="com.iwi.iwms.api.file.domain.UploadFileInfo">
 		<include refid="selectFile"></include>
-		AND FILE.FILE_SEQ = #{fileSeq}
+			AND FILE.FILE_SEQ = #{fileSeq}
 	</select>	
 	
 	<insert id="save" parameterType="com.iwi.iwms.api.file.domain.UploadFile"
@@ -62,9 +42,8 @@
 		(
 		    FILE_REF_TB
 		    , FILE_REF_COL
-			, FILE_REF_VAL
+			, FILE_REF_SEQ
 			, FILE_GB_CD
-			, FILE_ORD_NUM
 			, FILE_ORG_NM
 			, FILE_REAL_NM
 			, FILE_REAL_PATH
@@ -73,9 +52,8 @@
 		) VALUES (
 		    #{fileRefTb}
 			, #{fileRefCol}
-			, #{fileRefVal}
+			, #{fileRefSeq}
 			, #{fileGbCd}
-			, #{fileOrdNum}
 			, #{fileOrgNm}
 			, #{fileRealNm}
 			, #{fileRealPath}
@@ -83,15 +61,8 @@
 			, #{regSeq}
 		)		
 	</insert>		
-
-	<update id="update" parameterType="com.iwi.iwms.api.file.domain.UploadFile">
-		UPDATE TB_FILE 
-		SET
-		    USE_YN = 'Y'
-		WHERE FILE_SEQ = #{fileSeq}	
-	</update>	
 	
-	<delete id="delete" parameterType="com.iwi.iwms.api.file.domain.UploadFile">
+	<delete id="delete" parameterType="long">
 		DELETE 
 		FROM TB_FILE
 		WHERE FILE_SEQ = #{fileSeq}	 
@@ -103,18 +74,18 @@
 				@ROWNUM:=@ROWNUM + 1 AS ROWNUM
 				, FILE_ORD.FILE_REF_TB
 				, FILE_ORD.FILE_REF_COL
-				, FILE_ORD.FILE_REF_VAL 
+				, FILE_ORD.FILE_REF_SEQ 
 				, FILE_ORD.FILE_SEQ
 			FROM TB_FILE FILE_ORD, (SELECT @ROWNUM := 0) RN 
 			WHERE FILE_ORD.FILE_REF_TB = #{fileRefTb}
 			AND FILE_ORD.FILE_REF_COL = #{fileRefCol}
-			AND FILE_ORD.FILE_REF_VAL = #{fileRefVal}
+			AND FILE_ORD.FILE_REF_SEQ = #{fileRefSeq}
 			ORDER BY FILE_ORD.FILE_SEQ) AS R
 		SET 
-			FILE.FILE_ORD_NUM = R.ROWNUM
+			FILE.FILE_ORD_ORDER = R.ROWNUM
 		WHERE FILE.FILE_REF_TB = R.FILE_REF_TB
 		AND FILE.FILE_REF_COL = R.FILE_REF_COL
-		AND FILE.FILE_REF_VAL = R.FILE_REF_VAL
+		AND FILE.FILE_REF_SEQ = R.FILE_REF_SEQ
 		AND FILE.FILE_SEQ = R.FILE_SEQ
 	</update>		
 	

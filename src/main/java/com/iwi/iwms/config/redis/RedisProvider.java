@@ -15,7 +15,7 @@ public class RedisProvider {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
-    public boolean set(String key, Object value, long timeout) {
+    public void set(String key, Object value, long timeout) {
 		/*
 		 * opsForValue String 
 		 * opsForList  List 
@@ -23,37 +23,19 @@ public class RedisProvider {
 		 * opsForZSet  Sorted Set
 		 * opsForHash  Hash
 		 */
-    	
-		try {
-			redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.MILLISECONDS);
-			return true;
-		} catch(Exception e) {}
-		
-		return false;
+    	redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.MILLISECONDS);
     }
 
     public Object get(String key) {
-		try {
-			return redisTemplate.opsForValue().get(key);
-		} catch(Exception e) {}
-		
-		return null;
+    	return redisTemplate.opsForValue().get(key);
     }
 
     public boolean delete(String key) {
-		try {
-			 return redisTemplate.delete(key);
-		} catch(Exception e) {}
-		
-		return false;
+    	return redisTemplate.delete(key);
     }
 
     public boolean hasKey(String key) {
-		try {
-			 return redisTemplate.hasKey(key);
-		} catch(Exception e) {}
-		
-		return false;
+    	return redisTemplate.hasKey(key);
     }
 	
 	public void setHash(String key, String hashKey, Object value, long timeout) {
@@ -62,10 +44,9 @@ public class RedisProvider {
 	}
 	
 	public Object getHash(String key, String hashKey) {
-		try {
+		if(redisTemplate.opsForHash().hasKey(key, hashKey)) {
 			return redisTemplate.opsForHash().get(key, hashKey);
-		} catch(Exception e) {}
-		
+		}
 		return null;
 	}
 

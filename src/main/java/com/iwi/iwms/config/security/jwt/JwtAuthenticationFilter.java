@@ -52,24 +52,13 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         final HttpServletResponse response = (HttpServletResponse) servletResponse;
         
         String accessToken = resolveAuthHeader(request);
-        
-        // 테스트할때 token넣기 귀찮아서 임시로 사용
-        if(!StringUtils.hasText(accessToken)) {
-        	String ssoId = "fdca608f-b7a7-4b87-8a61-273b70bcc88a";
-        	List<String> roles = new ArrayList<>();
-            roles.add("ROLE_IWMS_ADMIN");
-            
-        	passAuthentication(ssoId, roles);
-        }
-        
         JwtCode accessTokenStatus = tokenValidation(accessToken);
-        
-        //log.info("======================================================================================================================");
-        //log.info("============== REFRESH TOKEN: {}", CookieUtil.getCookie(request, "refresh_token"));
-        //log.info("======================================================================================================================");
+        log.info("============== Referer: <{}>", request.getHeader("Referer"));
+        log.info("============== Access token status: <{}>", accessTokenStatus);
+        log.info("============== Refresh token: <{}>", CookieUtil.getCookie(request, "refresh_token"));
         
         if(JwtCode.EXPIRED.equals(accessTokenStatus)) {
-        	
+            
     		/**
     		 * Access token reissue flow
     		 * 1. 쿠키에서 리프레시 토큰 불러오기
@@ -80,14 +69,15 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     		 * 6. 해당 호출에 한해서 passAuthentication으로 임시로 인증받기
     		 */
         	
-        	String refreshToken = "refresh_token";//CookieUtil.getCookie(request, "refresh_token");
+        	String refreshToken = CookieUtil.getCookie(request, "refresh_token");
         	JwtCode refreshTokenStatus = tokenValidation(refreshToken);
+            log.info("============== Refresh token status: <{}>", refreshTokenStatus);
         	
         	if(JwtCode.EXPIRED.equals(refreshTokenStatus)) {
-                sendError(request, response, "리프레시 토큰이 만료되었습니다.");
+    			sendError(request, response, "만료된 리프레시 토큰입니다. 다시 인증해주세요");
                 return;
         	} else if(JwtCode.INVALID.equals(refreshTokenStatus)) {
-        		sendError(request, response, "인증에 실패했습니다.");
+    			sendError(request, response, "리프레시 토큰 검증에 실패했습니다. 다시 인증해주세요");
                 return;
         	} else {
         		String ssoId = getSsoId(refreshToken);
@@ -97,24 +87,31 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
         			log.info("reissue: {}", "리프레시 토큰은 확인했지만 재발급 로직 없음~~"); 
         			//AccessTokenResponse accessTokenResponse = keycloakProvidor.reissue(ssoId);
         			
-        			//List<String> roles = new ArrayList<>();
-                    //roles.add(loginUserInfo.getUserRole());
-        			//passAuthentication(ssoId, loginUserInfo.getRoles());
+        			List<String> roles = new ArrayList<>();
+                    roles.add(loginUserInfo.getUserRole());
+        			passAuthentication(ssoId, roles);
         			
         			//response.setHeader("access_token", accessTokenResponse.getToken());
         			
         		}else {
         			log.info("reissue: {}", "저장된 리프레시 토큰과 일치하지 않음");
-        			sendError(request, response, "인증에 실패했습니다.");
+        			sendError(request, response, "리프레시 토큰 검증에 실패했습니다. 다시 인증해주세요");
         			return;
         		}
         	}
         } else if(JwtCode.INVALID.equals(accessTokenStatus)) {
-        	//sendError(request, response, "인증에 실패했습니다.");
+        	String ssoId = "fdca608f-b7a7-4b87-8a61-273b70bcc88a";
+        	List<String> roles = new ArrayList<>();
+            roles.add("ROLE_IWMS_ADMIN");
+            
+        	passAuthentication(ssoId, roles);
+        	log.info("============== Pass authentication");
+        	
+			//sendError(request, response, "토큰 검증에 실패했습니다. 다시 인증해주세요.");
         	//return;
         }
         
-        chain.doFilter(request,response);
+        chain.doFilter(request, response);
 	}
     
     private String resolveAuthHeader(HttpServletRequest request) {

@@ -31,9 +31,9 @@ public class ReqServiceImpl implements ReqService {
 	}
 
 	@Override
-	public ReqInfo getReqBySeq(long reqSeq) {
-		return Optional.ofNullable(reqMapper.findBySeq(reqSeq))
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청을 찾을 수 없습니다."));
+	public ReqInfo getReqBySeq(Req req) {
+		return Optional.ofNullable(reqMapper.findBySeq(req))
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항을 찾을 수 없습니다."));
 	}
 
 	@Override
@@ -43,16 +43,16 @@ public class ReqServiceImpl implements ReqService {
 
 	@Override
 	public int updateReq(Req req) {
-		Optional.ofNullable(reqMapper.findBySeq(req.getRegSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청을 찾을 수 없습니다."));
+		Optional.ofNullable(reqMapper.findBySeq(req))
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항을 찾을 수 없습니다."));
 		
 		return reqMapper.update(req);
 	}
 
 	@Override
 	public int deleteReq(Req req) {
-		Optional.ofNullable(reqMapper.findBySeq(req.getRegSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청을 찾을 수 없습니다."));
+		Optional.ofNullable(reqMapper.findBySeq(req))
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항을 찾을 수 없습니다."));
 		
 		return reqMapper.delete(req);
 	}

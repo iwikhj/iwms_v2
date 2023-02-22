@@ -15,7 +15,7 @@ public interface ReqMapper {
 	
 	int count(Map<String, Object> map);
 	
-	ReqInfo findBySeq(long reqSeq);
+	ReqInfo findBySeq(Req req);
 	
 	void save(Req req);
 	

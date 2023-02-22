@@ -12,7 +12,7 @@ public interface ReqService {
 	
 	int countReq(Map<String, Object> map);
 
-	ReqInfo getReqBySeq(long reqSeq);
+	ReqInfo getReqBySeq(Req req);
 	
 	void insertReq(Req req);
 	

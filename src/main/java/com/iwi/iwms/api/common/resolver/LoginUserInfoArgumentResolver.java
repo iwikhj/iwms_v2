@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.user.service.UserService;
 import com.iwi.iwms.config.redis.RedisProvider;
+import com.iwi.iwms.utils.CookieUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -54,9 +55,9 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
 		//redis: 로그인 사용자 정보 불러오기 
 		LoginUserInfo loginUserInfo = objectMapper.convertValue(redis.getHash(ssoId, "user"), LoginUserInfo.class);
 
+        log.info("============== User info in Redis: {}", loginUserInfo == null ? "Not found user <null>" : loginUserInfo.getSsoId());
+        
 		if(loginUserInfo == null) {
-			//redis에서 사용자 정보 못불러오면 db에서 불러옴
-			log.info("redis에 사용자 정보가 없음");
 			loginUserInfo = userService.getLoginUser(ssoId);
 		}
 		

@@ -67,13 +67,13 @@ public class ReqController {
     @Operation(summary = "요청 정보", description = "요청 정보")
     @GetMapping(value = "/{reqSeq}")
     public ResponseEntity<ApiResponse<ReqInfo>> getReqBySeq(HttpServletRequest request
-    		, @PathVariable long reqSeq) {
+			, @Parameter(hidden = true) Req req) {
     	
-    	ReqInfo req = reqService.getReqBySeq(reqSeq);
+    	ReqInfo requ = reqService.getReqBySeq(req);
     	
 		return ResponseEntity.ok(ApiResponse.<ReqInfo>builder()
 				.request(request)
-				.data(req)
+				.data(requ)
 				.build());
     }
     

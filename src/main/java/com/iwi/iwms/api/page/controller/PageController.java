@@ -18,8 +18,8 @@ import com.iwi.iwms.api.common.response.Response;
 import com.iwi.iwms.api.comp.domain.CompInfo;
 import com.iwi.iwms.api.comp.service.CompService;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
-import com.iwi.iwms.api.req.domain.ReqInfo;
-import com.iwi.iwms.api.req.service.ReqService;
+import com.iwi.iwms.api.notice.domain.NoticeInfo;
+import com.iwi.iwms.api.notice.service.NoticeService;
 import com.iwi.iwms.utils.Pagination;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,19 +36,18 @@ import lombok.extern.slf4j.Slf4j;
 public class PageController {
 	
 	private final CompService compService;
-	private final ReqService reqService; 
 	
-    @Operation(summary = "소속 페이지 정보", description = "소속 페이지 정보")
+	private final NoticeService noticeService;
+	
+    @Operation(summary = "소속 목록 페이지 정보", description = "소속 목록 페이지 정보")
     @GetMapping(value = "/company")
-    public ResponseEntity<ListResponse<List<CompInfo>>> pageCompanyList(HttpServletRequest request
+    public ResponseEntity<ListResponse<List<CompInfo>>> pageCompany(HttpServletRequest request
     		, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
 			, @RequestParam(value = "search", required = false) String search
 			, @RequestParam(value = "startDate", required = false) String startDate
 			, @RequestParam(value = "endDate", required = false) String endDate
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
-    	
-    	log.info("loginUserInfo: {}", loginUserInfo);
     	
 		Map<String, Object> map = new HashMap<>();
 		map.put("search", search);
@@ -65,20 +64,59 @@ public class PageController {
 				.loginUserInfo(loginUserInfo)
 				.build());
     }
-	
-    @Operation(summary = "요청 사항 페이지 정보", description = "요청 사항 페이지 정보")
-    @GetMapping(value = "/request/{reqSeq}")
-    public ResponseEntity<Response<ReqInfo>> pageRequestList(HttpServletRequest request
-    		, @PathVariable long reqSeq
+    
+    @Operation(summary = "소속 상세 페이지 정보", description = "소속 상세 페이지 정보")
+    @GetMapping(value = "/company/{compSeq}")
+    public ResponseEntity<Response<CompInfo>> pageCompanyDetail(HttpServletRequest request
+    		, @PathVariable long compSeq
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
-    	log.info("loginUserInfo: {}", loginUserInfo);
+    	CompInfo comp = compService.getCompBySeq(compSeq);
     	
-		ReqInfo req = reqService.getReqBySeq(reqSeq);
-    	
-		return ResponseEntity.ok(Response.<ReqInfo>builder()
+		return ResponseEntity.ok(Response.<CompInfo>builder()
 				.request(request)
-				.data(req)
+				.data(comp)
+				.loginUserInfo(loginUserInfo)
+				.build());
+    }
+    
+    @Operation(summary = "공지사항 목록 페이지 정보", description = "공지사항 목록 페이지 정보")
+    @GetMapping(value = "/notice")
+    public ResponseEntity<ListResponse<List<NoticeInfo>>> pageNotice(HttpServletRequest request
+    		, @RequestParam(value = "page", required = false, defaultValue = "1") int page
+			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
+			, @RequestParam(value = "search", required = false) String search
+			, @RequestParam(value = "startDate", required = false) String startDate
+			, @RequestParam(value = "endDate", required = false) String endDate
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+    	
+		Map<String, Object> map = new HashMap<>();
+		map.put("search", search);
+		map.put("startDate", startDate);
+		map.put("endDate", endDate);
+		map.put("pagination", new Pagination(page, limit, noticeService.countNotice(map)));
+    	
+    	List<NoticeInfo> noticelist = noticeService.listNotice(map);
+    	
+		return ResponseEntity.ok(ListResponse.<List<NoticeInfo>>builder()
+				.request(request)
+				.data(noticelist)
+				.query(map)
+				.loginUserInfo(loginUserInfo)
+				.build());
+    }
+    
+    @Operation(summary = "공지사항 상세 페이지 정보", description = "공지사항 상세 페이지 정보")
+    @GetMapping(value = "/notice/{noticeSeq}")
+    public ResponseEntity<Response<NoticeInfo>> pageNoticeDetail(HttpServletRequest request
+    		, @PathVariable long noticeSeq
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+    	
+    	NoticeInfo notice = noticeService.getNoticeBySeq(noticeSeq);
+    	
+		return ResponseEntity.ok(Response.<NoticeInfo>builder()
+				.request(request)
+				.data(notice)
 				.loginUserInfo(loginUserInfo)
 				.build());
     }

@@ -35,7 +35,7 @@ public class LoggingAspect {
         long endAt = System.currentTimeMillis();
         log.info("RESPONSE: {}[{}] {} ({}ms)", pjp.getSignature().getDeclaringTypeName(), pjp.getSignature().getName(), result, endAt - startAt);
 
-        return pjp.proceed();
+        return result;
     }
 
     private String paramMapToString(Map<String, String[]> paramMap) {

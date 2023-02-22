@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwi.iwms.api.notice.mapper.NoticeMapper">
+
+	<resultMap id="resultNoticeMap" type="com.iwi.iwms.api.notice.domain.NoticeInfo">
+		<result property="noticeSeq" column="noticeSeq"/>
+		<result property="compSeq" column="compSeq"/>
+		<result property="compNm" column="compNm"/>
+		<result property="title" column="title"/>
+		<result property="content" column="content"/>
+		<result property="fixedTopYn" column="fixedTopYn"/>
+		<result property="mainTopYn" column="mainTopYn"/>
+		<result property="viewCnt" column="viewCnt"/>
+		<result property="delYn" column="delYn"/>
+		<result property="regDt" column="regDt"/>
+		<result property="regNm" column="regNm"/>
+		<result property="updtDt" column="updtDt"/>
+		<result property="updtNm" column="updtNm"/>
+		
+	   	<collection property="attachedFiles" column="noticeSeq" 
+			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="attachedFiles"/>
+	</resultMap>
+
+	<select id="attachedFiles" resultType="com.iwi.iwms.api.file.domain.UploadFileInfo">
+		SELECT 
+			FILE.FILE_SEQ AS fileSeq
+			, FILE.FILE_REF_TB AS fileRefTb
+			, FILE.FILE_REF_COL AS fileRefCol
+			, FILE.FILE_REF_SEQ AS fileRefSeq
+			, FILE.FILE_GB_CD AS fileGbCd
+			, FILE.FILE_ORD_ORDER AS fileOrdOrder
+			, FILE.FILE_ORG_NM AS fileOrgNm
+			, FILE.FILE_REAL_NM AS fileRealNm
+			, FILE.FILE_REAL_PATH AS fileRealPath
+			, CONCAT('/v1/file/download/', FILE.FILE_SEQ) AS fileDownloadUri
+			, FILE.DEL_YN AS delYn
+			, DATE_FORMAT(FILE.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+			, REG_USER.USER_NM AS regNm
+		FROM TB_FILE FILE
+		LEFT JOIN TB_USER REG_USER ON FILE.REG_SEQ = REG_USER.USER_SEQ
+		WHERE FILE.FILE_REF_TB = 'TB_NOTICE'
+			AND FILE.FILE_REF_COL = 'NOTICE_SEQ'
+			AND FILE.FILE_REF_SEQ = #{noticeSeq}
+		ORDER BY FILE.FILE_ORD_ORDER
+	</select>
+		
+	<sql id="selectNotice">
+		SELECT 
+			NOTI.NOTICE_SEQ AS noticeSeq
+			, NOTI.COMP_SEQ AS compSeq
+			, COMP.COMP_NM AS compNm	
+			, NOTI.TITLE AS title
+			, NOTI.CONTENT AS content
+			, NOTI.FIXED_TOP_YN AS fixedTopYn
+			, NOTI.MAIN_TOP_YN AS mainTopYn
+			, NOTI.VIEW_CNT AS viewCnt
+			, NOTI.DEL_YN AS delYn
+			, DATE_FORMAT(NOTI.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+			, REG_USER.USER_NM AS regNm
+			, DATE_FORMAT(NOTI.UPDT_DT, "%Y-%m-%d %H:%i:%s") AS updtDt
+			, UPDT_USER.USER_NM AS updtNm
+		FROM TB_NOTICE NOTI
+		LEFT JOIN TB_COMPANY COMP ON NOTI.COMP_SEQ = COMP.COMP_SEQ
+		LEFT JOIN TB_USER REG_USER ON NOTI.REG_SEQ = REG_USER.USER_SEQ
+		LEFT JOIN TB_USER UPDT_USER ON NOTI.UPDT_SEQ = UPDT_USER.USER_SEQ 
+		WHERE NOTI.DEL_YN = 'N'
+	</sql>
+	
+	<select id="findAll" parameterType="hashMap"
+		resultMap="resultNoticeMap">
+		<include refid="selectNotice"></include>
+		<if test='search != null and search != ""'>
+			AND NOTI.TITLE LIKE CONCAT('%', #{search}, '%') 
+			OR NOTI.CONTENT LIKE CONCAT('%', #{search}, '%') 
+			OR COMP.COMP_NM LIKE CONCAT('%', #{search}, '%') 
+		</if>			
+		ORDER BY NOTI.NOTICE_SEQ DESC
+		<if test='pagination != null and pagination != ""'>
+			LIMIT #{pagination.limitPerPage} OFFSET #{pagination.offset}
+		</if>
+	</select>	
+	
+	<select id="count" parameterType="hashMap"
+		resultType="int">
+		SELECT 
+			COUNT(NOTI.NOTICE_SEQ)
+		FROM TB_NOTICE NOTI
+		LEFT JOIN TB_COMPANY COMP ON NOTI.COMP_SEQ = COMP.COMP_SEQ
+		WHERE NOTI.DEL_YN = 'Y'
+		<if test='search != null and search != ""'>
+			AND NOTI.TITLE LIKE CONCAT('%', #{search}, '%') 
+			OR NOTI.CONTENT LIKE CONCAT('%', #{search}, '%') 
+			OR COMP.COMP_NM LIKE CONCAT('%', #{search}, '%') 
+		</if>				
+	</select>		
+	
+	<select id="findBySeq" parameterType="long"
+		resultMap="resultNoticeMap">
+		<include refid="selectNotice"></include>
+		AND NOTI.NOTICE_SEQ = #{noticeSeq}
+	</select>	
+
+	<insert id="save" parameterType="com.iwi.iwms.api.notice.domain.Notice"
+		useGeneratedKeys="true" keyProperty="noticeSeq">
+		INSERT INTO TB_NOTICE
+		(
+		    COMP_SEQ
+		    , TITLE
+			, CONTENT
+			, FIXED_TOP_YN
+		    , MAIN_TOP_YN
+		    , VIEW_CNT
+			, DEL_YN
+			, REG_DT
+			, REG_SEQ
+		) VALUES (
+			 #{compSeq}
+		    , #{title}
+			, #{content}
+			, #{fixedTopYn}
+			, #{mainTopYn}
+			, 0
+			, 'N'
+			, CURRENT_TIMESTAMP
+			, #{regSeq}
+		)		
+	</insert>		
+
+	<update id="update" parameterType="com.iwi.iwms.api.notice.domain.Notice">
+		UPDATE TB_NOTICE 
+		SET
+			COMP_SEQ = #{compSeq}
+		    , TITLE = #{title}
+			, CONTENT = #{content}
+			, FIXED_TOP_YN = #{fixedTopYn}
+			, MAIN_TOP_YN = #{mainTopYn}
+			, COMP_SEQ = #{compSeq}
+			, UPDT_DT = CURRENT_TIMESTAMP
+			, UPDT_SEQ = #{updtSeq}
+		WHERE NOTICE_SEQ = #{noticeSeq}	
+	</update>	
+	
+	<delete id="delete" parameterType="com.iwi.iwms.api.notice.domain.Notice">
+		DELETE 
+		FROM TB_NOTICE
+		WHERE NOTICE_SEQ = #{noticeSeq}	 
+	</delete>
+	
+	
+	<update id="updateViewCnt" parameterType="long">
+		UPDATE TB_NOTICE 
+		SET
+		    VIEW_CNT = VIEW_CNT + 1
+		WHERE NOTICE_SEQ = #{noticeSeq}	 
+	</update>
+			
+</mapper>

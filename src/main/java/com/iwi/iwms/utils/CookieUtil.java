@@ -9,18 +9,21 @@ import javax.servlet.http.HttpServletResponse;
 public class CookieUtil {
 
 	public static String getCookie(HttpServletRequest request, String name) {
+		if(request.getCookies() == null)
+			return null;
+		
 		return Arrays.stream(request.getCookies())
 				.filter(c -> name.equals(c.getName()))
 				.map(Cookie::getValue)
 				.findAny()
-				.orElse("");
+				.orElse(null);
 	}
 
 	public static void setCookie(HttpServletResponse response, String name, String value, boolean httpOnly) {
 		Cookie cookie = new Cookie(name, value);
 		cookie.setPath("/");
-		cookie.setSecure(true);
-		cookie.setMaxAge(60 * 60 * 24 * 30);
+		cookie.setSecure(false);
+		cookie.setMaxAge(60 * 60 * 24 * 7);
 		cookie.setHttpOnly(httpOnly);
 		
 		response.addCookie(cookie);
@@ -28,7 +31,6 @@ public class CookieUtil {
 	
 	public static void delCookie(HttpServletResponse response, String name) {
 		Cookie cookie = new Cookie(name, null);
-		cookie.setPath("/");
 		cookie.setMaxAge(0);
 		response.addCookie(cookie);
 	}

@@ -15,19 +15,19 @@ import lombok.ToString;
 public class FileStorageResponse {
 
 	@Schema(description = "원본 파일 이름") 
-	private String name;
+	private String originalFilename;
 	
-	@Schema(description = "서버에 저장된 파일 이름") 
-	private String rename;
+	@Schema(description = "실제 파일 이름") 
+	private String filename;
+	
+	@Schema(description = "파일 링크")
+    private String link;
 	
 	@Schema(description = "MimeType")
 	private String type;
     
 	@Schema(description = "파일 크기")
     private long size;
-    
-	@Schema(description = "파일 접근 경로")
-    private String url;
     
 	@Schema(description = "생성 일시")
     private String lastModified;

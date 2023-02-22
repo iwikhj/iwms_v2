@@ -24,13 +24,13 @@ public class UploadFileInfo {
 	private String fileRefCol;
 	
 	@Schema(description = "첨부 파일 키값")
-	private String fileRefVal;
+	private String fileRefSeq;
 	
 	@Schema(description = "첨부 파일 구분")
 	private String fileGbCd;
 	
 	@Schema(description = "첨부 파일 정렬 순서")
-	private String fileOrdNum;
+	private int fileOrdOrder;
 	
 	@Schema(description = "첨부 파일 원본 이름")
 	private String fileOrgNm;
@@ -40,6 +40,9 @@ public class UploadFileInfo {
 	
 	@Schema(description = "첨부 파일 저장 경로")
 	private String fileRealPath;
+	
+	@Schema(description = "첨부 파일 다운로드 URI")
+	private String fileDownloadUri;
 	
 	@Schema(description = "삭제 여부") 
 	private String delYn;

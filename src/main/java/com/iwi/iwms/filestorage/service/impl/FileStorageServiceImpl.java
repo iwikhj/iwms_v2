@@ -6,9 +6,12 @@ import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
+import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -17,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.iwi.iwms.filestorage.FileStorageResponse;
 import com.iwi.iwms.filestorage.service.FileStorageService;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 @RequiredArgsConstructor
 public class FileStorageServiceImpl implements FileStorageService {
+	
+	private final Tika tika = new Tika();
 	
 	private Path rootPath;
 	
@@ -42,23 +48,53 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 	
 	@Override
-	public void store(MultipartFile multipartFile, String path, String filename) {
+	public FileStorageResponse store(MultipartFile multipartFile, Path path, String filename) {
         try {
         	Path forder = rootPath.resolve(path).normalize();
         	if (!Files.exists(forder)) {
         		Files.createDirectories(forder);
         	}
         	
+        	String originalFilename = multipartFile.getOriginalFilename();
+        	
         	Path target = forder.resolve(filename);
         	File file = target.toFile();
         	
         	multipartFile.transferTo(file);
         	
+          	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+          	
+        	return FileStorageResponse.builder()
+        		.originalFilename(originalFilename)
+        		.filename(filename)
+        		.link("/v1/file/link/" + path.toString().replace("\\", "/") + "/" + filename)
+        		.type(tika.detect(file))
+        		.size(file.length())
+        		.lastModified(sdf.format(file.lastModified()))
+        		.build();
+        	
         } catch (IOException e) {
     		throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
 	}
-
+	
+	@Override
+	public Path move(Path source, Path target) {
+		try {
+        	source = rootPath.resolve(source).normalize();
+        	if (!Files.exists(source)) {
+        		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Source file not found");
+        	}
+        	
+        	target = rootPath.resolve(target).normalize();
+        	
+        	return Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
+        	
+        } catch (IOException e) {
+    		throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+	}
+	
 	@Override
 	public Stream<Path> loadAll() {
 		// TODO Auto-generated method stub
@@ -74,8 +110,6 @@ public class FileStorageServiceImpl implements FileStorageService {
 	@Override
 	public Resource loadAsResource(final Path path) {
 		Path target = rootPath.resolve(path).normalize();
-		log.info("target path: {}", target.toString());
-		
     	if (!Files.exists(target)) {
     		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found.");
     	}

@@ -13,7 +13,6 @@ import lombok.Getter;
 import lombok.ToString;
 
 @Getter
-@ToString
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class ApiListResponse<T> {
 

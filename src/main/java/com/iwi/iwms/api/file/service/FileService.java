@@ -1,25 +1,18 @@
 package com.iwi.iwms.api.file.service;
 
 import java.nio.file.Path;
-import java.util.List;
-import java.util.Map;
 
 import org.springframework.core.io.Resource;
+import org.springframework.web.multipart.MultipartFile;
 
-import com.iwi.iwms.api.file.domain.UploadFile;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
+import com.iwi.iwms.filestorage.FileStorageResponse;
 
 public interface FileService {
 
-	List<UploadFileInfo> listUploadFile(Map<String, Object> map);
+	FileStorageResponse upload(MultipartFile multipartFile, Path path);
 	
-	int countUploadFile(Map<String, Object> map);
-
-	UploadFileInfo getUploadFileInfoBySeq(long fileSeq);
+	UploadFileInfo getFileBySeq(long fileSeq);
 	
-	UploadFileInfo insertUploadFile(UploadFile uploadFile);
-	
-	int deleteUploadFile(UploadFile uploadFile);
-	
-	Resource getUploadFileResource(Path path);
+	Resource getFileResource(Path path);
 }

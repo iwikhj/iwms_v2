@@ -21,7 +21,7 @@ public class Code {
 	@Schema(hidden = true, description = "코드 SEQ")
 	private long codeSeq;
 	
-	@NotNull(message = "코드는 필수 입력값입니다.")
+	@NotNull(message = "코드는 필수 입력 사항입니다.")
 	@Schema(description = "코드")
 	private String codeCd;
 	

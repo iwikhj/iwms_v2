@@ -55,6 +55,8 @@ public class LoginServiceImpl implements LoginService{
 				redis.delete(ssoId);
 			}
 			
+			loginUserInfo.setRefreshToken(accessTokenResponse.getRefreshToken());
+			
 			long timeout = Duration.ofSeconds(accessTokenResponse.getRefreshExpiresIn()).toMillis();
 			redis.setHash(ssoId, "user", loginUserInfo, timeout);
 			
@@ -63,7 +65,7 @@ public class LoginServiceImpl implements LoginService{
 			response.setHeader("refresh_token", accessTokenResponse.getRefreshToken());
 			
 			// 리프레시 토큰은 쿠키에 담아서 저장한다.
-			//CookieUtil.setCookie(response, "refresh_token", accessTokenResponse.getRefreshToken(), false);
+			CookieUtil.setCookie(response, "refresh_token", accessTokenResponse.getRefreshToken(), false);
 
 			// 로그인한 사용자의 접속IP를 저장 및 LOGIN_ERR_CNT 초기화. 
 			String accessIp = request.getRemoteAddr().toString();
