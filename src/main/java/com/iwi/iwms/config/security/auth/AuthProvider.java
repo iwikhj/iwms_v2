@@ -1,8 +1,6 @@
-package com.iwi.iwms.config.security.keycloak;
+package com.iwi.iwms.config.security.auth;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.core.Response;
@@ -21,24 +19,21 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.iwi.iwms.config.retrofit.RetrofitProvider;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import retrofit2.Call;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class KeycloakProvider {
+public class AuthProvider {
 
-	private final Map<String, TokenManager> tokenManagerMap = new HashMap<String, TokenManager>();
-	
-	private final JwtDecoder jwtDecoder;
-	
 	@Value("${keycloak.auth-server-url}")
 	private String authServerUrl;
 	
@@ -53,6 +48,10 @@ public class KeycloakProvider {
 	
 	@Value("${keycloak.auth.client-id}")
 	private String authClientId;
+	
+	private final RetrofitProvider retrofitProvider;
+	
+	private final AuthTokenApi authTokenApi;
 	
 	/**
 	 * 토큰 발급
@@ -72,26 +71,39 @@ public class KeycloakProvider {
                 .build();
         
         TokenManager tokenManager = keycloak.tokenManager();
-        AccessTokenResponse response = tokenManager.grantToken();
+        AccessTokenResponse accessTokenResponse = tokenManager.grantToken();
         
-        Jwt jwt = jwtDecoder.decode(response.getToken());
-        //tokenManager.setMinTokenValidity(response.getRefreshExpiresIn());
-        tokenManagerMap.put(jwt.getSubject(), tokenManager);
-        return response;
+        keycloak.close();
+        
+        return accessTokenResponse;
 	}
 	
 	/**
-	 * 토큰 재발급
-	 * @param String ssoId
-	 * @return AccessTokenResponse
+	 * 액세스 토큰 재발급
+	 * @param String refreshToken
+	 * @return ReissueResponse
 	 */
-	public AccessTokenResponse reissue(@NotNull String ssoId) {
-		if(tokenManagerMap.containsKey(ssoId)) {
-			return tokenManagerMap.get(ssoId).refreshToken();
-		} else {
-			log.info("tokenManagerMap에 {}와 일치하는 데이터가 없음", ssoId);
+	public ReissueResponse reissue(@NotNull String refreshToken) {
+		if(!StringUtils.hasText(refreshToken)) {
+			return null;
 		}
-		return null;
+    	Call<ReissueResponse> call = authTokenApi.reissue(OAuth2Constants.REFRESH_TOKEN, refreshToken, authClientId);
+		return retrofitProvider.execute(call);
+	}
+	
+	/**
+	 * 토큰 검사
+	 * @param String token
+	 * @return IntrospectResponse
+	 */
+	public IntrospectResponse tokenIntrospect(String token) {
+		if(!StringUtils.hasText(token)) {
+			return IntrospectResponse.builder()
+					.active(false)
+					.build();
+		}
+    	Call<IntrospectResponse> call = authTokenApi.introspect(token, clientId, clientSecret);
+    	return retrofitProvider.execute(call);
 	}
 	
 	/**
@@ -121,13 +133,14 @@ public class KeycloakProvider {
         UsersResource usersResource = realmResource.users();
         
         boolean result = usersResource.list().stream().anyMatch(v -> v.getUsername().equals(username));
-        keycloak.close();
         
         if(result) {
         	log.info("Username already registered: {}", username);
         } else {
         	log.info("Username available: {}", username);
         }
+        
+        keycloak.close();
         
         return result;
 	}
@@ -303,9 +316,5 @@ public class KeycloakProvider {
         log.info("Deleted a user by userId: {}", ssoId);
         
         keycloak.close();
-        
-        if(tokenManagerMap.containsKey(ssoId)) {
-        	tokenManagerMap.remove(ssoId);
-        }
 	}
 }

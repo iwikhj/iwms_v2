@@ -1,4 +1,4 @@
-package com.iwi.iwms.config.security;
+package com.iwi.iwms.config.security.auth;
 
 import java.util.Collection;
 
@@ -36,7 +36,7 @@ public class QuickGuideUser implements UserDetails {
 	@Schema(description = "계정 만료 여부. true: 만료 안됨, false: 만료")
     private boolean isAccountNonExpired;
 	
-	@Schema(description = "계정 잠김 여부. true: 잠기지 안됨, false: 잠김")
+	@Schema(description = "계정 잠김 여부. true: 잠기지 않음, false: 잠김")
     private boolean isAccountNonLocked;
 	
 	@Schema(description = "비밀번호 만료 여부. true: 만료 안됨, false: 만료")

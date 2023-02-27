@@ -12,6 +12,9 @@ import lombok.ToString;
 @AllArgsConstructor
 public class SiteInfo {
 
+	@Schema(description = "번호")
+	private long rowNum;
+	
 	@Schema(description = "사이트 SEQ")
 	private long siteSeq;
 	
@@ -44,6 +47,9 @@ public class SiteInfo {
 	
 	@Schema(description = "사이트 구분 코드: [01: A, 02: B, 03: C, 04: D]") 
 	private String siteGbCd;
+	
+	@Schema(description = "사이트 구분") 
+	private String siteGb;
 	
 	@Schema(description = "사용 여부")
 	private String useYn;

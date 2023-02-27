@@ -1,9 +1,9 @@
-package com.iwi.iwms.config.security.jwt;
+package com.iwi.iwms.config.security.auth;
 
 import lombok.Getter;
 
 @Getter
-public enum JwtCode {
+public enum AuthCode {
 
 	VERIFIED("Verified"),
 	EXPIRED("Expired"),
@@ -12,7 +12,7 @@ public enum JwtCode {
 	
 	private String message;
 
-	private JwtCode(String message) {
+	private AuthCode(String message) {
 		this.message = message;
 	}
 }

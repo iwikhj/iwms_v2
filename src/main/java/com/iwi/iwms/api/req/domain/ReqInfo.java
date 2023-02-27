@@ -1,5 +1,9 @@
 package com.iwi.iwms.api.req.domain;
 
+import java.util.List;
+
+import com.iwi.iwms.api.file.domain.UploadFileInfo;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,10 +18,13 @@ import lombok.ToString;
 @AllArgsConstructor
 public class ReqInfo {
 
-	@Schema(description = "요청 SEQ")
+	@Schema(description = "번호")
+	private long rowNum;
+	
+	@Schema(description = "유지보수 SEQ")
 	private long reqSeq;
 	
-	@Schema(description = "요청 번호: R{YY}-{000001}") 
+	@Schema(description = "유지보수 번호") 
 	private String reqNo;
 
 	@Schema(description = "소속 SEQ")
@@ -38,25 +45,25 @@ public class ReqInfo {
 	@Schema(description = "사이트 이름")
 	private String siteNm;
 	
-	@Schema(description = "요청일: YYYYMMDD")
+	@Schema(description = "유지보수 등록일")
 	private String reqYmd;
 	
-	@Schema(description = "요청사항 타입 코드: [00: 일반, 99: 긴급]") 
+	@Schema(description = "유지보수 타입 코드") 
 	private String reqTypeCd;
 	
-	@Schema(description = "요청사항 타입") 
+	@Schema(description = "유지보수 타입") 
 	private String reqType;
 	
-	@Schema(description = "요청사항 구분 코드: [00: 오류, 01: 개선, 02: 추가, 99: 기타]") 
+	@Schema(description = "유지보수 구분 코드") 
 	private String reqGbCd;
 	
-	@Schema(description = "요청사항 구분") 
+	@Schema(description = "유지보수 구분") 
 	private String reqGb;
 
-	@Schema(description = "요청사항 완료일: YYYYMMDD")
+	@Schema(description = "유지보수 완료일 예정일")
 	private String reqEndYmd;
 	
-	@Schema(description = "요청사항 내용") 
+	@Schema(description = "유지보수 내용") 
 	private String reqContentsTxt;
 	
 	@Schema(description = "합의 여부") 
@@ -76,6 +83,9 @@ public class ReqInfo {
 	
 	@Schema(description = "삭제(취소) 사유") 
 	private String reasonTxt;
+	
+	@Schema(description = "첨부된 파일 정보")
+	private List<UploadFileInfo> attachedFiles;
 	
 	@Schema(description = "등록 일자") 
 	private String regDt;

@@ -4,7 +4,8 @@
 
 	<sql id="selectSite">
 		SELECT 
-			SITE.SITE_SEQ AS siteSeq
+			ROW_NUMBER() OVER(ORDER BY SITE.SITE_SEQ) AS rowNum
+			, SITE.SITE_SEQ AS siteSeq
 			, SITE.COMP_SEQ AS compSeq
 			, COMP.COMP_NM AS compNm
 			, SITE.PROJ_SEQ AS projSeq
@@ -15,6 +16,7 @@
 			, SITE.SITE_NM AS siteNm
 			, SITE.SITE_SW_NM AS siteSwNm
 			, SITE.SITE_GB_CD AS siteGbCd
+			, SITE_GB_CODE.CODE_NM AS siteGb
 			, SITE.USE_YN AS useYn
 			, DATE_FORMAT(SITE.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 			, REG_USER.USER_NM AS regNm
@@ -23,21 +25,17 @@
 		FROM TB_SITE SITE
 		INNER JOIN TB_COMPANY COMP ON SITE.COMP_SEQ = COMP.COMP_SEQ
 		INNER JOIN TB_PROJ PROJ ON SITE.PROJ_SEQ = PROJ.PROJ_SEQ
-		LEFT JOIN TB_CODE CODE ON SITE.SITE_GB_CD = CODE.CODE_CD AND CODE.UP_CODE_CD = 'SITE_GB_CD'    
+		LEFT JOIN TB_CODE SITE_GB_CODE ON SITE.SITE_GB_CD = SITE_GB_CODE.CODE_CD AND SITE_GB_CODE.UP_CODE_CD = 'SITE_GB_CD'    
 		LEFT JOIN TB_USER REG_USER ON SITE.REG_SEQ = REG_USER.USER_SEQ
 		LEFT JOIN TB_USER UPDT_USER ON SITE.UPDT_SEQ = UPDT_USER.USER_SEQ 
 		WHERE SITE.USE_YN = 'Y'
-		<if test='compSeq != null and compSeq != ""'>
-			AND PROJ.COMP_SEQ = #{compSeq}
-		</if>
-		<if test='projSeq != null and projSeq != ""'>
-			AND PROJ.PROJ_SEQ = #{projSeq}
-		</if>		
 	</sql>
 	
 	<select id="findAll" parameterType="hashMap"
 		resultType="com.iwi.iwms.api.comp.domain.SiteInfo">
 		<include refid="selectSite"></include>
+			AND PROJ.COMP_SEQ = #{compSeq}
+			AND PROJ.PROJ_SEQ = #{projSeq}
 		<if test='search != null and search != ""'>
 			AND SITE.SITE_NM LIKE CONCAT('%', #{search}, '%') 
 			OR SITE.SITE_SW_NM LIKE CONCAT('%', #{search}, '%') 
@@ -57,12 +55,8 @@
 		INNER JOIN TB_COMPANY COMP ON SITE.COMP_SEQ = COMP.COMP_SEQ
 		INNER JOIN TB_PROJ PROJ ON SITE.PROJ_SEQ = PROJ.PROJ_SEQ
 		WHERE SITE.USE_YN = 'Y'
-		<if test='compSeq != null and compSeq != ""'>
 			AND PROJ.COMP_SEQ = #{compSeq}
-		</if>
-		<if test='projSeq != null and projSeq != ""'>
 			AND PROJ.PROJ_SEQ = #{projSeq}
-		</if>	
 		<if test='search != null and search != ""'>
 			AND SITE.SITE_NM LIKE CONCAT('%', #{search}, '%') 
 			OR SITE.SITE_SW_NM LIKE CONCAT('%', #{search}, '%') 
@@ -73,7 +67,7 @@
 	<select id="findBySeq" parameterType="com.iwi.iwms.api.comp.domain.Site"
 		resultType="com.iwi.iwms.api.comp.domain.SiteInfo">
 		<include refid="selectSite"></include>
-		AND SITE.SITE_SEQ = #{siteSeq}
+			AND SITE.SITE_SEQ = #{siteSeq}
 	</select>	
 
 	<insert id="save" parameterType="com.iwi.iwms.api.comp.domain.Site"

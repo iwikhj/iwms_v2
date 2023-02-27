@@ -12,6 +12,9 @@ import lombok.ToString;
 @AllArgsConstructor
 public class PositionInfo {
 	
+	@Schema(description = "번호")
+	private long rowNum;
+	
 	@Schema(description = "직급 SEQ")
 	private long positionSeq;
 

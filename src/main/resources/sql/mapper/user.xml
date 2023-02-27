@@ -5,7 +5,8 @@
 	<!-- 사용자 조회 -->
 	<sql id="selectUser">
 		SELECT 
-			USER.USER_SEQ AS userSeq
+			ROW_NUMBER() OVER(ORDER BY USER.USER_SEQ) AS rowNum
+			, USER.USER_SEQ AS userSeq
 			, USER.USER_ID AS userId
 			, USER.USER_NM AS userNm
 			, USER.USER_GB_CD AS userGbCd
@@ -274,7 +275,7 @@
 			, MENU.MENU_DESC AS menuDesc
 			, MENU.PAGE_URL AS pageUrl
 			, MENU.PAGE_TARGET AS pageTarget
-		    , CASE WHEN ROLL_MENU.USER_ROLL_MENU_SEQ IS NOT NULL THEN 'Y' ELSE 'N' END AS hasPermission
+		    , CASE WHEN ROLL_MENU.USER_ROLL_MENU_SEQ IS NULL THEN 'N' ELSE 'Y' END AS hasPermission
 		    , ROLL_MENU.USER_SEQ AS userSeq
 		FROM TB_MENU MENU
 		LEFT JOIN 

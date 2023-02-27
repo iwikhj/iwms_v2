@@ -1,14 +1,15 @@
 package com.iwi.iwms.api.login.service;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.keycloak.representations.AccessTokenResponse;
 
 import com.iwi.iwms.api.login.domain.Login;
+import com.iwi.iwms.api.login.domain.Reissue;
+import com.iwi.iwms.config.security.auth.ReissueResponse;
 
 public interface LoginService {
 
-	AccessTokenResponse login(HttpServletRequest request, HttpServletResponse response, Login login);
+	AccessTokenResponse login(Login login);
+	
+	ReissueResponse reissue(Reissue reissue);
 	
 }

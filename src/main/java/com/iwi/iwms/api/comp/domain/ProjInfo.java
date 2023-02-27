@@ -12,6 +12,9 @@ import lombok.ToString;
 @AllArgsConstructor
 public class ProjInfo {
 
+	@Schema(description = "번호")
+	private long rowNum;
+	
 	@Schema(description = "프로젝트 SEQ")
 	private long projSeq;
 	

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.http.MediaType;
@@ -28,13 +29,16 @@ import com.iwi.iwms.api.user.domain.User;
 import com.iwi.iwms.api.user.domain.UserInfo;
 import com.iwi.iwms.api.user.domain.UserUpdate;
 import com.iwi.iwms.api.user.service.UserService;
+import com.iwi.iwms.utils.CookieUtil;
 import com.iwi.iwms.utils.Pagination;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Tag(name = "User", description = "IWMS 사용자 관리")
 @RequiredArgsConstructor
 @RestController
@@ -139,7 +143,7 @@ public class UserController {
     
     @Operation(summary = "내 정보", description = "내 정보")
     @GetMapping(value = "/me")
-    public ResponseEntity<ApiResponse<UserInfo>> getMe(HttpServletRequest request
+    public ResponseEntity<ApiResponse<UserInfo>> getMe(HttpServletRequest request, HttpServletResponse response
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
 
     	UserInfo user = userService.getUserBySeq(loginUserInfo.getUserSeq());

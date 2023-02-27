@@ -4,7 +4,8 @@
 
 	<sql id="selectComp">
 		SELECT 
-			COMP.COMP_SEQ AS compSeq
+			ROW_NUMBER() OVER(ORDER BY COMP.COMP_SEQ) AS rowNum
+			, COMP.COMP_SEQ AS compSeq
 			, COMP.COMP_NM AS compNm
 			, COMP.COMP_GB_CD AS compGbCd
 			, COMP.COMP_TEL AS compTel

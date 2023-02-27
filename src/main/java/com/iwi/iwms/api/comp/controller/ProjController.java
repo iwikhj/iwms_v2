@@ -19,8 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.common.response.ApiListResponse;
+import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.comp.domain.Proj;
 import com.iwi.iwms.api.comp.domain.ProjInfo;
 import com.iwi.iwms.api.comp.service.ProjService;
@@ -41,9 +41,9 @@ public class ProjController {
 	private final ProjService projService; 
 
 	@Operation(summary = "프로젝트 목록", description = "프로젝트 목록")
-	@GetMapping(value = "/project")
+	@GetMapping(value = {"/{compSeq}/project"})
 	public ResponseEntity<ApiListResponse<List<ProjInfo>>> listProj(HttpServletRequest request
-			, @RequestParam(value = "compSeq", required = false) Long compSeq
+			, @PathVariable String compSeq
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
 			, @RequestParam(value = "search", required = false) String search

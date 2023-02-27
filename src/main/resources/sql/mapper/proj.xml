@@ -4,7 +4,8 @@
 
 	<sql id="selectProj">
 		SELECT 
-			PROJ.PROJ_SEQ AS projSeq
+			ROW_NUMBER() OVER(ORDER BY PROJ.PROJ_SEQ) AS rowNum
+			, PROJ.PROJ_SEQ AS projSeq
 			, PROJ.COMP_SEQ AS compSeq
 			, COMP.COMP_NM AS compNm
 			, PROJ.PROJ_NM AS projNm
@@ -21,14 +22,12 @@
 		LEFT JOIN TB_USER REG_USER ON PROJ.REG_SEQ = REG_USER.USER_SEQ
 		LEFT JOIN TB_USER UPDT_USER ON PROJ.UPDT_SEQ = UPDT_USER.USER_SEQ 
 		WHERE PROJ.USE_YN = 'Y'
-		<if test='compSeq != null and compSeq != ""'>
-			AND PROJ.COMP_SEQ = #{compSeq}
-		</if>
 	</sql>
 	
 	<select id="findAll" parameterType="hashMap"
 		resultType="com.iwi.iwms.api.comp.domain.ProjInfo">
 		<include refid="selectProj"></include>
+			AND PROJ.COMP_SEQ = #{compSeq}
 		<if test='search != null and search != ""'>
 			AND PROJ.PROJ_NM LIKE CONCAT('%', #{search}, '%') 
 			OR PROJ.PROJ_SW_NM LIKE CONCAT('%', #{search}, '%') 
@@ -47,9 +46,7 @@
 		FROM TB_PROJ PROJ
 		INNER JOIN TB_COMPANY COMP ON PROJ.COMP_SEQ = COMP.COMP_SEQ
 		WHERE PROJ.USE_YN = 'Y'
-		<if test='compSeq != null and compSeq != ""'>
 			AND PROJ.COMP_SEQ = #{compSeq}
-		</if>
 		<if test='search != null and search != ""'>
 			AND PROJ.PROJ_NM LIKE CONCAT('%', #{search}, '%') 
 			OR PROJ.PROJ_SW_NM LIKE CONCAT('%', #{search}, '%') 
@@ -60,7 +57,7 @@
 	<select id="findBySeq" parameterType="com.iwi.iwms.api.comp.domain.Proj"
 		resultType="com.iwi.iwms.api.comp.domain.ProjInfo">
 		<include refid="selectProj"></include>
-		AND PROJ.PROJ_SEQ = #{projSeq}
+			AND PROJ.PROJ_SEQ = #{projSeq}
 	</select>	
 
 	<insert id="save" parameterType="com.iwi.iwms.api.comp.domain.Proj"

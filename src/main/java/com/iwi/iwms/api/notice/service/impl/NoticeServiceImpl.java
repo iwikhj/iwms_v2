@@ -88,7 +88,7 @@ public class NoticeServiceImpl implements NoticeService {
 		//
 		List<UploadFileInfo> attachedFiles = fileMapper.findAll(notice.getFileInfo());
 		attachedFiles.stream()
-			.filter(v -> !notice.getAttachedFilesSeq().contains(v.getFileSeq()))
+			.filter(v -> notice.getAttachedFilesSeq() == null || !notice.getAttachedFilesSeq().contains(v.getFileSeq()))
 			.forEach(v -> {
 				fileMapper.delete(v.getFileSeq());
 				fileStorageService.delete(Paths.get(v.getFileRealPath()).resolve(v.getFileRealNm()));

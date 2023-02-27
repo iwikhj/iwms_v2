@@ -16,6 +16,9 @@ import lombok.ToString;
 @AllArgsConstructor
 public class UserInfo {
 	
+	@Schema(description = "번호")
+	private long rowNum;
+	
 	@Schema(description = "사용자 SEQ")
 	private long userSeq;
 

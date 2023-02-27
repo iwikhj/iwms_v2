@@ -16,6 +16,9 @@ import lombok.ToString;
 @AllArgsConstructor
 public class NoticeInfo {
 
+	@Schema(description = "번호")
+	private long rowNum;
+	
 	@Schema(description = "공지사항 SEQ")
 	private long noticeSeq;
 	
@@ -40,11 +43,11 @@ public class NoticeInfo {
 	@Schema(description = "조회수") 
 	private int viewCnt;
 	
-	@Schema(description = "첨부된 파일 정보")
-	private List<UploadFileInfo> attachedFiles;
-	
 	@Schema(description = "삭제 여부") 
 	private String delYn;
+	
+	@Schema(description = "첨부된 파일 정보")
+	private List<UploadFileInfo> attachedFiles;
 	
 	@Schema(description = "등록 일자") 
 	private String regDt;

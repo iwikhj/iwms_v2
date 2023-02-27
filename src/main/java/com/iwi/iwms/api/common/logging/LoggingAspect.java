@@ -28,12 +28,12 @@ public class LoggingAspect {
         String params = getRequestParams(request); // request 값 가져오기
         
         long startAt = System.currentTimeMillis();
-        log.info("REQUEST: {}[{}] <method={}, path={}, param={}>", pjp.getSignature().getDeclaringTypeName(), pjp.getSignature().getName(), request.getMethod(), request.getRequestURI(), params);
+        log.info("[REQUEST] {}[{}] <method={}, path={}, param={}>", pjp.getSignature().getDeclaringTypeName(), pjp.getSignature().getName(), request.getMethod(), request.getRequestURI(), params);
 
         Object result = pjp.proceed();
 
         long endAt = System.currentTimeMillis();
-        log.info("RESPONSE: {}[{}] {} ({}ms)", pjp.getSignature().getDeclaringTypeName(), pjp.getSignature().getName(), result, endAt - startAt);
+        log.info("[RESPONSE] {}[{}] {} ({}ms)", pjp.getSignature().getDeclaringTypeName(), pjp.getSignature().getName(), result, endAt - startAt);
 
         return result;
     }

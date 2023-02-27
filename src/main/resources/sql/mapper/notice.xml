@@ -46,7 +46,8 @@
 		
 	<sql id="selectNotice">
 		SELECT 
-			NOTI.NOTICE_SEQ AS noticeSeq
+			ROW_NUMBER() OVER(ORDER BY NOTI.NOTICE_SEQ) AS rowNum
+			, NOTI.NOTICE_SEQ AS noticeSeq
 			, NOTI.COMP_SEQ AS compSeq
 			, COMP.COMP_NM AS compNm	
 			, NOTI.TITLE AS title
@@ -69,6 +70,9 @@
 	<select id="findAll" parameterType="hashMap"
 		resultMap="resultNoticeMap">
 		<include refid="selectNotice"></include>
+		<if test='compSeq != null and compSeq != ""'>
+			AND NOTI.COMP_SEQ = #{compSeq}
+		</if>
 		<if test='search != null and search != ""'>
 			AND NOTI.TITLE LIKE CONCAT('%', #{search}, '%') 
 			OR NOTI.CONTENT LIKE CONCAT('%', #{search}, '%') 
@@ -87,6 +91,9 @@
 		FROM TB_NOTICE NOTI
 		LEFT JOIN TB_COMPANY COMP ON NOTI.COMP_SEQ = COMP.COMP_SEQ
 		WHERE NOTI.DEL_YN = 'Y'
+		<if test='compSeq != null and compSeq != ""'>
+			AND NOTI.COMP_SEQ = #{compSeq}
+		</if>		
 		<if test='search != null and search != ""'>
 			AND NOTI.TITLE LIKE CONCAT('%', #{search}, '%') 
 			OR NOTI.CONTENT LIKE CONCAT('%', #{search}, '%') 

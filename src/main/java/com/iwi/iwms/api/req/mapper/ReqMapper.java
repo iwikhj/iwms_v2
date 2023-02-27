@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.iwi.iwms.api.req.domain.Agree;
 import com.iwi.iwms.api.req.domain.Req;
 import com.iwi.iwms.api.req.domain.ReqInfo;
 
@@ -15,11 +16,13 @@ public interface ReqMapper {
 	
 	int count(Map<String, Object> map);
 	
-	ReqInfo findBySeq(Req req);
+	ReqInfo findBySeq(long reqSeq);
 	
 	void save(Req req);
 	
 	int update(Req req);
 	
 	int delete(Req req);
+	
+	int updateAgree(Agree agree);
 }

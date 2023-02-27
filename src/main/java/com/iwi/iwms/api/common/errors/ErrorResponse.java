@@ -28,7 +28,6 @@ public class ErrorResponse {
 	
 	@Schema(description = "에러 메세지")
     private String message;
-
 	
 	public String toJson() {
 		try {

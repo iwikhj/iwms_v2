@@ -41,10 +41,10 @@ public class SiteController {
 	private final SiteService siteService; 
 
 	@Operation(summary = "사이트 목록", description = "사이트 목록")
-	@GetMapping(value = "/project/site")
+	@GetMapping(value = "/{compSeq}/project/{projSeq}/site")
 	public ResponseEntity<ApiListResponse<List<SiteInfo>>> listSite(HttpServletRequest request
-			, @RequestParam(value = "compSeq", required = false) Long compSeq
-			, @RequestParam(value = "projSeq", required = false) Long projSeq
+			, @PathVariable String compSeq
+			, @PathVariable String projSeq
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
 			, @RequestParam(value = "search", required = false) String search

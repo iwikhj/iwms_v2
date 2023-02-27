@@ -28,4 +28,8 @@ public class Login {
     
     @Schema(hidden = true, description = "사용자 ID 기억(cookie)") 
     private String rememberId;
+    
+    @Schema(hidden = true, description = "로그인 아이피") 
+    private String loginIp;
+    
 }

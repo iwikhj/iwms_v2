@@ -16,7 +16,7 @@ import com.iwi.iwms.api.user.domain.UserInfo;
 import com.iwi.iwms.api.user.domain.UserUpdate;
 import com.iwi.iwms.api.user.mapper.UserMapper;
 import com.iwi.iwms.api.user.service.UserService;
-import com.iwi.iwms.config.security.keycloak.KeycloakProvider;
+import com.iwi.iwms.config.security.auth.AuthProvider;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,7 +28,7 @@ public class UserServiceImpl implements UserService {
 
 	private final UserMapper userMapper;
 	
-	private final KeycloakProvider keycloakProvider;
+	private final AuthProvider keycloakProvider;
 	
 	@Override
 	public List<UserInfo> listUser(Map<String, Object> map) {

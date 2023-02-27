@@ -4,7 +4,8 @@
 
 	<sql id="selectPosition">
 		SELECT 
-			POSI.POSITION_SEQ AS positionSeq
+			ROW_NUMBER() OVER(ORDER BY POSI.POSITION_SEQ) AS rowNum
+			, POSI.POSITION_SEQ AS positionSeq
 			, POSI.POSITION_NM AS positionNm
 			, POSI.COMP_SEQ AS compSeq
 			, COMP.COMP_NM AS compNm

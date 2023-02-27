@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwi.iwms.api.req.mapper.ReqMapper">
+
+	<resultMap id="resultReqMap" type="com.iwi.iwms.api.req.domain.ReqInfo">
+		<result property="reqSeq" column="reqSeq"/>
+		<result property="reqNo" column="reqNo"/>
+		<result property="siteSeq" column="siteSeq"/>
+		<result property="siteNm" column="siteNm"/>
+		<result property="reqYmd" column="reqYmd"/>
+		<result property="reqTypeCd" column="reqTypeCd"/>
+		<result property="reqType" column="reqType"/>
+		<result property="reqGbCd" column="reqGbCd"/>
+		<result property="reqGb" column="reqGb"/>
+		<result property="reqEndYmd" column="reqEndYmd"/>
+		<result property="reqContentsTxt" column="reqContentsTxt"/>
+		<result property="agreeYn" column="agreeYn"/>
+		<result property="agreeDt" column="agreeDt"/>
+		<result property="agreeUserSeq" column="agreeUserSeq"/>
+		<result property="agreeUserNm" column="agreeUserNm"/>
+		<result property="delYn" column="delYn"/>
+		<result property="reasonTxt" column="reasonTxt"/>
+		<result property="regDt" column="regDt"/>
+		<result property="regNm" column="regNm"/>
+		<result property="updtDt" column="updtDt"/>
+		<result property="updtNm" column="updtNm"/>
+		
+	   	<collection property="attachedFiles" column="reqSeq" 
+			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="attachedFiles"/>
+	</resultMap>
+
+	<select id="attachedFiles" resultType="com.iwi.iwms.api.file.domain.UploadFileInfo">
+		SELECT 
+			FILE.FILE_SEQ AS fileSeq
+			, FILE.FILE_REF_TB AS fileRefTb
+			, FILE.FILE_REF_COL AS fileRefCol
+			, FILE.FILE_REF_SEQ AS fileRefSeq
+			, FILE.FILE_GB_CD AS fileGbCd
+			, FILE.FILE_ORD_ORDER AS fileOrdOrder
+			, FILE.FILE_ORG_NM AS fileOrgNm
+			, FILE.FILE_REAL_NM AS fileRealNm
+			, FILE.FILE_REAL_PATH AS fileRealPath
+			, CONCAT('/v1/file/download/', FILE.FILE_SEQ) AS fileDownloadUri
+			, FILE.DEL_YN AS delYn
+			, DATE_FORMAT(FILE.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+			, REG_USER.USER_NM AS regNm
+		FROM TB_FILE FILE
+		LEFT JOIN TB_USER REG_USER ON FILE.REG_SEQ = REG_USER.USER_SEQ
+		WHERE FILE.FILE_REF_TB = 'TB_REQ'
+			AND FILE.FILE_REF_COL = 'REQ_SEQ'
+			AND FILE.FILE_REF_SEQ = #{reqSeq}
+		ORDER BY FILE.FILE_ORD_ORDER
+	</select>
+	
+	<sql id="selectReq">
+		SELECT 
+			ROW_NUMBER() OVER(ORDER BY REQ.REQ_SEQ) AS rowNum
+			, REQ.REQ_SEQ AS reqSeq
+			, REQ.REQ_NO AS reqNo
+			, REQ.COMP_SEQ AS compSeq
+			, COMP.COMP_NM AS compNm
+			, REQ.PROJ_SEQ AS projSeq
+			, PROJ.PROJ_NM AS projNm
+			, REQ.SITE_SEQ AS siteSeq
+			, SITE.SITE_NM AS siteNm
+			, REQ.REQ_YMD AS reqYmd
+			, REQ.REQ_TYPE_CD AS reqTypeCd
+			, REQ_TYPE_CODE.CODE_NM AS reqType
+			, REQ.REQ_GB_CD AS reqGbCd
+			, REQ_GB_CODE.CODE_NM AS reqGb
+			, REQ.REQ_END_YMD AS reqEndYmd
+			, REQ.REQ_CONTENTS_TXT AS reqContentsTxt
+			, REQ.AGREE_YN AS agreeYn
+			, REQ.AGREE_DT AS agreeDt
+			, REQ.AGREE_USER_SEQ AS agreeUserSeq
+			, AGREE_USER.USER_NM AS agreeUserNm
+			, REQ.DEL_YN AS delYn
+			, REQ.REASON_TXT AS reasonTxt
+			, DATE_FORMAT(REQ.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+			, REG_USER.USER_NM AS regNm
+			, DATE_FORMAT(REQ.UPDT_DT, "%Y-%m-%d %H:%i:%s") AS updtDt
+			, UPDT_USER.USER_NM AS updtNm
+		FROM TB_REQ REQ
+		INNER JOIN TB_COMPANY COMP ON REQ.COMP_SEQ = COMP.COMP_SEQ
+		INNER JOIN TB_PROJ PROJ ON REQ.PROJ_SEQ = PROJ.PROJ_SEQ
+		INNER JOIN TB_SITE SITE ON REQ.SITE_SEQ = SITE.SITE_SEQ
+		LEFT JOIN TB_CODE REQ_TYPE_CODE ON REQ.REQ_TYPE_CD = REQ_TYPE_CODE.CODE_CD 
+			AND REQ_TYPE_CODE.UP_CODE_CD = 'REQ_TYPE_CD'  
+		LEFT JOIN TB_CODE REQ_GB_CODE ON REQ.REQ_GB_CD = REQ_GB_CODE.CODE_CD 
+			AND REQ_GB_CODE.UP_CODE_CD = 'REQ_GB_CD'      
+		LEFT JOIN TB_USER AGREE_USER ON REQ.AGREE_USER_SEQ = AGREE_USER.USER_SEQ
+		LEFT JOIN TB_USER REG_USER ON REQ.REG_SEQ = REG_USER.USER_SEQ
+		LEFT JOIN TB_USER UPDT_USER ON REQ.UPDT_SEQ = UPDT_USER.USER_SEQ 
+		WHERE REQ.DEL_YN = 'N'
+	</sql>
+	
+	<select id="findAll" parameterType="hashMap"
+		resultMap="resultReqMap">
+		<include refid="selectReq"></include>
+		<if test='search != null and search != ""'>
+			AND REQ.REQ_NO LIKE CONCAT('%', #{search}, '%') 
+			OR COMP.COMP_NM LIKE CONCAT('%', #{search}, '%')
+			OR PROJ.PROJ_NM LIKE CONCAT('%', #{search}, '%') 
+			OR SITE.SITE_NM LIKE CONCAT('%', #{search}, '%') 
+			OR REQ.REQ_CONTENTS_TX LIKE CONCAT('%', #{search}, '%') 
+		</if>			
+		ORDER BY REQ.REQ_SEQ DESC
+		<if test='pagination != null and pagination != ""'>
+			LIMIT #{pagination.limitPerPage} OFFSET #{pagination.offset}
+		</if>
+	</select>	
+	
+	<select id="count" parameterType="hashMap"
+		resultType="int">
+		SELECT 
+			COUNT(REQ_SEQ)
+		FROM TB_REQ
+		WHERE DEL_YN = 'N'
+		<if test='search != null and search != ""'>
+			AND REQ.REQ_NO LIKE CONCAT('%', #{search}, '%') 
+			OR COMP.COMP_NM LIKE CONCAT('%', #{search}, '%')
+			OR PROJ.PROJ_NM LIKE CONCAT('%', #{search}, '%') 
+			OR SITE.SITE_NM LIKE CONCAT('%', #{search}, '%') 
+			OR REQ.REQ_CONTENTS_TX LIKE CONCAT('%', #{search}, '%') 
+		</if>				
+	</select>	
+	
+	<select id="findBySeq" parameterType="long"
+		resultMap="resultReqMap">
+		<include refid="selectReq"></include>
+		AND REQ.REQ_SEQ = #{reqSeq}
+	</select>	
+	
+	<insert id="save" parameterType="com.iwi.iwms.api.req.domain.Req"
+		useGeneratedKeys="true" keyProperty="reqSeq">
+		
+		INSERT INTO TB_REQ
+		(
+		    REQ_NO
+		    , SITE_SEQ
+			, PROJ_SEQ
+			, COMP_SEQ
+			, REQ_YMD
+			, REQ_TYPE_CD
+			, REQ_GB_CD
+			, REQ_END_YMD
+			, REQ_CONTENTS_TXT
+			, DEL_YN
+			, REG_DT
+			, REG_SEQ
+		) VALUES (
+		    (
+				SELECT 
+					CONCAT('R', DATE_FORMAT(CURRENT_TIMESTAMP, "%y"), '-', LPAD(COALESCE(MAX(SUBSTR(S_REQ.REQ_NO, 5)), 0) + 1, 6, 0))
+				FROM TB_REQ AS S_REQ
+				WHERE S_REQ.REQ_NO LIKE CONCAT('R', DATE_FORMAT(CURRENT_TIMESTAMP, "%y"), '%')
+				LIMIT 1		    
+		    )
+			, #{siteSeq}
+			, #{projSeq}
+			, #{compSeq}
+			, DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
+			, #{reqTypeCd}
+			, #{reqGbCd}
+			, #{reqEndYmd}
+			, #{reqContentsTxt}
+			, 'N'
+			, CURRENT_TIMESTAMP
+			, #{regSeq}
+		)		
+	</insert>		
+
+	<update id="update" parameterType="com.iwi.iwms.api.req.domain.Req">
+		UPDATE TB_REQ 
+		SET
+		   REQ_TYPE_CD = #{reqTypeCd}
+			, REQ_GB_CD = #{reqGbCd}
+			, REQ_END_YMD = #{reqEndYmd}
+			, REQ_CONTENTS_TXT = #{reqContentsTxt}
+			, UPDT_DT = CURRENT_TIMESTAMP
+			, UPDT_SEQ = #{updtSeq}
+		WHERE REQ_SEQ = #{reqSeq}	
+	</update>	
+	
+	<delete id="delete" parameterType="com.iwi.iwms.api.req.domain.Req">
+		DELETE 
+		FROM TB_REQ
+		WHERE REQ_SEQ = #{reqSeq}	 
+	</delete>
+		
+	<update id="updateAgree" parameterType="com.iwi.iwms.api.req.domain.Agree">
+		UPDATE TB_REQ 
+		SET
+		    AGREE_YN = #{agreeYn}
+			, AGREE_DT = CURRENT_TIMESTAMP
+			, AGREE_USER_SEQ = #{updtSeq}
+			, UPDT_DT = CURRENT_TIMESTAMP
+			, UPDT_SEQ = #{updtSeq}
+		WHERE REQ_SEQ = #{reqSeq}	
+	</update>			
+		
+</mapper>

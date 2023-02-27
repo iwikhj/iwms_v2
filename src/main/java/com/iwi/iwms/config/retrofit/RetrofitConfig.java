@@ -1,4 +1,3 @@
-/*
 package com.iwi.iwms.config.retrofit;
 
 import java.security.cert.CertificateException;
@@ -15,7 +14,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.iwi.iwms.config.retrofit.api.AuthApi;
+import com.iwi.iwms.config.security.auth.AuthTokenApi;
 
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -24,8 +23,12 @@ import retrofit2.converter.gson.GsonConverterFactory;
 @Configuration
 public class RetrofitConfig {
 	
-	@Value("${base-url}")
 	private String baseUrl;
+	
+	@Value("${keycloak.auth-server-url}")
+    private void setBaseUrl(String authServerUrl, @Value("${keycloak.realm}") String realm) {
+		this.baseUrl = authServerUrl + "/realms/" + realm + "/";
+    }
 	
 	@Bean
 	public Retrofit retrofit() {
@@ -37,8 +40,8 @@ public class RetrofitConfig {
 	}
 	
 	@Bean
-	public AuthApi mediaServerApi(Retrofit retrofit) {
-		return retrofit.create(AuthApi.class);
+	public AuthTokenApi mediaServerApi(Retrofit retrofit) {
+		return retrofit.create(AuthTokenApi.class);
 	}
 	
 	@Bean
@@ -84,5 +87,3 @@ public class RetrofitConfig {
 	}
 
 }
-
-*/

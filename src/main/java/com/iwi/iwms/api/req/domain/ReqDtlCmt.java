@@ -1,8 +1,6 @@
-package com.iwi.iwms.api.notice.domain;
+package com.iwi.iwms.api.req.domain;
 
 import java.util.List;
-
-import javax.validation.constraints.NotNull;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,34 +15,29 @@ import lombok.Setter;
 import lombok.ToString;
 
 @ToString
-@Setter
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Notice {
+public class ReqDtlCmt {
 
-	@Schema(hidden = true, description = "공지사항 SEQ")
-	private Long noticeSeq;
+	@Schema(hidden = true, description = "요구사항 코멘트 SEQ")
+	private Long reqDtlCmtSeq;
 	
-	@Schema(description = "회사 SEQ")
-	private Long compSeq;
+	@Schema(hidden = true, description = "유지보수 SEQ")
+	private long reqSeq;
 	
-	@Schema(description = "제목") 
-	private String title;
+	@Schema(hidden = true, description = "요구사항 SEQ")
+	private long reqDtlSeq;
 	
-	@Schema(description = "내용") 
-	private String content;
+	@Schema(hidden = true, description = "요구사항 번호") 
+	private String reqDtlNo;
+
+	@Schema(description = "요구사항 코멘트") 
+	private String reqDtlCmt;
 	
-	@NotNull
-	@Schema(description = "최상단 고정 여부", defaultValue = "N", allowableValues = {"Y", "N"}) 
-	private String fixedTopYn;
-	
-	@NotNull
-	@Schema(description = "메인상단 노출 여부", defaultValue = "N", allowableValues = {"Y", "N"}) 
-	private String mainTopYn;
-	
-	@Schema(hidden = true, description = "조회수") 
-	private int viewCnt;
+	@Schema(hidden = true, description = "삭제 여부", allowableValues = {"Y", "N"}) 
+	private String delYn;
 	
 	@Schema(description = "첨부할 파일")
 	private List<MultipartFile> files;
@@ -61,15 +54,15 @@ public class Notice {
 	@Schema(hidden = true, description = "수정자 SEQ") 
 	private long updtSeq;
 	
-	public Notice of(final LoginUserInfo loginUserInfo) {
+	public ReqDtlCmt of(final LoginUserInfo loginUserInfo) {
 		this.regSeq = loginUserInfo.getUserSeq();
 		this.updtSeq = loginUserInfo.getUserSeq();
 		
 		this.fileInfo = new UploadFile();
-		this.fileInfo.setFileRefTb("TB_NOTICE");
-		this.fileInfo.setFileRefCol("NOTICE_SEQ");
-		if(this.noticeSeq != null && this.noticeSeq != 0) {
-			this.fileInfo.setFileRefSeq(this.noticeSeq);
+		this.fileInfo.setFileRefTb("TB_REQ_DTL_CMT");
+		this.fileInfo.setFileRefCol("REQ_DTL_CMT_SEQ");
+		if(this.reqDtlCmtSeq != null && this.reqDtlCmtSeq != 0) {
+			this.fileInfo.setFileRefSeq(this.reqDtlCmtSeq);
 		}
 		this.fileInfo.setFileGbCd("01");
 		this.fileInfo.setRegSeq(loginUserInfo.getUserSeq());
@@ -77,5 +70,4 @@ public class Notice {
 		
 		return this;
 	}
-
 }

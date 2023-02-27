@@ -12,6 +12,9 @@ import lombok.ToString;
 @AllArgsConstructor
 public class CompInfo {
 
+	@Schema(description = "번호")
+	private long rowNum;
+	
 	@Schema(description = "소속 SEQ")
 	private long compSeq;
 	

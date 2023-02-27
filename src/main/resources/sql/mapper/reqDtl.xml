@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwi.iwms.api.req.mapper.ReqDtlMapper">
+
+	<select id="findBySeq" parameterType="long"
+		resultType="com.iwi.iwms.api.req.domain.ReqDtlInfo">
+		SELECT
+			DTL.REQ_SEQ AS reqSeq
+			, DTL.REQ_NO AS reqNo
+			, DTL.REQ_DTL_SEQ AS reqDtlSeq
+			, DTL.REQ_DTL_NO AS reqDtlNo
+			, DTL.REQ_DTL_NM AS reqDtlNm
+			, DTL.REQ_DTL_CONTENT_TXT AS reqDtlContentTxt
+			, DTL.DTL_SITE_GB_CD AS dtlSiteGbCd
+			, CODE1.CODE_NM AS dtlSiteGb
+			, DTL.REQ_GB_CD AS reqGbCd
+			, CODE2.CODE_NM AS reqGb
+			, DTL.SITE_GB_CD_STR AS siteGbCdStr
+			, DTL.REQ_DTL_STAT_CD AS reqDtlStatCd
+			, CODE3.CODE_NM AS reqDtlStat
+			, DTL.REQ_DTL_STAT_CMT AS reqDtlStatCmt
+			, DTL.TGT_YMD AS tgtYmd
+			, DTL.TGT_MM AS tgtMm
+			, DTL.MNG_OK_YMD AS mngOkYmd
+			, DTL.MNG_OK_SEQ AS mngOkSeq
+			, DTL.CUS_OK_YMD AS cusOkYmd
+			, DTL.CUS_OK_SEQ AS cusOkSeq
+			, DTL.RETURN_YMD AS returnYmd
+			, DTL.RETURN_SEQ AS returnSeq
+			, DTL.REQ_DTL_SCORE AS reqDtlScore
+			, DTL.REQ_DTL_EVAL_COTENT_CMT AS reqDtlEvalCotentCmt
+			, DATE_FORMAT(DTL.DEL_DT, "%Y-%m-%d %H:%i:%s") AS delDt
+			, DTL.DEL_YN AS delYn
+			, DATE_FORMAT(DTL.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+			, REG_USER.USER_NM AS regNm
+			, DATE_FORMAT(DTL.UPDT_DT, "%Y-%m-%d %H:%i:%s") AS updtDt
+			, UPDT_USER.USER_NM AS updtNm			
+		FROM TB_REQ_DTL DTL
+		INNER JOIN TB_REQ REQ ON DTL.REQ_SEQ = REQ.REQ_SEQ
+		LEFT JOIN TB_CODE CODE1 ON DTL.DTL_SITE_GB_CD = CODE1.CODE_CD 
+			AND CODE1.UP_CODE_CD = 'DTL_SITE_GB_CD' 
+		LEFT JOIN TB_CODE CODE2 ON DTL.REQ_DTL_STAT_CD = CODE2.CODE_CD 
+			AND CODE2.UP_CODE_CD = 'REQ_DTL_STAT_CD'  
+		LEFT JOIN TB_CODE CODE3 ON DTL.REQ_GB_CD = CODE3.CODE_CD 
+			AND CODE3.UP_CODE_CD = 'REQ_GB_CD'   
+		LEFT JOIN TB_USER REG_USER ON DTL.REG_SEQ = REG_USER.USER_SEQ
+		LEFT JOIN TB_USER UPDT_USER ON DTL.UPDT_SEQ = UPDT_USER.USER_SEQ 
+		WHERE DTL.DEL_YN = 'N'
+			AND DTL.REQ_DTL_SEQ = #{reqDtlSeq}
+	</select>	
+
+	<insert id="save" parameterType="com.iwi.iwms.api.req.domain.ReqDtl">
+		INSERT INTO TB_REQ_DTL
+		(
+		    REQ_DTL_NO
+		    , REQ_SEQ
+			, REQ_NO
+			, REQ_DTL_NM
+			, REQ_DTL_CONTENT_TXT
+			, DTL_SITE_GB_CD
+			, REQ_GB_CD
+			, SITE_GB_CD_STR
+			, REQ_DTL_STAT_CD
+			, DEL_YN
+			, REG_DT
+			, REG_SEQ
+		) VALUES (
+		    (
+				SELECT
+					CONCAT(#{reqNo}, '-', LPAD(COALESCE(MAX(SUBSTR(S_REQ_DTL.REQ_DTL_NO, 12)), 0) + 1, 2, 0))
+				FROM TB_REQ_DTL AS S_REQ_DTL
+                WHERE S_REQ_DTL.REQ_NO = #{reqNo}
+				LIMIT 1	    
+		    )
+			, #{reqSeq}
+			, #{reqNo}
+			, #{reqDtlNm}
+			, #{reqDtlContentTxt}
+			, #{dtlSiteGbCd}
+			, #{reqGbCd}
+			, #{siteGbCdStr}
+			, '00'
+			, 'N'
+			, CURRENT_TIMESTAMP
+			, #{regSeq}
+		)		
+		<selectKey keyColumn="REQ_DTL_SEQ,REQ_DTL_NO,REQ_DTL_STAT_CD" keyProperty="reqDtlSeq,reqDtlNo,reqDtlStatCd" resultType="map" order="AFTER">
+        	SELECT 
+        		REQ_DTL_SEQ
+        		, REQ_DTL_NO
+        		, REQ_DTL_STAT_CD
+        	FROM TB_REQ_DTL
+        	WHERE REQ_DTL_SEQ = LAST_INSERT_ID()
+    	</selectKey>
+	</insert>	
+
+	<insert id="saveHistory" parameterType="com.iwi.iwms.api.req.domain.ReqDtl">
+		INSERT INTO TB_REQ_DTL_HIS
+		(
+		    REQ_DTL_SEQ
+		    , REQ_DTL_NO
+			, REQ_DTL_STAT_CD
+			, REG_YMD
+			, REG_DT
+			, REG_SEQ
+		) VALUES (
+			#{reqDtlSeq}
+			, #{reqDtlNo}
+			, #{reqDtlStatCd}
+			, DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
+			, CURRENT_TIMESTAMP
+			, #{regSeq}
+		)		
+	</insert>	
+
+	<select id="findCommentBySeq" parameterType="long"
+		resultType="com.iwi.iwms.api.req.domain.ReqDtlCmtInfo">
+		SELECT
+			CMT.REQ_DTL_CMT_SEQ AS reqDtlCmtSeq
+			, REQ.REQ_SEQ AS reqSeq
+			, REQ.REQ_NO AS reqNo
+			, CMT.REQ_DTL_SEQ AS reqDtlSeq
+			, CMT.REQ_DTL_NO AS reqDtlNo
+			, CMT.REQ_DTL_CMT AS reqDtlCmt
+			, CMT.USER_SEQ AS userSeq
+			, USER.USER_NM AS userNm
+			, CMT.DEL_YN AS delYn
+			, DATE_FORMAT(CMT.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+			, REG_USER.USER_NM AS regNm
+			, DATE_FORMAT(CMT.UPDT_DT, "%Y-%m-%d %H:%i:%s") AS updtDt
+			, UPDT_USER.USER_NM AS updtNm			
+		FROM TB_REQ REQ
+		INNER JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ
+		INNER JOIN TB_REQ_DTL_CMT CMT ON DTL.REQ_DTL_SEQ = CMT.REQ_DTL_SEQ
+		LEFT JOIN TB_USER USER ON CMT.USER_SEQ = USER.USER_SEQ
+		LEFT JOIN TB_USER REG_USER ON CMT.REG_SEQ = REG_USER.USER_SEQ
+		LEFT JOIN TB_USER UPDT_USER ON CMT.UPDT_SEQ = UPDT_USER.USER_SEQ 
+		WHERE CMT.DEL_YN = 'N'
+			AND CMT.REQ_DTL_CMT_SEQ = #{reqDtlCmtSeq}
+	</select>	
+		
+	<insert id="saveComment" parameterType="com.iwi.iwms.api.req.domain.ReqDtlCmt"
+				useGeneratedKeys="true" keyProperty="reqDtlCmtSeq">
+		INSERT INTO TB_REQ_DTL_CMT
+		(
+		    REQ_DTL_SEQ
+		    , REQ_DTL_NO
+			, REQ_DTL_CMT
+			, USER_SEQ
+			, DEL_YN
+			, REG_DT
+			, REG_SEQ
+		) VALUES (
+			#{reqDtlSeq}
+			, #{reqDtlNo}
+			, #{reqDtlCmt}
+			, #{regSeq}
+			, 'N'
+			, CURRENT_TIMESTAMP
+			, #{regSeq}
+		)		
+	</insert>		
+
+	<update id="updateComment" parameterType="com.iwi.iwms.api.req.domain.ReqDtlCmt">
+		UPDATE TB_REQ_DTL_CMT 
+		SET
+		   REQ_DTL_CMT = #{reqDtlCmt}
+			, UPDT_DT = CURRENT_TIMESTAMP
+			, UPDT_SEQ = #{updtSeq}
+		WHERE REQ_DTL_CMT_SEQ = #{reqDtlCmtSeq}	
+	</update>
+
+	<delete id="deleteComment" parameterType="com.iwi.iwms.api.req.domain.ReqDtlCmt">
+		DELETE 
+		FROM TB_REQ_DTL_CMT
+		WHERE REQ_DTL_CMT_SEQ = #{reqDtlCmtSeq}	 
+	</delete>
+		
+	<!-- 유지보수상세 처리상태 업데이트 
+	<update id="updateStat" parameterType="com.iwi.iwms.api.req.domain.ReqDtl">
+		UPDATE  TB_REQ_DTL
+		SET     REQ_DTL_STAT_CD    = #{reqDtlStatCd}
+		        , REQ_DTL_STAT_CMT = #{reqDtlStatCmt}
+		        , MNG_OK_DT        = SYSDATE
+		        , MNG_OK_SEQ       = #{mngOkSeq}
+		        , MNG_OK_IP        = #{mngOkIp}
+		        , UPD_DT           = SYSDATE
+		        , UPD_SEQ          = #{updSeq}
+		        , UPD_IP           = #{updIp}
+		WHERE   REQ_DTL_NO = #{reqDtlNo}
+	</update>	
+	-->	
+</mapper>

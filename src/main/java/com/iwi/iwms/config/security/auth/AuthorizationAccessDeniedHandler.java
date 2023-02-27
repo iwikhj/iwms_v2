@@ -1,4 +1,4 @@
-package com.iwi.iwms.config.security.jwt;
+package com.iwi.iwms.config.security.auth;
 
 import java.io.IOException;
 
@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-public class JwtAccessDeniedHandler implements AccessDeniedHandler {
+public class AuthorizationAccessDeniedHandler implements AccessDeniedHandler {
 
     @Override
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException e) throws IOException {

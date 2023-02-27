@@ -1,4 +1,4 @@
-package com.iwi.iwms.config.filter.cors;
+package com.iwi.iwms.config.filter;
 
 import java.io.IOException;
 
@@ -11,6 +11,12 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
+import org.springframework.stereotype.Component;
+
+@Component
+@Order(Ordered.HIGHEST_PRECEDENCE)
 public class CorsFilter implements Filter {
 	
 	@Override
@@ -21,11 +27,11 @@ public class CorsFilter implements Filter {
 			throws IOException, ServletException {
 		final HttpServletRequest request = (HttpServletRequest) req;
 		final HttpServletResponse response = (HttpServletResponse) resp; 
-		
+		 
 		response.setHeader("Access-Control-Allow-Origin", "*"); 
-		response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE"); 
+		response.setHeader("Access-Control-Allow-Methods", "POST, GET, PUT, PATCH, DELETE, OPTIONS"); 
 		response.setHeader("Access-Control-Max-Age", "3600"); 
-		response.setHeader("Access-Control-Allow-Headers", "x-requested-with, Content-Type, Authorization");
+		response.setHeader("Access-Control-Allow-Headers", "Content-Type,Origin,Accept,X-Requested-With,Content-Type,Access-Control-Request-Method,Access-Control-Request-Headers,Authorization");
 		
         chain.doFilter(request, response);
 	}

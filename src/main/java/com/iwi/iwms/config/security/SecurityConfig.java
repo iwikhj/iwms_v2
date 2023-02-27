@@ -23,11 +23,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iwi.iwms.config.redis.RedisProvider;
-import com.iwi.iwms.config.security.jwt.JwtAccessDeniedHandler;
-import com.iwi.iwms.config.security.jwt.JwtAuthenticationEntryPoint;
-import com.iwi.iwms.config.security.jwt.JwtAuthenticationFilter;
+import com.iwi.iwms.config.security.auth.AuthenticationEntryPointHandler;
+import com.iwi.iwms.config.security.auth.AuthenticationFilter;
+import com.iwi.iwms.config.security.auth.AuthorizationAccessDeniedHandler;
 import com.nimbusds.jose.shaded.json.JSONArray;
 
 import lombok.RequiredArgsConstructor;
@@ -48,10 +46,6 @@ public class SecurityConfig {
 		this.jwkSetUri = authServerUrl + "/realms/" + realm + jwkSetUri;
     }
 	
-    private final RedisProvider redis;
-    
-    private final ObjectMapper objectMapper;
-	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		matchUrlAndAuthority(http);
@@ -59,8 +53,8 @@ public class SecurityConfig {
 		http
 			.csrf().disable()
 			.exceptionHandling()
-			.authenticationEntryPoint(new JwtAuthenticationEntryPoint())
-			.accessDeniedHandler(new JwtAccessDeniedHandler())
+			.authenticationEntryPoint(new AuthenticationEntryPointHandler())
+			.accessDeniedHandler(new AuthorizationAccessDeniedHandler())
 			.and()
             .sessionManagement()
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
@@ -74,7 +68,7 @@ public class SecurityConfig {
 			.oauth2ResourceServer()
 			.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
 			.and()
-			.addFilterBefore(new JwtAuthenticationFilter(jwtDecoder(), redis, objectMapper), UsernamePasswordAuthenticationFilter.class);
+			.addFilterBefore(new AuthenticationFilter(jwtDecoder()), UsernamePasswordAuthenticationFilter.class);
 		
 		return http.build();
 	}
@@ -90,14 +84,15 @@ public class SecurityConfig {
         */
 		http
 		 	.authorizeRequests()
-		 	.antMatchers(HttpMethod.GET, "/v1/user/me").hasRole("IWMS_ADMIN")
-		 	.antMatchers(HttpMethod.GET, "/v1/staff").hasAuthority("ROLE_IWMS_USER");
+		 	.antMatchers(HttpMethod.POST, "/v1/code").hasRole("IWMS_ADMIN")
+		 	.antMatchers(HttpMethod.GET, "/v1/user/me").hasAnyRole("IWMS_ADMIN", "IWMS_USER");
+		
 	}
 	
 	@Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
 	    return (web) -> web.ignoring()
-	    		.antMatchers("/v1/login", "/apidocs/**", "/swagger-ui/**")
+	    		.antMatchers("/v1/login", "/v1/reissue", "/apidocs/**", "/swagger-ui/**")
 	    		.requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 

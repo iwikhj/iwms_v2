@@ -37,7 +37,7 @@ public class Site {
 	private String siteSwNm;
 	
 	@NotNull
-	@Schema(description = "사이트 구분 코드: [01: A, 02: B, 03: C, 04: D]", allowableValues = {"01", "02", "03", "04"}) 
+	@Schema(description = "사이트 구분 코드: [01: 프론트, 02: 관리자, 03: 기타]", allowableValues = {"01", "02", "03"}) 
 	private String siteGbCd;
 	
 	@NotNull

@@ -55,7 +55,7 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
 		//redis: 로그인 사용자 정보 불러오기 
 		LoginUserInfo loginUserInfo = objectMapper.convertValue(redis.getHash(ssoId, "user"), LoginUserInfo.class);
 
-        log.info("============== User info in Redis: {}", loginUserInfo == null ? "Not found user <null>" : loginUserInfo.getSsoId());
+        //log.info("============== User info in Redis: {}", loginUserInfo == null ? "Not found user <null>" : loginUserInfo.getSsoId());
         
 		if(loginUserInfo == null) {
 			loginUserInfo = userService.getLoginUser(ssoId);

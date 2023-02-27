@@ -1,4 +1,4 @@
-package com.iwi.iwms.config.security.jwt;
+package com.iwi.iwms.config.security.auth;
 
 import java.io.IOException;
 
@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Component
 @Slf4j
-public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
+public class AuthenticationEntryPointHandler implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request,  HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
