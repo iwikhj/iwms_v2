@@ -54,26 +54,22 @@ public class AuthenticationFilter extends GenericFilterBean {
         String token = resolveAuthHeader(request);
         AuthCode tokenStatus = tokenValidation(token);
         
-        
         log.info("[Referer] <{}>", request.getHeader("Referer"));
-        log.info("[Access IP] <{}>", request.getRemoteAddr());
-        log.info("[Token status] <{}>", tokenStatus);
+        log.info("[Token status] <{}>", tokenStatus.name());
         
-        
-        if(AuthCode.EXPIRED.equals(tokenStatus)) {
-        	log.info("[토큰 검증: 실패] <{}>", tokenStatus.name()); 
+        if(AuthCode.VERIFIED.equals(tokenStatus)) {
+        	//
+        } else if(AuthCode.EXPIRED.equals(tokenStatus)) {
 			//sendError(request, response, HttpStatus.UNAUTHORIZED, tokenStatus.name());
 			//return;
         	passAuthentication("fdca608f-b7a7-4b87-8a61-273b70bcc88a", Arrays.asList("ROLE_IWMS_ADMIN"));
     		request = ignoreRequestHeader(servletRequest, request, H_AUTHORIZATION);
+    		
         } else if(AuthCode.INVALID.equals(tokenStatus)) {
-        	log.info("[토큰 검증: 실패] <{}>", tokenStatus.name()); 
 			//sendError(request, response, HttpStatus.BAD_REQUEST, tokenStatus.name());
 			//return;
         	passAuthentication("fdca608f-b7a7-4b87-8a61-273b70bcc88a", Arrays.asList("ROLE_IWMS_ADMIN"));
     		request = ignoreRequestHeader(servletRequest, request, H_AUTHORIZATION);
-        } else {
-        	log.info("[토큰 검증: 성공] <{}>", tokenStatus.name()); 
         }
 
         chain.doFilter(request, response);

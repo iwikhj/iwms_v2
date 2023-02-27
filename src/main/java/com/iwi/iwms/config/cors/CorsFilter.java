@@ -1,4 +1,4 @@
-package com.iwi.iwms.config.filter;
+package com.iwi.iwms.config.cors;
 
 import java.io.IOException;
 
