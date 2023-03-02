@@ -1,7 +1,5 @@
 package com.iwi.iwms.api.req.domain;
 
-import javax.validation.constraints.NotNull;
-
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,19 +14,21 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Agree {
+public class ReqCancel {
 
 	@Schema(hidden = true, description = "유지보수 SEQ")
 	private long reqSeq;
 	
-	@NotNull
-	@Schema(description = "합의 여부", defaultValue = "N", allowableValues = {"Y", "N"}) 
-	private String agreeYn;
+	@Schema(hidden = true, description = "삭제 여부", allowableValues = {"Y", "N"}) 
+	private String delYn;
+	
+	@Schema(description = "취소 사유") 
+	private String reasonTxt;
 	
 	@Schema(hidden = true, description = "수정자 SEQ") 
 	private long updtSeq;
 	
-	public Agree of(final LoginUserInfo loginUserInfo) {
+	public ReqCancel of(final LoginUserInfo loginUserInfo) {
 		this.updtSeq = loginUserInfo.getUserSeq();
 		return this;
 	}

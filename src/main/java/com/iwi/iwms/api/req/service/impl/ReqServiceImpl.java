@@ -12,7 +12,8 @@ import org.springframework.web.server.ResponseStatusException;
 import com.iwi.iwms.api.file.domain.UploadFile;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
 import com.iwi.iwms.api.file.service.FileService;
-import com.iwi.iwms.api.req.domain.Agree;
+import com.iwi.iwms.api.req.domain.ReqAgree;
+import com.iwi.iwms.api.req.domain.ReqCancel;
 import com.iwi.iwms.api.req.domain.Req;
 import com.iwi.iwms.api.req.domain.ReqInfo;
 import com.iwi.iwms.api.req.mapper.ReqMapper;
@@ -103,9 +104,21 @@ public class ReqServiceImpl implements ReqService {
 		return result;
 	}
 	
+	@Transactional(rollbackFor = {Exception.class})
 	@Override
-	public int updateReqAgree(Agree agree) {
-		return reqMapper.updateAgree(agree);
+	public int cancelReq(ReqCancel reqCancel) {
+		Optional.ofNullable(reqMapper.findBySeq(reqCancel.getReqSeq()))
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항을 찾을 수 없습니다."));
+		
+		return reqMapper.cancel(reqCancel);
+	}
+	
+	@Override
+	public int updateReqAgree(ReqAgree reqAgree) {
+		Optional.ofNullable(reqMapper.findBySeq(reqAgree.getReqSeq()))
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항을 찾을 수 없습니다."));
+		
+		return reqMapper.agree(reqAgree);
 	}
 
 }

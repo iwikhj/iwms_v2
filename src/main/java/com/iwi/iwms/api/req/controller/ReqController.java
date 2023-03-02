@@ -23,7 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.iwi.iwms.api.common.response.ApiListResponse;
 import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
-import com.iwi.iwms.api.req.domain.Agree;
+import com.iwi.iwms.api.req.domain.ReqAgree;
+import com.iwi.iwms.api.req.domain.ReqCancel;
 import com.iwi.iwms.api.req.domain.Req;
 import com.iwi.iwms.api.req.domain.ReqDtl;
 import com.iwi.iwms.api.req.domain.ReqDtlCmt;
@@ -131,12 +132,27 @@ public class ReqController {
 				.build());
 	}
     
-    @Operation(summary = "요청사항 합의 업데이트", description = "요청사항 합의 업데이트")
+    @Operation(summary = "요청사항 취소", description = "요청사항 취소")
+	@PatchMapping(value = "/{reqSeq}/cancel")
+	public ResponseEntity<ApiResponse<Boolean>> cancelReq(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
+			, @PathVariable long reqSeq
+			, @Parameter(hidden = true) ReqCancel cancel) {
+    	
+    	boolean result = reqService.cancelReq(cancel.of(loginUserInfo)) > 0 ? true : false;
+
+		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+				.request(request)
+				.data(result)
+				.build());
+	}
+    
+    @Operation(summary = "요청사항 합의", description = "요청사항 합의")
 	@PatchMapping(value = "/{reqSeq}/agree", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> updateReqAgree(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long reqSeq
-			, @ModelAttribute @Valid Agree agree) {
+			, @ModelAttribute @Valid ReqAgree agree) {
 
     	boolean result = reqService.updateReqAgree(agree.of(loginUserInfo)) > 0 ? true : false;
     	

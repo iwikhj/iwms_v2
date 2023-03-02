@@ -3,7 +3,8 @@ package com.iwi.iwms.api.req.service;
 import java.util.List;
 import java.util.Map;
 
-import com.iwi.iwms.api.req.domain.Agree;
+import com.iwi.iwms.api.req.domain.ReqAgree;
+import com.iwi.iwms.api.req.domain.ReqCancel;
 import com.iwi.iwms.api.req.domain.Req;
 import com.iwi.iwms.api.req.domain.ReqInfo;
 
@@ -21,5 +22,7 @@ public interface ReqService {
 	
 	int deleteReq(Req req);
 	
-	int updateReqAgree(Agree agree);
+	int cancelReq(ReqCancel reqCancel);
+	
+	int updateReqAgree(ReqAgree reqAgree);
 }

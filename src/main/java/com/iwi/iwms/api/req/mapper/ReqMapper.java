@@ -5,7 +5,8 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import com.iwi.iwms.api.req.domain.Agree;
+import com.iwi.iwms.api.req.domain.ReqAgree;
+import com.iwi.iwms.api.req.domain.ReqCancel;
 import com.iwi.iwms.api.req.domain.Req;
 import com.iwi.iwms.api.req.domain.ReqInfo;
 
@@ -24,5 +25,7 @@ public interface ReqMapper {
 	
 	int delete(Req req);
 	
-	int updateAgree(Agree agree);
+	int cancel(ReqCancel reqCancel);
+	
+	int agree(ReqAgree reqAgree);
 }

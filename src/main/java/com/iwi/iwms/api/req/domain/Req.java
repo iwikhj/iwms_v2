@@ -57,12 +57,6 @@ public class Req {
 	@Schema(description = "유지보수 내용") 
 	private String reqContentsTxt;
 	
-	@Schema(hidden = true, description = "삭제(취소) 여부", allowableValues = {"Y", "N"}) 
-	private String delYn;
-	
-	@Schema(hidden = true, description = "삭제(취소) 사유") 
-	private String reasonTxt;
-	
 	@Schema(description = "첨부할 파일")
 	private List<MultipartFile> files;
 	
