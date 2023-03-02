@@ -48,11 +48,22 @@ public class ReqDtl {
 	@Schema(hidden = true, description = "요구사항 상태 코드: [00: 접수, 01: 처리중, 02: 처리완료, 03: 검수완료, 04: 협의요청, 05: 취소]", allowableValues = {"00", "01", "02", "03", "04", "05"}) 
 	private String reqDtlStatCd;
 	
+    @Pattern(regexp = "^(19|20)\\d{2}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[0-1])$", message = "완료 예정일의 날짜 형식이 유효하지 않습니다(YYYYMMDD)")
+	@Schema(description = "완료 예정일: YYYYMMDD")
+	private String tgtYmd;
+	
+	@Schema(description = "완료 예정 공수")
+	private Integer tgtMm;
+	
 	@Schema(hidden = true, description = "등록자 SEQ") 
 	private long regSeq;
 	
+	@Schema(hidden = true, description = "수정자 SEQ") 
+	private long updtSeq;
+	
 	public ReqDtl of(final LoginUserInfo loginUserInfo) {
 		this.regSeq = loginUserInfo.getUserSeq();
+		this.updtSeq = loginUserInfo.getUserSeq();
 		return this;
 	}
 }

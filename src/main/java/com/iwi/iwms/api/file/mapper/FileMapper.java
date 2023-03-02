@@ -10,7 +10,7 @@ import com.iwi.iwms.api.file.domain.UploadFileInfo;
 @Mapper
 public interface FileMapper {
 
-	List<UploadFileInfo> findAll(UploadFile uploadFile);
+	List<UploadFileInfo> findAllByRef(UploadFile uploadFile);
 	
 	UploadFileInfo findBySeq(long fileSeq);
 	

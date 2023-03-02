@@ -14,9 +14,10 @@
 		<result property="updtNm" column="updtNm"/>
 		
 	   	<collection property="childCodeInfoList" column="codeCd" 
-			ofType="com.iwi.iwms.api.code.domain.ChildCodeInfo" select="childCode"/>
+			ofType="com.iwi.iwms.api.code.domain.ChildCodeInfo" select="findAllByUpCode"/>
 	</resultMap>
-	
+
+	<!-- 공통 코드 부모 목록 조회 -->	
 	<select id="findAll" parameterType="hashMap"
 		resultMap="resultCodeMap">
 		SELECT 
@@ -31,7 +32,7 @@
 			, UPDT_USER.USER_NM AS updtNm			
 		FROM TB_CODE CODE
 		LEFT JOIN TB_USER REG_USER ON CODE.REG_SEQ = REG_USER.USER_SEQ
-		LEFT JOIN TB_USER UPDT_USER ON CODE.UPDT_SEQ = UPDT_USER.USER_SEQ 		
+		LEFT JOIN TB_USER UPDT_USER ON CODE.UPDT_SEQ = UPDT_USER.USER_SEQ 
         WHERE CODE.UP_CODE_CD IS NULL
         AND CODE.USE_YN = 'Y'
 		<if test='search != null and search != ""'>
@@ -40,8 +41,9 @@
 		</if>		
         ORDER BY CODE.CODE_SEQ DESC
 	</select>
-	
-	<select id="childCode" resultType="com.iwi.iwms.api.code.domain.ChildCodeInfo">
+
+	<!-- 공통 코드 자식 목록 조회 -->	
+	<select id="findAllByUpCode" resultType="com.iwi.iwms.api.code.domain.ChildCodeInfo">
 		SELECT 
 			CODE.CODE_SEQ AS codeSeq
 			, CODE.CODE_CD AS codeCd
@@ -52,7 +54,7 @@
 			, DATE_FORMAT(CODE.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 			, REG_USER.USER_NM AS regNm
 			, DATE_FORMAT(CODE.UPDT_DT, "%Y-%m-%d %H:%i:%s") AS updtDt
-			, UPDT_USER.USER_NM AS updtNm
+			, UPDT_USER.USER_NM AS updtNm	
 		FROM TB_CODE CODE
 		LEFT JOIN TB_USER REG_USER ON CODE.REG_SEQ = REG_USER.USER_SEQ
 		LEFT JOIN TB_USER UPDT_USER ON CODE.UPDT_SEQ = UPDT_USER.USER_SEQ 
@@ -61,7 +63,8 @@
 		AND CODE.UP_CODE_CD = #{codeCd}
 		ORDER BY CODE.CODE_ORDER
 	</select>
-	
+
+	<!-- 공통 코드 등록 -->	
 	<insert id="save" parameterType="com.iwi.iwms.api.code.domain.Code"
 		useGeneratedKeys="true" keyProperty="codeSeq">
 		INSERT INTO TB_CODE
@@ -86,6 +89,7 @@
 		)		
 	</insert>		
 
+	<!-- 공통 코드 수정 -->
 	<update id="update" parameterType="com.iwi.iwms.api.code.domain.Code">
 		UPDATE TB_CODE 
 		SET
@@ -98,7 +102,8 @@
 			, UPDT_SEQ = #{updtSeq}
 		WHERE CODE_SEQ = #{codeSeq}	
 	</update>	
-	
+
+	<!-- 공통 코드 삭제 -->	
 	<delete id="delete" parameterType="com.iwi.iwms.api.code.domain.Code">
 		DELETE 
 		FROM TB_CODE

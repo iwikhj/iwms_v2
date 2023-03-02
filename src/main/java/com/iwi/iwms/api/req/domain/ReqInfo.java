@@ -87,6 +87,9 @@ public class ReqInfo {
 	@Schema(description = "첨부된 파일 정보")
 	private List<UploadFileInfo> attachedFiles;
 	
+	@Schema(description = "요청사항 상세 목록")
+	private List<ReqDtlInfo> details;
+	
 	@Schema(description = "등록 일자") 
 	private String regDt;
 	

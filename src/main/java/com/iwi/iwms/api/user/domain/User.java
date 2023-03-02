@@ -1,5 +1,6 @@
 package com.iwi.iwms.api.user.domain;
 
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
@@ -22,18 +23,14 @@ public class User {
 	@Schema(hidden = true, description = "사용자 SEQ")
 	private long userSeq;
 
-	@NotNull(message = "사용자 ID는 필수 입력 사항입니다")
-	@Schema(description = "사용자 ID")
+	@Email(message = "사용자 아이디는 이메일 형식으로 입력해주세요")
+	@NotNull(message = "사용자 아이디는 필수 입력 사항입니다")
+	@Schema(description = "사용자 아이디(이메일 형식)")
 	private String userId;
 	
 	@NotNull(message = "사용자 이름은 필수 입력 사항입니다")
 	@Schema(description = "사용자 이름")
 	private String userNm;
-	
-	@NotNull(message = "비밀번호는 필수 입력 사항입니다")
-	@Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,20}$", message = "비밀번호는 영문 숫자 특수문자를 모두 포함하여 공백없이 8 20자로 입력해주세요")
-	@Schema(description = "비밀번호: 8~20자의 숫자, 영문자, 특수문자를 포함") 
-	private String userPwd;
 	
 	@NotNull
 	@Schema(description = "사용자 구분 코드: [00: 유지보수, 01: 전산담당, 02: 현업담당, 99: 관리자]", allowableValues = {"00", "01", "02", "99"}) 

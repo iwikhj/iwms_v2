@@ -3,6 +3,8 @@ package com.iwi.iwms.api.login.service.impl;
 import java.time.Duration;
 import java.util.Optional;
 
+import javax.ws.rs.NotAuthorizedException;
+
 import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.HttpStatus;
@@ -40,14 +42,19 @@ public class LoginServiceImpl implements LoginService{
 	@Override
 	public AccessTokenResponse login(Login login) {
 		
-		// 등록된 Id인지 확인
+		// 등록된 ID 확인
 		UserInfo userInfo = Optional.ofNullable(userMapper.findById(login.getUsername()))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "등록되지 않은 사용자 또는 잘못된 비밀번호입니다."));
+				
+		// 비밀번호 5회 이상 불일치
+		if(userInfo.getLoginErrCnt() >= 5) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 5회 이상 일치하지 않아 사용할 수 없는 계정입니다. 담당자에게 연락주시기 바랍니다.");
+		}
 		
 		try {
-			// 인증 요청 
+			// 인증 서버 인증 요청 
 			AccessTokenResponse accessTokenResponse = authProvider.grantToken(login.getUsername(), login.getPassword());
-			
+			log.info("USERNAME: [{}]", accessTokenResponse);
 			String ssoId = userInfo.getSsoId();
 			
 			// 로그인한 사용자의 정보를 Redis 서버에 저장한다. 이후 요청에 대한 사용자 정보는 Redis 서버에서 불러온다.
@@ -69,11 +76,14 @@ public class LoginServiceImpl implements LoginService{
 			return accessTokenResponse;
 		} catch(RedisConnectionFailureException e) {
 			throw new ResponseStatusException(HttpStatus.GATEWAY_TIMEOUT, "Unable to connect to Redis");
-		} catch(Exception e) {
+		} catch(NotAuthorizedException e) {
 			userMapper.updateLoginFailure(userInfo.asUser());
 			log.info("USERNAME: [{}], LOGIN ERROR COUNT: [{}]", userInfo.getUserId(), userInfo.getLoginErrCnt() + 1);
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "등록되지 않은 사용자 또는 잘못된 비밀번호입니다.");
-		}
+		} catch(Exception e) {
+			e.printStackTrace();
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+		} 
 		
 	}
 

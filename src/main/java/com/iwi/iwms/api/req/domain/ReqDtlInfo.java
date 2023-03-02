@@ -1,5 +1,7 @@
 package com.iwi.iwms.api.req.domain;
 
+import java.util.List;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +15,9 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReqDtlInfo {
+	
+	@Schema(description = "번호")
+	private long rowNum;
 
 	@Schema(description = "유지보수 SEQ")
 	private long reqSeq;
@@ -85,6 +90,9 @@ public class ReqDtlInfo {
 	
 	@Schema(description = "평가 내용") 
 	private String reqDtlEvalCotentCmt;
+	
+	@Schema(description = "요구사항 상세 코멘트") 
+	private List<ReqDtlCmtInfo> comments;
 	
 	@Schema(description = "삭제 여부")
 	private String delYn;

@@ -18,6 +18,9 @@ import lombok.ToString;
 @AllArgsConstructor
 public class ReqDtlCmtInfo {
 
+	@Schema(description = "번호")
+	private long rowNum;
+	
 	@Schema(description = "요구사항 코멘트 SEQ")
 	private Long reqDtlCmtSeq;
 	
@@ -36,11 +39,17 @@ public class ReqDtlCmtInfo {
 	@Schema(description = "요구사항 코멘트") 
 	private String reqDtlCmt;
 	
+	@Schema(description = "코멘트 입력 유저 SEQ") 
+	private long userSeq;
+	
 	@Schema(description = "코멘트 입력 유저") 
 	private String userNm;
 	
 	@Schema(description = "첨부된 파일 정보")
 	private List<UploadFileInfo> attachedFiles;
+	
+	@Schema(description = "삭제 여부") 
+	private String delYn;
 	
 	@Schema(description = "등록 일자") 
 	private String regDt;

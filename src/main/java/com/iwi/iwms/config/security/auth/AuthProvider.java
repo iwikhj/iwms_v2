@@ -223,7 +223,7 @@ public class AuthProvider {
 	 * @param String lastName
 	 * @param String email
 	 */
-	public void updateUser(String ssoId, String firstName, String lastName, String email) {
+	public void updateUser(String ssoId, String firstName, String lastName) {
 		log.info("by userId: {}", ssoId);
 		
         Keycloak keycloak = connectKeycloak();
@@ -236,8 +236,6 @@ public class AuthProvider {
         UserRepresentation idmUser = new UserRepresentation();
         idmUser.setFirstName(StringUtils.hasText(firstName) ? firstName : "");
         idmUser.setLastName(StringUtils.hasText(lastName) ? lastName : "");
-        idmUser.setEmail(StringUtils.hasText(email) ? email : "");
-        idmUser.setEmailVerified(StringUtils.hasText(email) ? true : false);
         
         // update user
         userResource.update(idmUser);

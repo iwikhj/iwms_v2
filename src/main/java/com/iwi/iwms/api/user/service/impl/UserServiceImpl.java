@@ -43,7 +43,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public UserInfo getUserBySeq(long userSeq) {
 		return Optional.ofNullable(userMapper.findBySeq(userSeq))
-					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다"));
 	}
 	
 	@Override
@@ -56,14 +56,14 @@ public class UserServiceImpl implements UserService {
 	public void insertUser(User user) {
 		//인증 서버에 사용자 등록
 		String username = user.getUserId();
-		String password = user.getUserPwd();
-		String firstName = "iwms"; 
-		String lastName = user.getUserNm(); 
-		String email = null;
+		String password = user.getUserId();
+		String lastName = "iwms"; 
+		String firstName = user.getUserNm(); 
+		String email = username;
 		String role = user.getUserRole();
 		
 		if(keycloakProvider.existsUsername(username)) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "이미 등록된 사용자 ID입니다.");
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "이미 등록된 사용자 아이디입니다");
 		}
 		
 		String ssoId = keycloakProvider.insertUser(username, password, firstName, lastName, email, role);
@@ -88,10 +88,9 @@ public class UserServiceImpl implements UserService {
 			
 			//인증 서버의 사용자 이름 수정
 			if(!userUpdate.getUserNm().equals(userInfo.getUserNm())) {
-				String firstName = "iwms"; 
-				String lastName = userUpdate.getUserNm(); 
-				String email = null;
-				keycloakProvider.updateUser(userInfo.getSsoId(), firstName, lastName, email);
+				String lastName = "iwms"; 
+				String firstName = userUpdate.getUserNm(); 
+				keycloakProvider.updateUser(userInfo.getSsoId(), firstName, lastName);
 			}
 			
 			//인증 서버의 사용자 권한 수정
@@ -123,7 +122,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public int changePassword(PasswordChange passwordChange) {
 		UserInfo userInfo = Optional.ofNullable(userMapper.findBySeq(passwordChange.getUserSeq()))
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다"));
 		
 		int result = userMapper.updatePassword(passwordChange.asUser());
 		
@@ -139,7 +138,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public int resetPassword(PasswordChange passwordChange) {
 		UserInfo userInfo = Optional.ofNullable(userMapper.findBySeq(passwordChange.getUserSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다"));
 		
 		int result = userMapper.updatePassword(passwordChange.asUser());
 		
@@ -154,7 +153,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public LoginUserInfo getLoginUser(String ssoId) {
 		return Optional.ofNullable(userMapper.findLoginUser(ssoId))
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "사용자를 찾을 수 없습니다."));
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "사용자를 찾을 수 없습니다"));
 	}
 	
 }

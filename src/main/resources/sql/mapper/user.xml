@@ -2,7 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iwi.iwms.api.user.mapper.UserMapper">
 
-	<!-- 사용자 조회 -->
 	<sql id="selectUser">
 		SELECT 
 			ROW_NUMBER() OVER(ORDER BY USER.USER_SEQ) AS rowNum
@@ -30,22 +29,22 @@
 			, USER.VERIFY_YN AS verifyYn
 			, USER.LAST_LOGIN_IP AS lastLoginIp
 			, USER.LAST_LOGIN_DT AS lastLoginDt
-			, USER.USE_YN AS useYn
 			, USER.SSO_ID AS ssoId
 			, USER.USER_ROLE AS userRole
+			, USER.USE_YN AS useYn			
 			, USER.USER_DOR_YMD AS userDorYmd
 			, USER.USER_DEL_YMD AS userDelYmd
 			, DATE_FORMAT(USER.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 			, REG_USER.USER_NM AS regNm
 			, DATE_FORMAT(USER.UPDT_DT, "%Y-%m-%d %H:%i:%s") AS updtDt
-			, UPDT_USER.USER_NM AS updtNm
+			, UPDT_USER.USER_NM AS updtNm				
 		FROM TB_USER USER
 		INNER JOIN TB_COMPANY COMP ON USER.COMP_SEQ = COMP.COMP_SEQ
 		INNER JOIN TB_POSITION POSI ON USER.POSITION_SEQ = POSI.POSITION_SEQ
         LEFT JOIN TB_CODE USER_GB_CODE ON USER.USER_GB_CD = USER_GB_CODE.CODE_CD AND USER_GB_CODE.UP_CODE_CD = 'USER_GB_CD'       
         LEFT JOIN TB_CODE USER_BUSI_CODE ON USER.USER_BUSI_CD = USER_BUSI_CODE.CODE_CD AND USER_BUSI_CODE.UP_CODE_CD = 'BUSI_ROLL_CD'  		
 		LEFT JOIN TB_USER REG_USER ON USER.REG_SEQ = REG_USER.USER_SEQ
-		LEFT JOIN TB_USER UPDT_USER ON USER.UPDT_SEQ = UPDT_USER.USER_SEQ 
+		LEFT JOIN TB_USER UPDT_USER ON USER.UPDT_SEQ = UPDT_USER.USER_SEQ 		
 		WHERE USER.USE_YN = 'Y'
 	</sql>
 	
@@ -64,7 +63,7 @@
 		</if>
 	</select>	
 	
-	<!-- 사용자 COUNT -->
+	<!-- 사용자 수 -->
 	<select id="count" parameterType="hashMap"
 		resultType="int">
 		SELECT 
@@ -78,15 +77,23 @@
 			OR POSI.POSITION_NM LIKE CONCAT('%', #{search}, '%')
 		</if>			
 	</select>	
+		
+	<!-- 소속별 사용자 목록 조회 -->
+	<select id="findAllByCompSeq" parameterType="long"
+		resultType="com.iwi.iwms.api.user.domain.UserInfo">
+		<include refid="selectUser"></include>
+			AND USER.COMP_SEQ = #{compSeq}		
+		ORDER BY USER.USER_SEQ DESC
+	</select>	
 	
-	<!-- SEQ로 특정 사용자 조회 -->
+	<!-- 사용자 단일 조회 -->
 	<select id="findBySeq" parameterType="long"
 		resultType="com.iwi.iwms.api.user.domain.UserInfo">
 		<include refid="selectUser"></include>
 		AND USER.USER_SEQ = #{userSeq}
 	</select>	
 	
-	<!-- USER ID로 특정 사용자 조회 -->
+	<!-- 아이디와 일치하는 사용자 조회 -->
 	<select id="findById" parameterType="String"
 		resultType="com.iwi.iwms.api.user.domain.UserInfo">
 		<include refid="selectUser"></include>
@@ -124,7 +131,7 @@
 		) VALUES (
 		    #{userId}
 			, #{userNm}
-			, #{userPwd}
+			, #{userId}
 			, #{userGbCd}
 			, #{userBusiCd}
 			, #{positionSeq}

@@ -32,7 +32,7 @@ public class ChildCodeInfo {
 	
 	@Schema(description = "등록 일자") 
 	private String regDt;
-	
+
 	@Schema(description = "등록자") 
 	private String regNm;
 	

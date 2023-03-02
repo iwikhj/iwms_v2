@@ -84,7 +84,7 @@ public class UserController {
 				.build());
     }
     
-    @Operation(summary = "사용자 등록", description = "사용자 등록")
+    @Operation(summary = "사용자 등록", description = "사용자 등록<br/> - 신규 사용자등록 시 비밀번호는 아이디와 동일합니다")
 	@PostMapping(value = "", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> insertUser(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo

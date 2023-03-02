@@ -28,6 +28,7 @@ import com.iwi.iwms.api.req.domain.Req;
 import com.iwi.iwms.api.req.domain.ReqDtl;
 import com.iwi.iwms.api.req.domain.ReqDtlCmt;
 import com.iwi.iwms.api.req.domain.ReqInfo;
+import com.iwi.iwms.api.req.service.ReqDtlCmtService;
 import com.iwi.iwms.api.req.service.ReqDtlService;
 import com.iwi.iwms.api.req.service.ReqService;
 import com.iwi.iwms.utils.Pagination;
@@ -47,7 +48,9 @@ public class ReqController {
 	
 	private final ReqDtlService reqDtlService;
 	
-	@Operation(summary = "유지보수 목록", description = "유지보수 목록")
+	private final ReqDtlCmtService reqDtlCmtService;
+	
+	@Operation(summary = "요청사항 목록", description = "요청사항 목록")
 	@GetMapping(value = "")
 	public ResponseEntity<ApiListResponse<List<ReqInfo>>> listReq(HttpServletRequest request
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
@@ -71,7 +74,7 @@ public class ReqController {
 				.build());
 	}
 	
-    @Operation(summary = "유지보수 상세", description = "유지보수 상세")
+    @Operation(summary = "요청사항 상세", description = "요청사항 상세")
     @GetMapping(value = "/{reqSeq}")
     public ResponseEntity<ApiResponse<ReqInfo>> getReqBySeq(HttpServletRequest request
     		, @PathVariable long reqSeq) {
@@ -84,7 +87,7 @@ public class ReqController {
 				.build());
     }
     
-    @Operation(summary = "유지보수 등록", description = "유지보수 등록")
+    @Operation(summary = "요청사항 등록", description = "요청사항 등록")
 	@PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> insertReq(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
@@ -98,7 +101,7 @@ public class ReqController {
 				.build());
 	}
     
-    @Operation(summary = "유지보수 수정", description = "유지보수 수정")
+    @Operation(summary = "요청사항 수정", description = "요청사항 수정")
 	@PutMapping(value = "/{reqSeq}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> updateReq(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
@@ -113,7 +116,7 @@ public class ReqController {
 				.build());
 	}
     
-    @Operation(summary = "유지보수 삭제", description = "유지보수 삭제")
+    @Operation(summary = "요청사항 삭제", description = "요청사항 삭제")
 	@DeleteMapping(value = "/{reqSeq}")
 	public ResponseEntity<ApiResponse<Boolean>> deleteReq(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
@@ -128,7 +131,7 @@ public class ReqController {
 				.build());
 	}
     
-    @Operation(summary = "유지보수 합의 여부", description = "유지보수 합의 여부")
+    @Operation(summary = "요청사항 합의 업데이트", description = "요청사항 합의 업데이트")
 	@PatchMapping(value = "/{reqSeq}/agree", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> updateReqAgree(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
@@ -143,11 +146,7 @@ public class ReqController {
 				.build());
 	}
     
-    
-    
-    
-    
-    @Operation(summary = "유지보수 요구사항 등록", description = "유지보수 요구사항 등록")
+    @Operation(summary = "요청사항 상세 등록", description = "요청사항 상세 등록")
 	@PostMapping(value = "/{reqSeq}/detail", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> insertReqDtl(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
@@ -162,7 +161,39 @@ public class ReqController {
 				.build());
 	}
     
-    @Operation(summary = "유지보수 요구사항 코멘트 등록", description = "유지보수 요구사항 코멘트 등록")
+    @Operation(summary = "요청사항 상세 수정", description = "요청사항 상세 수정")
+	@PutMapping(value = "/{reqSeq}/detail/{reqDtlSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<ApiResponse<Boolean>> updateReqDtl(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
+			, @PathVariable long reqSeq
+			, @PathVariable long reqDtlSeq
+			, @ModelAttribute @Valid ReqDtl reqDtl) {
+    	
+    	boolean result = reqDtlService.updateReqDtl(reqDtl.of(loginUserInfo)) > 0 ? true : false;
+
+    	return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+				.request(request)
+				.data(result)
+				.build());
+	}
+    
+    @Operation(summary = "요청사항 상세 삭제", description = "요청사항 상세 삭제")
+	@DeleteMapping(value = "/{reqSeq}/detail/{reqDtlSeq}")
+	public ResponseEntity<ApiResponse<Boolean>> deleteReqDtl(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
+			, @PathVariable long reqSeq
+			, @PathVariable long reqDtlSeq
+			, @Parameter(hidden = true) ReqDtl reqDtl) {
+    	
+    	boolean result = reqDtlService.deleteReqDtl(reqDtl.of(loginUserInfo)) > 0 ? true : false;
+
+    	return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+				.request(request)
+				.data(result)
+				.build());
+	}
+    
+    @Operation(summary = "요청사항 상세 코멘트 등록", description = "요청사항 상세 코멘트 등록")
 	@PostMapping(value = "/{reqSeq}/detail/{reqDtlSeq}/comment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> insertReqDtlCmt(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
@@ -170,7 +201,7 @@ public class ReqController {
 			, @PathVariable long reqDtlSeq
 			, @ModelAttribute @Valid ReqDtlCmt reqDtlCmt) {
     	
-    	reqDtlService.insertReqDtlCmt(reqDtlCmt.of(loginUserInfo));
+    	reqDtlCmtService.insertReqDtlCmt(reqDtlCmt.of(loginUserInfo));
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
 				.request(request)
@@ -178,7 +209,7 @@ public class ReqController {
 				.build());
 	}
     
-    @Operation(summary = "유지보수 요구사항 코멘트 수정", description = "유지보수 요구사항 코멘트 수정")
+    @Operation(summary = "요청사항 상세 코멘트 수정", description = "요청사항 상세 코멘트 수정")
 	@PutMapping(value = "/{reqSeq}/detail/{reqDtlSeq}/comment/{reqDtlCmtSeq}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> updateReqDtlCmt(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
@@ -187,7 +218,7 @@ public class ReqController {
 			, @PathVariable long reqDtlCmtSeq
 			, @ModelAttribute @Valid ReqDtlCmt reqDtlCmt) {
     	
-    	boolean result = reqDtlService.updateReqDtlCmt(reqDtlCmt.of(loginUserInfo)) > 0 ? true : false;
+    	boolean result = reqDtlCmtService.updateReqDtlCmt(reqDtlCmt.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
 				.request(request)
@@ -195,7 +226,7 @@ public class ReqController {
 				.build());
 	}
     
-    @Operation(summary = "유지보수 요구사항 코멘트 삭제", description = "유지보수 요구사항 코멘트 삭제")
+    @Operation(summary = "요청사항 상세 코멘트 삭제", description = "요청사항 상세 코멘트 삭제")
 	@DeleteMapping(value = "/{reqSeq}/detail/{reqDtlSeq}/comment/{reqDtlCmtSeq}")
 	public ResponseEntity<ApiResponse<Boolean>> deleteReqDtlCmt(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
@@ -204,7 +235,7 @@ public class ReqController {
 			, @PathVariable long reqDtlCmtSeq
 			, @Parameter(hidden = true) ReqDtlCmt reqDtlCmt) {
     	
-    	boolean result = reqDtlService.deleteReqDtlCmt(reqDtlCmt.of(loginUserInfo)) > 0 ? true : false;
+    	boolean result = reqDtlCmtService.deleteReqDtlCmt(reqDtlCmt.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
 				.request(request)

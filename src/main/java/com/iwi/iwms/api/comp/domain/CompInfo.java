@@ -1,5 +1,9 @@
 package com.iwi.iwms.api.comp.domain;
 
+import java.util.List;
+
+import com.iwi.iwms.api.user.domain.UserInfo;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,6 +31,9 @@ public class CompInfo {
 	@Schema(description = "소속 전화번호")
 	private String compTel;
 	
+	@Schema(description = "소속 회원 목록")
+	private List<UserInfo> users;
+	
 	@Schema(description = "사용 여부")
 	private String useYn;
 	
@@ -40,5 +47,5 @@ public class CompInfo {
 	private String updtDt;
 	
 	@Schema(description = "수정자") 
-	private String updtNm;
+	private String updtNm;	
 }

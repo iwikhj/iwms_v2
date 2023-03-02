@@ -13,6 +13,7 @@
 			, FILE.FILE_ORG_NM AS fileOrgNm
 			, FILE.FILE_REAL_NM AS fileRealNm
 			, FILE.FILE_REAL_PATH AS fileRealPath
+			, CONCAT('/v1/file/download/', FILE.FILE_SEQ) AS fileDownloadUri			
 			, FILE.DEL_YN AS delYn
 			, DATE_FORMAT(FILE.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 			, REG_USER.USER_NM AS regNm
@@ -20,8 +21,9 @@
 		LEFT JOIN TB_USER REG_USER ON FILE.REG_SEQ = REG_USER.USER_SEQ
 		WHERE FILE.DEL_YN = 'N'
 	</sql>
-	
-	<select id="findAll" parameterType="com.iwi.iwms.api.file.domain.UploadFile"
+
+	<!-- 참조 파일 목록 조회 -->	
+	<select id="findAllByRef" parameterType="com.iwi.iwms.api.file.domain.UploadFile"
 		resultType="com.iwi.iwms.api.file.domain.UploadFileInfo">
 		<include refid="selectFile"></include>
 			AND FILE.FILE_REF_TB = #{fileRefTb}
@@ -29,13 +31,15 @@
 			AND FILE.FILE_REF_SEQ = #{fileRefSeq}
 		ORDER BY FILE.FILE_ORD_ORDER
 	</select>	
-	
+
+	<!-- 참조 파일 단일 조회 -->		
 	<select id="findBySeq" parameterType="long"
 		resultType="com.iwi.iwms.api.file.domain.UploadFileInfo">
 		<include refid="selectFile"></include>
 			AND FILE.FILE_SEQ = #{fileSeq}
 	</select>	
-	
+
+	<!-- 참조 파일 등록 -->			
 	<insert id="save" parameterType="com.iwi.iwms.api.file.domain.UploadFile"
 		useGeneratedKeys="true" keyProperty="fileSeq">
 		INSERT INTO TB_FILE
@@ -61,13 +65,15 @@
 			, #{regSeq}
 		)		
 	</insert>		
-	
+
+	<!-- 참조 파일 삭제 -->	
 	<delete id="delete" parameterType="long">
 		DELETE 
 		FROM TB_FILE
 		WHERE FILE_SEQ = #{fileSeq}	 
 	</delete>
-	
+
+	<!-- 참조 파일 정렬 업데이트 -->	
 	<update id="updateOrderNum" parameterType="com.iwi.iwms.api.file.domain.UploadFile">
 		UPDATE TB_FILE FILE,
 			(SELECT 

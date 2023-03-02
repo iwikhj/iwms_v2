@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.iwi.iwms.api.req.mapper.ReqDtlCmtMapper">
+
+	<resultMap id="resultReqDtlCmtMap" type="com.iwi.iwms.api.req.domain.ReqDtlCmtInfo">
+		<result property="rowNum" column="rowNum"/>
+		<result property="reqDtlCmtSeq" column="reqDtlCmtSeq"/>
+		<result property="reqSeq" column="reqSeq"/>
+		<result property="reqNo" column="reqNo"/>
+		<result property="reqDtlSeq" column="reqDtlSeq"/>
+		<result property="reqDtlNo" column="reqDtlNo"/>
+		<result property="reqDtlCmt" column="reqDtlCmt"/>
+		<result property="userSeq" column="userSeq"/>
+		<result property="userNm" column="userNm"/>
+		<result property="delYn" column="delYn"/>
+		<result property="regDt" column="regDt"/>
+		<result property="regNm" column="regNm"/>
+		<result property="updtDt" column="updtDt"/>
+		<result property="updtNm" column="updtNm"/>
+			
+	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=reqDtlCmtSeq" 
+			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.findAllByRef"/>
+			
+	</resultMap>
+
+	<sql id="selectReqDtlCmt">
+		SELECT
+			ROW_NUMBER() OVER(ORDER BY CMT.REQ_DTL_CMT_SEQ) AS rowNum
+			, CMT.REQ_DTL_CMT_SEQ AS reqDtlCmtSeq
+			, REQ.REQ_SEQ AS reqSeq
+			, REQ.REQ_NO AS reqNo
+			, CMT.REQ_DTL_SEQ AS reqDtlSeq
+			, CMT.REQ_DTL_NO AS reqDtlNo
+			, CMT.REQ_DTL_CMT AS reqDtlCmt
+			, CMT.USER_SEQ AS userSeq
+			, USER.USER_NM AS userNm
+			, CMT.DEL_YN AS delYn
+			, DATE_FORMAT(CMT.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+			, REG_USER.USER_NM AS regNm
+			, DATE_FORMAT(CMT.UPDT_DT, "%Y-%m-%d %H:%i:%s") AS updtDt
+			, UPDT_USER.USER_NM AS updtNm
+			, 'TB_REQ_DTL_CMT' AS fileRefTb
+			, 'REQ_DTL_CMT_SEQ' AS fileRefCol			
+		FROM TB_REQ REQ
+		INNER JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ
+		INNER JOIN TB_REQ_DTL_CMT CMT ON DTL.REQ_DTL_SEQ = CMT.REQ_DTL_SEQ
+		LEFT JOIN TB_USER USER ON CMT.USER_SEQ = USER.USER_SEQ
+		LEFT JOIN TB_USER REG_USER ON CMT.REG_SEQ = REG_USER.USER_SEQ
+		LEFT JOIN TB_USER UPDT_USER ON CMT.UPDT_SEQ = UPDT_USER.USER_SEQ 
+		WHERE CMT.DEL_YN = 'N'
+	</sql>
+		
+	<select id="findAllByReqDtlSeq" parameterType="long"
+		resultMap="resultReqDtlCmtMap">
+		<include refid="selectReqDtlCmt"></include>
+			AND CMT.REQ_DTL_SEQ = #{reqDtlSeq}
+	</select>	
+		
+		
+	<select id="findBySeq" parameterType="long"
+		resultMap="resultReqDtlCmtMap">
+		<include refid="selectReqDtlCmt"></include>
+			AND CMT.REQ_DTL_CMT_SEQ = #{reqDtlCmtSeq}
+	</select>	
+		
+	<insert id="save" parameterType="com.iwi.iwms.api.req.domain.ReqDtlCmt"
+				useGeneratedKeys="true" keyProperty="reqDtlCmtSeq">
+		INSERT INTO TB_REQ_DTL_CMT
+		(
+		    REQ_DTL_SEQ
+		    , REQ_DTL_NO
+			, REQ_DTL_CMT
+			, USER_SEQ
+			, DEL_YN
+			, REG_DT
+			, REG_SEQ
+		) VALUES (
+			#{reqDtlSeq}
+			, #{reqDtlNo}
+			, #{reqDtlCmt}
+			, #{regSeq}
+			, 'N'
+			, CURRENT_TIMESTAMP
+			, #{regSeq}
+		)		
+	</insert>		
+
+	<update id="update" parameterType="com.iwi.iwms.api.req.domain.ReqDtlCmt">
+		UPDATE TB_REQ_DTL_CMT 
+		SET
+		   REQ_DTL_CMT = #{reqDtlCmt}
+			, UPDT_DT = CURRENT_TIMESTAMP
+			, UPDT_SEQ = #{updtSeq}
+		WHERE REQ_DTL_CMT_SEQ = #{reqDtlCmtSeq}	
+	</update>
+
+	<delete id="delete" parameterType="com.iwi.iwms.api.req.domain.ReqDtlCmt">
+		DELETE 
+		FROM TB_REQ_DTL_CMT
+		WHERE REQ_DTL_CMT_SEQ = #{reqDtlCmtSeq}	 
+	</delete>
+</mapper>

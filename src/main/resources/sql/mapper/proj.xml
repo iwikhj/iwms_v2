@@ -23,7 +23,8 @@
 		LEFT JOIN TB_USER UPDT_USER ON PROJ.UPDT_SEQ = UPDT_USER.USER_SEQ 
 		WHERE PROJ.USE_YN = 'Y'
 	</sql>
-	
+
+	<!-- 소속 프로젝트 목록 조회 -->	
 	<select id="findAll" parameterType="hashMap"
 		resultType="com.iwi.iwms.api.comp.domain.ProjInfo">
 		<include refid="selectProj"></include>
@@ -38,7 +39,8 @@
 			LIMIT #{pagination.limitPerPage} OFFSET #{pagination.offset}
 		</if>
 	</select>	
-	
+
+	<!-- 소속 프로젝트 수 -->	
 	<select id="count" parameterType="hashMap"
 		resultType="int">
 		SELECT 
@@ -53,13 +55,15 @@
 			OR COMP.COMP_NM LIKE CONCAT('%', #{search}, '%') 
 		</if>				
 	</select>		
-	
+
+	<!-- 소속 프로젝트 단일 조회 -->	
 	<select id="findBySeq" parameterType="com.iwi.iwms.api.comp.domain.Proj"
 		resultType="com.iwi.iwms.api.comp.domain.ProjInfo">
 		<include refid="selectProj"></include>
 			AND PROJ.PROJ_SEQ = #{projSeq}
 	</select>	
 
+	<!-- 소속 프로젝트 등록 -->
 	<insert id="save" parameterType="com.iwi.iwms.api.comp.domain.Proj"
 		useGeneratedKeys="true" keyProperty="projSeq">
 		INSERT INTO TB_PROJ
@@ -84,6 +88,7 @@
 		)		
 	</insert>		
 
+	<!-- 소속 프로젝트 수정 -->
 	<update id="update" parameterType="com.iwi.iwms.api.comp.domain.Proj">
 		UPDATE TB_PROJ 
 		SET
@@ -96,7 +101,8 @@
 			, UPDT_SEQ = #{updtSeq}
 		WHERE PROJ_SEQ = #{projSeq}	
 	</update>	
-	
+
+	<!-- 소속 프로젝트 삭제 -->	
 	<delete id="delete" parameterType="com.iwi.iwms.api.comp.domain.Proj">
 		DELETE 
 		FROM TB_PROJ

@@ -1,6 +1,5 @@
 package com.iwi.iwms.api.notice.service.impl;
 
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -12,13 +11,11 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.iwi.iwms.api.file.domain.UploadFile;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
-import com.iwi.iwms.api.file.mapper.FileMapper;
+import com.iwi.iwms.api.file.service.FileService;
 import com.iwi.iwms.api.notice.domain.Notice;
 import com.iwi.iwms.api.notice.domain.NoticeInfo;
 import com.iwi.iwms.api.notice.mapper.NoticeMapper;
 import com.iwi.iwms.api.notice.service.NoticeService;
-import com.iwi.iwms.filestorage.service.FileStorageService;
-import com.iwi.iwms.utils.FilePolicy;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,11 +25,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class NoticeServiceImpl implements NoticeService {
 	
+	private static final String UPLOAD_PATH_PREFIX = "notice/";
+	
 	private final NoticeMapper noticeMapper;
 	
-	private final FileMapper fileMapper;
-	
-    private final FileStorageService fileStorageService;
+	private final FileService fileService;
 	
 	@Override
 	public List<NoticeInfo> listNotice(Map<String, Object> map) {
@@ -55,27 +52,14 @@ public class NoticeServiceImpl implements NoticeService {
 	public void insertNotice(Notice notice) {
 		
 		noticeMapper.save(notice);
-		log.info("noticeSeq: {}, 첨부파일: {}", notice.getNoticeSeq(), notice.getFiles());
 		
+		// 첨부파일 저장
 		if(notice.getFiles() != null && !notice.getFiles().isEmpty()) {
-			log.info("첨부파일 있음");
 			UploadFile uploadFile = notice.getFileInfo();
 			uploadFile.setFileRefSeq(notice.getNoticeSeq());
-			uploadFile.setFileRealPath("notice/" + notice.getNoticeSeq());
-			
-			notice.getFiles().stream()
-				.forEach(v -> {
-					uploadFile.setFileOrgNm(v.getOriginalFilename());
-					uploadFile.setFileRealNm(FilePolicy.rename(v.getOriginalFilename()));
-					fileMapper.save(uploadFile);
-					
-			    	log.info("fileSeq: {}", v.getOriginalFilename());
-					fileStorageService.store(v, Paths.get(uploadFile.getFileRealPath()), uploadFile.getFileRealNm());
-				});
-			
-	    	fileMapper.updateOrderNum(uploadFile);
+			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + notice.getNoticeSeq());
+			fileService.insertAttachFiles(notice.getFiles(), uploadFile);
 		}
-		
 	}
 
 	@Transactional(rollbackFor = {Exception.class})
@@ -85,31 +69,19 @@ public class NoticeServiceImpl implements NoticeService {
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "공지사항을 찾을 수 없습니다."));
 		
 		int result = noticeMapper.update(notice);
-		//
-		List<UploadFileInfo> attachedFiles = fileMapper.findAll(notice.getFileInfo());
-		attachedFiles.stream()
-			.filter(v -> notice.getAttachedFilesSeq() == null || !notice.getAttachedFilesSeq().contains(v.getFileSeq()))
-			.forEach(v -> {
-				fileMapper.delete(v.getFileSeq());
-				fileStorageService.delete(Paths.get(v.getFileRealPath()).resolve(v.getFileRealNm()));
-			});
+
+		// 첨부파일 삭제
+		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(notice.getFileInfo());
+		if(attachedFiles != null && attachedFiles.size() > 0) {
+			fileService.deleteAttachFiles(attachedFiles, notice.getAttachedFilesSeq());
+		}
 		
+		// 첨부파일 저장
 		if(notice.getFiles() != null && !notice.getFiles().isEmpty()) {
 			log.info("첨부파일 있음");
 			UploadFile uploadFile = notice.getFileInfo();
-			uploadFile.setFileRealPath("notice/" + notice.getNoticeSeq());
-			
-			notice.getFiles().stream()
-				.forEach(v -> {
-					uploadFile.setFileOrgNm(v.getOriginalFilename());
-					uploadFile.setFileRealNm(FilePolicy.rename(v.getOriginalFilename()));
-					fileMapper.save(uploadFile);
-					
-			    	log.info("fileSeq: {}", v.getOriginalFilename());
-					fileStorageService.store(v, Paths.get(uploadFile.getFileRealPath()), uploadFile.getFileRealNm());
-				});
-			
-	    	fileMapper.updateOrderNum(uploadFile);
+			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + notice.getNoticeSeq());
+			fileService.insertAttachFiles(notice.getFiles(), uploadFile);
 		}
 		return result;
 	}
@@ -122,15 +94,10 @@ public class NoticeServiceImpl implements NoticeService {
 		
 		int result = noticeMapper.delete(notice);
 		
-		List<UploadFileInfo> attachedFiles = fileMapper.findAll(notice.getFileInfo());
-		
+		// 첨부파일 삭제(디렉토리까지)
+		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(notice.getFileInfo());
 		if(attachedFiles != null && attachedFiles.size() > 0) {
-			attachedFiles.stream()
-				.forEach(v -> {
-					fileMapper.delete(v.getFileSeq());
-				});
-			
-			fileStorageService.deleteAll(Paths.get(attachedFiles.get(0).getFileRealPath()));
+			fileService.deleteAttachAll(attachedFiles);
 		}
 		return result;
 	}

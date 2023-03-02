@@ -133,4 +133,21 @@ public class SiteController {
 				.data(result)
 				.build());
 	}
+    
+    //assign site user
+    @Operation(summary = "사이트 담당자 추가", description = "사이트 담당자 추가")
+	@PostMapping(value = "/{compSeq}/project/{projSeq}/site/{siteSeq}/user/{userSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<ApiResponse<Boolean>> insertSiteUser(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
+    		, @PathVariable long compSeq
+    		, @PathVariable long projSeq
+			, @ModelAttribute @Valid Site site) {
+    	
+    	siteService.insertSite(site.of(loginUserInfo));
+
+		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+				.request(request)
+				.data(true)
+				.build());
+	}
 }

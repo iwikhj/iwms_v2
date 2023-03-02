@@ -22,7 +22,7 @@ public class UserInfo {
 	@Schema(description = "사용자 SEQ")
 	private long userSeq;
 
-	@Schema(description = "사용자ID")
+	@Schema(description = "사용자 아이디")
 	private String userId;
 	
 	@Schema(description = "사용자 이름")
@@ -91,6 +91,12 @@ public class UserInfo {
 	@Schema(description = "마지막 로그인 시간") 
 	private String lastLoginDt;
 	
+	@Schema(description = "인증 서버 ID")
+	private String ssoId;
+	
+	@Schema(description = "사용자 권한") 
+	private String userRole;
+	
 	@Schema(description = "사용 여부") 
 	private String useYn;
 	
@@ -102,7 +108,7 @@ public class UserInfo {
 	
 	@Schema(description = "등록 일자") 
 	private String regDt;
-	
+
 	@Schema(description = "등록자") 
 	private String regNm;
 	
@@ -110,13 +116,7 @@ public class UserInfo {
 	private String updtDt;
 	
 	@Schema(description = "수정자") 
-	private String updtNm;
-	
-	@Schema(description = "인증 서버 ID")
-	private String ssoId;
-	
-	@Schema(description = "사용자 권한") 
-	private String userRole;
+	private String updtNm;	
 	
 	public User asUser() {
 		User user = new User();

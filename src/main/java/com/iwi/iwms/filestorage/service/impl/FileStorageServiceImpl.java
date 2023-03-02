@@ -63,7 +63,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         	multipartFile.transferTo(file);
         	
           	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-          	
+    		
         	return FileStorageResponse.builder()
         		.originalFilename(originalFilename)
         		.filename(filename)
