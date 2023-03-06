@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.iwi.iwms.api.comp.domain.Proj;
 import com.iwi.iwms.api.comp.domain.ProjInfo;
+import com.iwi.iwms.api.comp.domain.ProjUserInfo;
 import com.iwi.iwms.api.comp.domain.ProjUserList;
 
 public interface ProjService {
@@ -21,7 +22,9 @@ public interface ProjService {
 	
 	int deleteProj(Proj proj);
 	
-	Map<String, Object> listProjUser(long projSeq);
+	List<ProjUserInfo> listCustProjUser(long projSeq);
+	
+	List<ProjUserInfo> listPerfProjUser(long projSeq);
 
 	int updateProjUser(ProjUserList projUserList);
 }

@@ -22,11 +22,11 @@ public class Site {
 	private long siteSeq;
 	
 	@NotNull(message = "소속은 필수 입력 사항입니다")
-	@Schema(hidden = true, description = "소속 SEQ")
+	@Schema(description = "소속 SEQ")
 	private long compSeq;
 	
 	@NotNull(message = "프로젝트는 필수 입력 사항입니다")
-	@Schema(hidden = true, description = "프로젝트 SEQ")
+	@Schema( description = "프로젝트 SEQ")
 	private long projSeq;
 	
 	@NotNull(message = "사이트 이름은 필수 입력 사항입니다")

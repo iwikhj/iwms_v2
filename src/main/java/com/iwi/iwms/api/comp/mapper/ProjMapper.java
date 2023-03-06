@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import com.iwi.iwms.api.comp.domain.Proj;
 import com.iwi.iwms.api.comp.domain.ProjInfo;
 import com.iwi.iwms.api.comp.domain.ProjUser;
+import com.iwi.iwms.api.comp.domain.ProjUserInfo;
 
 @Mapper
 public interface ProjMapper {
@@ -24,7 +25,9 @@ public interface ProjMapper {
 	
 	int deleteProj(Proj proj);
 	
-	Map<String, Object> listProjUser(long projSeq);
+	List<ProjUserInfo> listCustProjUser(long projSeq);
+	
+	List<ProjUserInfo> listPerfProjUser(long projSeq);
 	
 	int updateProjUser(List<ProjUser> projUserList);
 	

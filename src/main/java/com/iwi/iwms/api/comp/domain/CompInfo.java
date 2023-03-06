@@ -31,6 +31,9 @@ public class CompInfo {
 	@Schema(description = "소속 전화번호")
 	private String compTel;
 	
+	@Schema(description = "소속 직급 목록")
+	private List<PositionInfo> positions;
+	
 	@Schema(description = "소속 회원 목록")
 	private List<UserInfo> users;
 	

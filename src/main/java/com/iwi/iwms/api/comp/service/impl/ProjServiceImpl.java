@@ -11,6 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.iwi.iwms.api.comp.domain.Proj;
 import com.iwi.iwms.api.comp.domain.ProjInfo;
+import com.iwi.iwms.api.comp.domain.ProjUserInfo;
 import com.iwi.iwms.api.comp.domain.ProjUserList;
 import com.iwi.iwms.api.comp.mapper.ProjMapper;
 import com.iwi.iwms.api.comp.service.ProjService;
@@ -61,11 +62,19 @@ public class ProjServiceImpl implements ProjService {
 	}
 
 	@Override
-	public Map<String, Object> listProjUser(long projSeq) {
+	public List<ProjUserInfo> listCustProjUser(long projSeq) {
 		Optional.ofNullable(projMapper.getProjBySeq(projSeq))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "프로젝트를 찾을 수 없습니다."));
+		
+		return projMapper.listCustProjUser(projSeq);
+	}
 
-		return projMapper.listProjUser(projSeq);
+	@Override
+	public List<ProjUserInfo> listPerfProjUser(long projSeq) {
+		Optional.ofNullable(projMapper.getProjBySeq(projSeq))
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "프로젝트를 찾을 수 없습니다."));
+		
+		return projMapper.listPerfProjUser(projSeq);
 	}
 	
 	@Transactional(rollbackFor = {Exception.class})

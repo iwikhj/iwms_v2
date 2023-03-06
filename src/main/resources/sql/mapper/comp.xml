@@ -14,6 +14,9 @@
 		<result property="updtDt" column="updtDt"/>
 		<result property="updtNm" column="updtNm"/>
 		
+	   	<collection property="positions" column="compSeq" 
+			ofType="com.iwi.iwms.api.comp.domain.PositionInfo" select="com.iwi.iwms.api.comp.mapper.PositionMapper.listPositionByCompSeq"/>
+					
 	   	<collection property="users" column="compSeq" 
 			ofType="com.iwi.iwms.api.user.domain.UserInfo" select="com.iwi.iwms.api.user.mapper.UserMapper.listUserByCompSeq"/>
 	</resultMap>

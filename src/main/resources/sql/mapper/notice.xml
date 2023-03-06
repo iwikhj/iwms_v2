@@ -3,6 +3,7 @@
 <mapper namespace="com.iwi.iwms.api.notice.mapper.NoticeMapper">
 
 	<resultMap id="resultNoticeMap" type="com.iwi.iwms.api.notice.domain.NoticeInfo">
+		<result property="rowNum" column="rowNum"/>
 		<result property="noticeSeq" column="noticeSeq"/>
 		<result property="compSeq" column="compSeq"/>
 		<result property="compNm" column="compNm"/>

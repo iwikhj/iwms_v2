@@ -2,6 +2,19 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iwi.iwms.api.comp.mapper.PositionMapper">
 
+	<resultMap id="resultPositionMap" type="com.iwi.iwms.api.comp.domain.PositionInfo">
+		<result property="rowNum" column="rowNum"/>
+		<result property="positionSeq" column="positionSeq"/>
+		<result property="positionNm" column="positionNm"/>
+		<result property="compSeq" column="compSeq"/>
+		<result property="compNm" column="compNm"/>
+		<result property="useYn" column="useYn"/>
+		<result property="regDt" column="regDt"/>
+		<result property="regNm" column="regNm"/>
+		<result property="updtDt" column="updtDt"/>
+		<result property="updtNm" column="updtNm"/>
+	</resultMap>
+	
 	<sql id="selectPosition">
 		SELECT 
 			ROW_NUMBER() OVER(ORDER BY POSI.POSITION_SEQ) AS rowNum
@@ -19,13 +32,15 @@
 		LEFT JOIN TB_USER REG_USER ON POSI.REG_SEQ = REG_USER.USER_SEQ
 		LEFT JOIN TB_USER UPDT_USER ON POSI.UPDT_SEQ = UPDT_USER.USER_SEQ 
 		WHERE POSI.USE_YN = 'Y'
-			AND POSI.COMP_SEQ = #{compSeq}
 	</sql>
 
 	<!-- 직급 목록 조회 -->		
 	<select id="listPosition" parameterType="hashMap"
-		resultType="com.iwi.iwms.api.comp.domain.PositionInfo">
+		resultMap="resultPositionMap">
 		<include refid="selectPosition"></include>
+		<if test='compSeq != null and compSeq != ""'>
+			AND POSI.COMP_SEQ = #{compSeq}
+		</if>
 		<if test='search != null and search != ""'>
 			AND POSI.POSITION_NM LIKE CONCAT('%', #{search}, '%') 
 		</if>			
@@ -34,10 +49,18 @@
 			LIMIT #{pagination.limitPerPage} OFFSET #{pagination.offset}
 		</if>
 	</select>	
+
+	<!-- 소속별 직급 목록 조회 -->
+	<select id="listPositionByCompSeq" parameterType="long"
+		resultMap="resultPositionMap">
+		<include refid="selectPosition"></include>
+			AND POSI.COMP_SEQ = #{compSeq}
+		ORDER BY POSI.POSITION_SEQ DESC		
+	</select>		
 	
 	<!-- 직급 단일 조회 -->	
 	<select id="getPositionBySeq" parameterType="com.iwi.iwms.api.comp.domain.Position"
-		resultType="com.iwi.iwms.api.comp.domain.PositionInfo">
+		resultMap="resultPositionMap">
 		<include refid="selectPosition"></include>
 		AND POSI.POSITION_SEQ = #{positionSeq}
 	</select>	

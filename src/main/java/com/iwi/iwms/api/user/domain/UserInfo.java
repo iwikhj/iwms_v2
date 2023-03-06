@@ -1,6 +1,10 @@
 package com.iwi.iwms.api.user.domain;
 
+import java.util.List;
+
 import org.springframework.beans.BeanUtils;
+
+import com.iwi.iwms.api.comp.domain.Proj;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -28,13 +32,13 @@ public class UserInfo {
 	@Schema(description = "사용자 이름")
 	private String userNm;
 	
-	@Schema(description = "사용자 구분 코드: [00: 유지보수, 01: 전산담당, 02: 현업담당, 99: 관리자]") 
+	@Schema(description = "사용자 구분 코드") 
 	private String userGbCd;
 	
 	@Schema(description = "사용자 구분")
 	private String userGb;
 	
-	@Schema(description = "사용자 업무 코드: [PL: 기획, DS: 디자인, UI: 퍼블리싱, DV: 개발, ET: 기타]") 
+	@Schema(description = "사용자 업무 코드") 
 	private String userBusiCd;
 	
 	@Schema(description = "사용자 업무")
@@ -96,6 +100,9 @@ public class UserInfo {
 	
 	@Schema(description = "사용자 권한") 
 	private String userRole;
+	
+	@Schema(description = "담당 프로젝트") 
+	private List<Proj> projects;
 	
 	@Schema(description = "사용 여부") 
 	private String useYn;

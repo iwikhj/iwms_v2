@@ -3,6 +3,7 @@ package com.iwi.iwms.api.comp.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -32,19 +33,19 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
-@Tag(name = "Company Project Site", description = "IWMS 프로젝트 사이트 관리")
+@Tag(name = "Site", description = "IWMS 사이트 관리")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/v1/company")
+@RequestMapping("/v1/site")
 public class SiteController {
 	
 	private final SiteService siteService; 
 
 	@Operation(summary = "사이트 목록", description = "사이트 목록")
-	@GetMapping(value = "/{compSeq}/project/{projSeq}/site")
+	@GetMapping(value = "")
 	public ResponseEntity<ApiListResponse<List<SiteInfo>>> listSite(HttpServletRequest request
-			, @PathVariable String compSeq
-			, @PathVariable String projSeq
+			, @RequestParam(value = "compSeq", required = false) Optional<String> compSeq
+			, @RequestParam(value = "projSeq", required = false) Optional<String> projSeq
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
 			, @RequestParam(value = "search", required = false) String search
@@ -52,8 +53,12 @@ public class SiteController {
 			, @RequestParam(value = "endDate", required = false) String endDate) {
 		
 		Map<String, Object> map = new HashMap<>();
-		map.put("compSeq", compSeq);
-		map.put("projSeq", projSeq);
+		if(compSeq.isPresent()) {
+			map.put("compSeq", compSeq.get());
+		}
+		if(projSeq.isPresent()) {
+			map.put("projSeq", projSeq.get());
+		}
 		map.put("search", search);
 		map.put("startDate", startDate);
 		map.put("endDate", endDate);
@@ -69,10 +74,8 @@ public class SiteController {
 	}
 	
     @Operation(summary = "사이트 정보", description = "사이트 정보")
-    @GetMapping(value = "/{compSeq}/project/{projSeq}/site/{siteSeq}")
+    @GetMapping(value = "/{siteSeq}")
     public ResponseEntity<ApiResponse<SiteInfo>> getSiteBySeq(HttpServletRequest request
-    		, @PathVariable long compSeq
-    		, @PathVariable long projSeq
     		, @PathVariable long siteSeq
 			, @Parameter(hidden = true) Site site) {
     	
@@ -85,11 +88,9 @@ public class SiteController {
     }
     
     @Operation(summary = "사이트 등록", description = "사이트 등록")
-	@PostMapping(value = "/{compSeq}/project/{projSeq}/site", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> insertSite(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
-    		, @PathVariable long compSeq
-    		, @PathVariable long projSeq
 			, @ModelAttribute @Valid Site site) {
     	
     	siteService.insertSite(site.of(loginUserInfo));
@@ -101,11 +102,9 @@ public class SiteController {
 	}
     
     @Operation(summary = "사이트 수정", description = "사이트 수정")
-	@PutMapping(value = "/{compSeq}/project/{projSeq}/site/{siteSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PutMapping(value = "/{siteSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> updateSite(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
-			, @PathVariable long compSeq
-			, @PathVariable long projSeq
 			, @PathVariable long siteSeq
 			, @ModelAttribute @Valid Site site) {
     	
@@ -118,11 +117,9 @@ public class SiteController {
 	}
     
     @Operation(summary = "사이트 삭제", description = "사이트 삭제")
-	@DeleteMapping(value = "/{compSeq}/project/{projSeq}/site/{siteSeq}")
+	@DeleteMapping(value = "/{siteSeq}")
 	public ResponseEntity<ApiResponse<Boolean>> deleteSite(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
-			, @PathVariable long compSeq
-			, @PathVariable long projSeq
 			, @PathVariable long siteSeq
 			, @Parameter(hidden = true) Site site) {
     	
@@ -131,23 +128,6 @@ public class SiteController {
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
 				.request(request)
 				.data(result)
-				.build());
-	}
-    
-    //assign site user
-    @Operation(summary = "사이트 담당자 추가", description = "사이트 담당자 추가")
-	@PostMapping(value = "/{compSeq}/project/{projSeq}/site/{siteSeq}/user/{userSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ApiResponse<Boolean>> insertSiteUser(HttpServletRequest request
-			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
-    		, @PathVariable long compSeq
-    		, @PathVariable long projSeq
-			, @ModelAttribute @Valid Site site) {
-    	
-    	siteService.insertSite(site.of(loginUserInfo));
-
-		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
-				.data(true)
 				.build());
 	}
 }

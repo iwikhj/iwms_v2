@@ -1,9 +1,5 @@
 package com.iwi.iwms.api.comp.domain;
 
-import org.springframework.util.StringUtils;
-
-import com.iwi.iwms.api.login.domain.LoginUserInfo;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,14 +17,17 @@ public class ProjUserInfo {
 	@Schema(description = "번호")
 	private long rowNum;
 	
+	@Schema(description = "소속 SEQ")
+	private long compSeq;
+	
+	@Schema(description = "소속 이름")
+	private String compNm;
+	
 	@Schema(description = "사용자 SEQ")
 	private long userSeq;
 	
 	@Schema(description = "사용자 이름")
 	private String userNm;
-	
-	@Schema(description = "대표자 여부") 
-	private String repUserYn;
 	
 	@Schema(description = "사용자 업무 코드") 
 	private String busiRollCd;
@@ -38,4 +37,10 @@ public class ProjUserInfo {
 	
 	@Schema(description = "직급") 
 	private String positionNm;
+	
+	@Schema(description = "프로젝트 담당자 SEQ") 
+	private Long projUserSeq;
+	
+	@Schema(description = "대표자 여부") 
+	private String repUserYn;
 }

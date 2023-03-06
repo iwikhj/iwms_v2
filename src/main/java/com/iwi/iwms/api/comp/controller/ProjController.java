@@ -25,6 +25,7 @@ import com.iwi.iwms.api.common.response.ApiListResponse;
 import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.comp.domain.Proj;
 import com.iwi.iwms.api.comp.domain.ProjInfo;
+import com.iwi.iwms.api.comp.domain.ProjUser;
 import com.iwi.iwms.api.comp.domain.ProjUserInfo;
 import com.iwi.iwms.api.comp.domain.ProjUserList;
 import com.iwi.iwms.api.comp.service.ProjService;
@@ -132,21 +133,28 @@ public class ProjController {
 	}
     
     @Operation(summary = "프로젝트 담당자 목록 조회", description = "프로젝트 담당자 목록 조회")
-	@GetMapping(value = "/{projSeq}/assign")
-	public ResponseEntity<ApiResponse<Map<String, Object>>> listProjUser(HttpServletRequest request
+	@GetMapping(value = "/{projSeq}/projUser")
+	public ResponseEntity<ApiResponse<List<ProjUserInfo>>> listProjUser(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
-			, @PathVariable long projSeq) {
+			, @PathVariable long projSeq
+			, @Parameter(description = "구분: [1: 고객사, 2: 수행사]") @RequestParam(value = "projUserGb", required = true) int projUserGb) {
     	
-    	Map<String, Object> projUserList = projService.listProjUser(projSeq);
+    	List<ProjUserInfo> projUserList = null;
+    			
+		if(projUserGb == 1) {
+			projUserList = projService.listCustProjUser(projSeq);
+		} else if(projUserGb == 2) {
+			projUserList = projService.listPerfProjUser(projSeq);
+		}
     	
-		return ResponseEntity.ok(ApiResponse.<Map<String, Object>>builder()
+		return ResponseEntity.ok(ApiResponse.<List<ProjUserInfo>>builder()
 				.request(request)
 				.data(projUserList)
 				.build());
 	}
     
     @Operation(summary = "프로젝트 담당자 등록", description = "프로젝트 담당자 등록")
-	@PostMapping(value = "/{projSeq}/assign", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/{projSeq}/projUser", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> updateProjUser(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long projSeq

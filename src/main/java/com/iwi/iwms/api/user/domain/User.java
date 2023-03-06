@@ -31,11 +31,11 @@ public class User {
 	private String userNm;
 	
 	@NotNull
-	@Schema(description = "사용자 구분 코드: [00: 유지보수, 01: 전산담당, 02: 현업담당, 99: 관리자]", allowableValues = {"00", "01", "02", "99"}) 
+	@Schema(description = "사용자 구분 코드: [00: 유지보수, 10: 전산담당, 11: 현업담당, 99: 관리자]", allowableValues = {"00", "10", "11", "99"}) 
 	private String userGbCd;
 	
 	@NotNull
-	@Schema(description = "사용자 업무 코드: [PL: 기획, DS: 디자인, UI: 퍼블리싱, DV: 개발, ET: 기타]", allowableValues = {"PL", "DS", "UI", "DV", "ET"}) 
+	@Schema(description = "사용자 업무 코드: [PN: 기획, DS: 디자인, UI: 퍼블리싱, DV: 개발, ET: 기타]", allowableValues = {"PN", "DS", "UI", "DV", "ET"}) 
 	private String userBusiCd; 
 
 	@Schema(description = "직급 SEQ") 
