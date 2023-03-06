@@ -70,13 +70,13 @@
 		useGeneratedKeys="true" keyProperty="positionSeq">
 		INSERT INTO TB_POSITION
 		(
-		    POSITION_NM
-		    , COMP_SEQ
+			POSITION_NM
+			, COMP_SEQ
 			, USE_YN
 			, REG_DT
 			, REG_SEQ
 		) VALUES (
-		    #{positionNm}
+			#{positionNm}
 			, #{compSeq}
 			, #{useYn}
 			, CURRENT_TIMESTAMP
