@@ -7,19 +7,26 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.iwi.iwms.api.comp.domain.Proj;
 import com.iwi.iwms.api.comp.domain.ProjInfo;
+import com.iwi.iwms.api.comp.domain.ProjUser;
 
 @Mapper
 public interface ProjMapper {
 
-	List<ProjInfo> findAll(Map<String, Object> map);
+	List<ProjInfo> listProj(Map<String, Object> map);
 	
-	int count(Map<String, Object> map);
+	int countProj(Map<String, Object> map);
 	
-	ProjInfo findBySeq(Proj proj);
+	ProjInfo getProjBySeq(long projSeq);
 	
-	void save(Proj proj);
+	void insertProj(Proj proj);
 	
-	int update(Proj proj);
+	int updateProj(Proj proj);
 	
-	int delete(Proj proj);
+	int deleteProj(Proj proj);
+	
+	Map<String, Object> listProjUser(long projSeq);
+	
+	int updateProjUser(List<ProjUser> projUserList);
+	
+	int deleteProjUser(long projSeq);
 }

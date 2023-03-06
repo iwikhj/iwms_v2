@@ -11,15 +11,15 @@ import com.iwi.iwms.api.comp.domain.CompInfo;
 @Mapper
 public interface CompMapper {
 
-	List<CompInfo> findAll(Map<String, Object> map);
+	List<CompInfo> listComp(Map<String, Object> map);
 	
-	int count(Map<String, Object> map);
+	int countComp(Map<String, Object> map);
 	
-	CompInfo findBySeq(long compSeq);
+	CompInfo getCompBySeq(long compSeq);
 	
-	void save(Comp comp);
+	void insertComp(Comp comp);
 	
-	int update(Comp comp);
+	int updateComp(Comp comp);
 	
-	int delete(Comp comp);
+	int deleteComp(Comp comp);
 }

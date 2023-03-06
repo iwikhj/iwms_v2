@@ -32,7 +32,7 @@
 	</sql>
 
 	<!-- 프로젝트 사이트 목록 조회 -->	
-	<select id="findAll" parameterType="hashMap"
+	<select id="listSite" parameterType="hashMap"
 		resultType="com.iwi.iwms.api.comp.domain.SiteInfo">
 		<include refid="selectSite"></include>
 			AND PROJ.COMP_SEQ = #{compSeq}
@@ -49,7 +49,7 @@
 	</select>	
 
 	<!-- 프로젝트 사이트 수 -->	
-	<select id="count" parameterType="hashMap"
+	<select id="countSite" parameterType="hashMap"
 		resultType="int">
 		SELECT 
 			COUNT(SITE.SITE_SEQ)
@@ -67,14 +67,14 @@
 	</select>		
 
 	<!-- 프로젝트 사이트 단일 조회 -->	
-	<select id="findBySeq" parameterType="com.iwi.iwms.api.comp.domain.Site"
+	<select id="getSiteBySeq" parameterType="com.iwi.iwms.api.comp.domain.Site"
 		resultType="com.iwi.iwms.api.comp.domain.SiteInfo">
 		<include refid="selectSite"></include>
 			AND SITE.SITE_SEQ = #{siteSeq}
 	</select>	
 
 	<!-- 프로젝트 사이트 등록 -->
-	<insert id="save" parameterType="com.iwi.iwms.api.comp.domain.Site"
+	<insert id="insertSite" parameterType="com.iwi.iwms.api.comp.domain.Site"
 		useGeneratedKeys="true" keyProperty="siteSeq">
 		INSERT INTO TB_SITE
 		(
@@ -99,7 +99,7 @@
 	</insert>		
 
 	<!-- 프로젝트 사이트 수정 -->
-	<update id="update" parameterType="com.iwi.iwms.api.comp.domain.Site">
+	<update id="updateSite" parameterType="com.iwi.iwms.api.comp.domain.Site">
 		UPDATE TB_SITE 
 		SET
 		    SITE_NM = #{siteNm}
@@ -112,7 +112,7 @@
 	</update>	
 
 	<!-- 프로젝트 사이트 삭제 -->	
-	<delete id="delete" parameterType="com.iwi.iwms.api.comp.domain.Site">
+	<delete id="deleteSite" parameterType="com.iwi.iwms.api.comp.domain.Site">
 		DELETE 
 		FROM TB_SITE
 		WHERE SITE_SEQ = #{siteSeq}	 

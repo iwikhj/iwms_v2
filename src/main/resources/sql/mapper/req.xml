@@ -3,6 +3,7 @@
 <mapper namespace="com.iwi.iwms.api.req.mapper.ReqMapper">
 
 	<resultMap id="resultReqMap" type="com.iwi.iwms.api.req.domain.ReqInfo">
+		<result property="rowNum" column="rowNum"/>
 		<result property="reqSeq" column="reqSeq"/>
 		<result property="reqNo" column="reqNo"/>
 		<result property="siteSeq" column="siteSeq"/>
@@ -26,10 +27,10 @@
 		<result property="updtNm" column="updtNm"/>
 			
 	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=reqSeq" 
-			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.findAllByRef"/>
+			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>
 			
 	   	<collection property="details" column="reqSeq" 
-			ofType="com.iwi.iwms.api.req.domain.ReqDtlInfo" select="com.iwi.iwms.api.req.mapper.ReqDtlMapper.findAllByReqSeq"/>			
+			ofType="com.iwi.iwms.api.req.domain.ReqDtlInfo" select="com.iwi.iwms.api.req.mapper.ReqDtlMapper.listReqDtlByReqSeq"/>			
 			
 	</resultMap>
 	
@@ -78,7 +79,7 @@
 	</sql>
 
 	<!-- 요청사항 목록 조회 -->		
-	<select id="findAll" parameterType="hashMap"
+	<select id="listReq" parameterType="hashMap"
 		resultMap="resultReqMap">
 		<include refid="selectReq"></include>
 		<if test='search != null and search != ""'>
@@ -95,7 +96,7 @@
 	</select>	
 	
 	<!-- 요청사항 수 -->
-	<select id="count" parameterType="hashMap"
+	<select id="countReq" parameterType="hashMap"
 		resultType="int">
 		SELECT 
 			COUNT(REQ_SEQ)
@@ -111,14 +112,14 @@
 	</select>	
 
 	<!-- 요청사항 단일 조회 -->	
-	<select id="findBySeq" parameterType="long"
+	<select id="getReqBySeq" parameterType="long"
 		resultMap="resultReqMap">
 		<include refid="selectReq"></include>
 		AND REQ.REQ_SEQ = #{reqSeq}
 	</select>	
 
 	<!-- 요청사항 등록 -->	
-	<insert id="save" parameterType="com.iwi.iwms.api.req.domain.Req"
+	<insert id="insertReq" parameterType="com.iwi.iwms.api.req.domain.Req"
 		useGeneratedKeys="true" keyProperty="reqSeq">
 		
 		INSERT INTO TB_REQ
@@ -158,7 +159,7 @@
 	</insert>		
 
 	<!-- 요청사항 수정 -->
-	<update id="update" parameterType="com.iwi.iwms.api.req.domain.Req">
+	<update id="updateReq" parameterType="com.iwi.iwms.api.req.domain.Req">
 		UPDATE TB_REQ 
 		SET
 		   REQ_TYPE_CD = #{reqTypeCd}
@@ -171,14 +172,14 @@
 	</update>	
 	
 	<!-- 요청사항 삭제 -->
-	<delete id="delete" parameterType="com.iwi.iwms.api.req.domain.Req">
+	<delete id="deleteReq" parameterType="com.iwi.iwms.api.req.domain.Req">
 		DELETE 
 		FROM TB_REQ
 		WHERE REQ_SEQ = #{reqSeq}	 
 	</delete>
 
 	<!-- 요청사항 취소 -->
-	<update id="cancel" parameterType="com.iwi.iwms.api.req.domain.ReqCancel">
+	<update id="cancelReq" parameterType="com.iwi.iwms.api.req.domain.ReqCancel">
 		UPDATE TB_REQ 
 		SET
 		   REASON_TXT = #{reasonTxt}
@@ -189,7 +190,7 @@
 	</update>	
 	
 	<!-- 요청사항 합의 -->	
-	<update id="agree" parameterType="com.iwi.iwms.api.req.domain.ReqAgree">
+	<update id="agreeReq" parameterType="com.iwi.iwms.api.req.domain.ReqAgree">
 		UPDATE TB_REQ 
 		SET
 		    AGREE_YN = #{agreeYn}

@@ -23,14 +23,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.iwi.iwms.api.common.response.ApiListResponse;
 import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
+import com.iwi.iwms.api.req.domain.Req;
 import com.iwi.iwms.api.req.domain.ReqAgree;
 import com.iwi.iwms.api.req.domain.ReqCancel;
-import com.iwi.iwms.api.req.domain.Req;
 import com.iwi.iwms.api.req.domain.ReqDtl;
 import com.iwi.iwms.api.req.domain.ReqDtlCmt;
+import com.iwi.iwms.api.req.domain.ReqDtlUser;
 import com.iwi.iwms.api.req.domain.ReqInfo;
 import com.iwi.iwms.api.req.service.ReqDtlCmtService;
 import com.iwi.iwms.api.req.service.ReqDtlService;
+import com.iwi.iwms.api.req.service.ReqDtlUserService;
 import com.iwi.iwms.api.req.service.ReqService;
 import com.iwi.iwms.utils.Pagination;
 
@@ -50,6 +52,8 @@ public class ReqController {
 	private final ReqDtlService reqDtlService;
 	
 	private final ReqDtlCmtService reqDtlCmtService;
+	
+	private final ReqDtlUserService reqDtlUserCmtService;
 	
 	@Operation(summary = "요청사항 목록", description = "요청사항 목록")
 	@GetMapping(value = "")
@@ -149,12 +153,12 @@ public class ReqController {
     
     @Operation(summary = "요청사항 합의", description = "요청사항 합의")
 	@PatchMapping(value = "/{reqSeq}/agree", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ApiResponse<Boolean>> updateReqAgree(HttpServletRequest request
+	public ResponseEntity<ApiResponse<Boolean>> agreeReq(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long reqSeq
 			, @ModelAttribute @Valid ReqAgree agree) {
 
-    	boolean result = reqService.updateReqAgree(agree.of(loginUserInfo)) > 0 ? true : false;
+    	boolean result = reqService.agreeReq(agree.of(loginUserInfo)) > 0 ? true : false;
     	
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
 				.request(request)
@@ -259,4 +263,55 @@ public class ReqController {
 				.build());
 	}
     
+    
+    @Operation(summary = "요청사항 상세 담당자 처리 등록", description = "요청사항 상세 담당자 처리 등록")
+	@PostMapping(value = "/{reqSeq}/detail/{reqDtlSeq}/process", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<ApiResponse<Boolean>> insertReqDtlUser(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
+			, @PathVariable long reqSeq
+			, @PathVariable long reqDtlSeq
+			, @ModelAttribute @Valid ReqDtlUser reqDtlUser) {
+    	
+    	reqDtlUserCmtService.insertReqDtlUser(reqDtlUser.of(loginUserInfo));
+
+		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+				.request(request)
+				.data(true)
+				.build());
+	}
+    
+    
+    @Operation(summary = "요청사항 상세 담당자 처리 수정", description = "요청사항 상세 담당자 처리 수정")
+	@PutMapping(value = "/{reqSeq}/detail/{reqDtlSeq}/process/{reqDtlUserSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<ApiResponse<Boolean>> updateReqDtlUser(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
+			, @PathVariable long reqSeq
+			, @PathVariable long reqDtlSeq
+			, @PathVariable long reqDtlUserSeq
+			, @ModelAttribute @Valid ReqDtlUser reqDtlUser) {
+    	
+    	boolean result = reqDtlUserCmtService.updateReqDtlUser(reqDtlUser.of(loginUserInfo)) > 0 ? true : false;
+
+		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+				.request(request)
+				.data(result)
+				.build());
+	}
+    
+    @Operation(summary = "요청사항 상세 담당자 처리 삭제", description = "요청사항 상세 담당자 처리 삭제")
+	@DeleteMapping(value = "/{reqSeq}/detail/{reqDtlSeq}/process/{reqDtlUserSeq}")
+	public ResponseEntity<ApiResponse<Boolean>> deleteReqDtlUser(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
+			, @PathVariable long reqSeq
+			, @PathVariable long reqDtlSeq
+			, @PathVariable long reqDtlUserSeq
+			, @Parameter(hidden = true) ReqDtlUser reqDtlUser) {
+    	
+    	boolean result = reqDtlUserCmtService.deleteReqDtlUser(reqDtlUser.of(loginUserInfo)) > 0 ? true : false;
+
+		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+				.request(request)
+				.data(result)
+				.build());
+	}
 }

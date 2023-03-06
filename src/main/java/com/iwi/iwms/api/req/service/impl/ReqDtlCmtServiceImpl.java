@@ -36,11 +36,10 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public void insertReqDtlCmt(ReqDtlCmt reqDtlCmt) {
-		ReqDtlInfo reqDtlInfo = Optional.ofNullable(reqDtlMapper.findBySeq(reqDtlCmt.getReqDtlSeq()))
+		Optional.ofNullable(reqDtlMapper.getReqDtlBySeq(reqDtlCmt.getReqDtlSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항 상세를 찾을 수 없습니다."));
 		
-		reqDtlCmt.setReqDtlNo(reqDtlInfo.getReqDtlNo());
-		reqDtlCmtMapper.save(reqDtlCmt);
+		reqDtlCmtMapper.insertReqDtlCmt(reqDtlCmt);
 		
 		// 첨부파일 저장
 		if(reqDtlCmt.getFiles() != null && !reqDtlCmt.getFiles().isEmpty()) {
@@ -54,10 +53,10 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateReqDtlCmt(ReqDtlCmt reqDtlCmt) {
-		Optional.ofNullable(reqDtlCmtMapper.findBySeq(reqDtlCmt.getReqDtlCmtSeq()))
+		Optional.ofNullable(reqDtlCmtMapper.getReqDtlCmtBySeq(reqDtlCmt.getReqDtlCmtSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항 상세 코멘트를 찾을 수 없습니다."));
 		
-		int result = reqDtlCmtMapper.update(reqDtlCmt);
+		int result = reqDtlCmtMapper.updateReqDtlCmt(reqDtlCmt);
 		
 		// 첨부파일 삭제
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(reqDtlCmt.getFileInfo());
@@ -77,10 +76,10 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int deleteReqDtlCmt(ReqDtlCmt reqDtlCmt) {
-		Optional.ofNullable(reqDtlCmtMapper.findBySeq(reqDtlCmt.getReqDtlCmtSeq()))
+		Optional.ofNullable(reqDtlCmtMapper.getReqDtlCmtBySeq(reqDtlCmt.getReqDtlCmtSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항 상세 코멘트를 찾을 수 없습니다."));
 		
-		int result = reqDtlCmtMapper.delete(reqDtlCmt);
+		int result = reqDtlCmtMapper.deleteReqDtlCmt(reqDtlCmt);
 		
 		// 첨부파일 삭제(디렉토리까지)
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(reqDtlCmt.getFileInfo());

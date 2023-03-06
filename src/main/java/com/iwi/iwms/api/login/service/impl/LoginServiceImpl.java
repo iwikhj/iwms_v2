@@ -43,7 +43,7 @@ public class LoginServiceImpl implements LoginService{
 	public AccessTokenResponse login(Login login) {
 		
 		// 등록된 ID 확인
-		UserInfo userInfo = Optional.ofNullable(userMapper.findById(login.getUsername()))
+		UserInfo userInfo = Optional.ofNullable(userMapper.getUserById(login.getUsername()))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "등록되지 않은 사용자 또는 잘못된 비밀번호입니다."));
 				
 		// 비밀번호 5회 이상 불일치
@@ -59,7 +59,7 @@ public class LoginServiceImpl implements LoginService{
 			
 			// 로그인한 사용자의 정보를 Redis 서버에 저장한다. 이후 요청에 대한 사용자 정보는 Redis 서버에서 불러온다.
 			// 사용자 정보의 만료 시간은 리플레시 토큰의 만료 시간과 동일하게 설정한다. 리플레시 토큰 만료시에는 다시 로그인해야 한다.
-			LoginUserInfo loginUserInfo = userMapper.findLoginUser(ssoId);
+			LoginUserInfo loginUserInfo = userMapper.getLoginUser(ssoId);
 			
 			if(redis.hasKey(ssoId)) {
 				redis.delete(ssoId);
@@ -98,7 +98,7 @@ public class LoginServiceImpl implements LoginService{
         }
         
 		LoginUserInfo loginUserInfo = objectMapper.convertValue(redis.getHash(introspect.getSub(), "user"), LoginUserInfo.class);
-		if(!loginUserInfo.getRefreshToken().equals(reissue.getRefreshToken())) {
+		if(loginUserInfo == null || !loginUserInfo.getRefreshToken().equals(reissue.getRefreshToken())) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 유효하지 않습니다");
 		}
     	

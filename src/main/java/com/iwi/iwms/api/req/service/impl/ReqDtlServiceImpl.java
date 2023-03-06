@@ -38,22 +38,22 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public void insertReqDtl(ReqDtl reqDtl) {
-		ReqInfo reqInfo = Optional.ofNullable(reqMapper.findBySeq(reqDtl.getReqSeq()))
+		ReqInfo reqInfo = Optional.ofNullable(reqMapper.getReqBySeq(reqDtl.getReqSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요구사항을 찾을 수 없습니다."));
 		
 		reqDtl.setReqNo(reqInfo.getReqNo());
 		reqDtl.setReqGbCd(reqInfo.getReqGbCd());
-		reqDtlMapper.save(reqDtl);
 		
-		reqDtlMapper.saveHistory(reqDtl);
+		reqDtlMapper.insertReqDtl(reqDtl);
+		reqDtlMapper.insertReqDtlHis(reqDtl);
 	}
 
 	@Override
 	public int updateReqDtl(ReqDtl reqDtl) {
-		Optional.ofNullable(reqDtlMapper.findBySeq(reqDtl.getReqDtlSeq()))
+		Optional.ofNullable(reqDtlMapper.getReqDtlBySeq(reqDtl.getReqDtlSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요구사항 상세를 찾을 수 없습니다."));
 		
-		int result = reqDtlMapper.update(reqDtl);
+		int result = reqDtlMapper.updateReqDtl(reqDtl);
 		
 		return result;		
 		
@@ -62,10 +62,10 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int deleteReqDtl(ReqDtl reqDtl) {
-		ReqDtlInfo reqDtlInfo = Optional.ofNullable(reqDtlMapper.findBySeq(reqDtl.getReqDtlSeq()))
+		ReqDtlInfo reqDtlInfo = Optional.ofNullable(reqDtlMapper.getReqDtlBySeq(reqDtl.getReqDtlSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요구사항 상세를 찾을 수 없습니다."));
 		
-		int result = reqDtlMapper.delete(reqDtl);
+		int result = reqDtlMapper.deleteReqDtl(reqDtl);
 		
 		//  요청사항 상세 디렉토리 삭제
 		List<ReqDtlCmtInfo> comments = reqDtlInfo.getComments();

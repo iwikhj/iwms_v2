@@ -11,15 +11,15 @@ import com.iwi.iwms.api.comp.domain.SiteInfo;
 @Mapper
 public interface SiteMapper {
 
-	List<SiteInfo> findAll(Map<String, Object> map);
+	List<SiteInfo> listSite(Map<String, Object> map);
 	
-	int count(Map<String, Object> map);
+	int countSite(Map<String, Object> map);
 	
-	SiteInfo findBySeq(Site site);
+	SiteInfo getSiteBySeq(Site site);
 	
-	void save(Site site);
+	void insertSite(Site site);
 	
-	int update(Site site);
+	int updateSite(Site site);
 	
-	int delete(Site site);
+	int deleteSite(Site site);
 }

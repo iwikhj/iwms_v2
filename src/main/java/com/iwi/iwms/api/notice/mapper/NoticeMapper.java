@@ -11,17 +11,17 @@ import com.iwi.iwms.api.notice.domain.NoticeInfo;
 @Mapper
 public interface NoticeMapper {
 
-	List<NoticeInfo> findAll(Map<String, Object> map);
+	List<NoticeInfo> listNotice(Map<String, Object> map);
 	
-	int count(Map<String, Object> map);
+	int countNotice(Map<String, Object> map);
 	
-	NoticeInfo findBySeq(long noticeSeq);
+	NoticeInfo getNoticeBySeq(long noticeSeq);
 	
-	void save(Notice notice);
+	void insertNotice(Notice notice);
 	
-	int update(Notice notice);
+	int updateNotice(Notice notice);
 	
-	int delete(Notice notice);
+	int deleteNotice(Notice notice);
 	
 	int updateViewCnt(long noticeSeq);
 }

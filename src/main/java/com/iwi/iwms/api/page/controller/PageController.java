@@ -130,7 +130,7 @@ public class PageController {
     }
     
     
-    @Operation(summary = "요구사항 목록 페이지 정보", description = "요구사항 목록 페이지 정보")
+    @Operation(summary = "요청사항 목록 페이지 정보", description = "요청사항 목록 페이지 정보")
     @GetMapping(value = "/request")
     public ResponseEntity<ListResponse<List<ReqInfo>>> pageReq(HttpServletRequest request
     		, @RequestParam(value = "page", required = false, defaultValue = "1") int page
@@ -156,7 +156,7 @@ public class PageController {
 				.build());
     }
     
-    @Operation(summary = "요구사항 상세 페이지 정보", description = "요구사항 상세 페이지 정보")
+    @Operation(summary = "요청사항 상세 페이지 정보", description = "요청사항 상세 페이지 정보")
     @GetMapping(value = "/request/{reqSeq}")
     public ResponseEntity<Response<ReqInfo>> pageReqDetail(HttpServletRequest request
     		, @PathVariable long reqSeq

@@ -11,13 +11,13 @@ import com.iwi.iwms.api.comp.domain.PositionInfo;
 @Mapper
 public interface PositionMapper {
 
-	List<PositionInfo> findAll(Map<String, Object> map);
+	List<PositionInfo> listPosition(Map<String, Object> map);
 	
-	PositionInfo findBySeq(Position position);
+	PositionInfo getPositionBySeq(Position position);
 	
-	void save(Position position);
+	void insertPosition(Position position);
 	
-	int update(Position position);
+	int updatePosition(Position position);
 	
-	int delete(Position position);
+	int deletePosition(Position position);
 }

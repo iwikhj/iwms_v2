@@ -23,7 +23,7 @@
 	</sql>
 
 	<!-- 직급 목록 조회 -->		
-	<select id="findAll" parameterType="hashMap"
+	<select id="listPosition" parameterType="hashMap"
 		resultType="com.iwi.iwms.api.comp.domain.PositionInfo">
 		<include refid="selectPosition"></include>
 		<if test='search != null and search != ""'>
@@ -36,14 +36,14 @@
 	</select>	
 	
 	<!-- 직급 단일 조회 -->	
-	<select id="findBySeq" parameterType="com.iwi.iwms.api.comp.domain.Position"
+	<select id="getPositionBySeq" parameterType="com.iwi.iwms.api.comp.domain.Position"
 		resultType="com.iwi.iwms.api.comp.domain.PositionInfo">
 		<include refid="selectPosition"></include>
 		AND POSI.POSITION_SEQ = #{positionSeq}
 	</select>	
 
 	<!-- 직급 등록 -->
-	<insert id="save" parameterType="com.iwi.iwms.api.comp.domain.Position"
+	<insert id="insertPosition" parameterType="com.iwi.iwms.api.comp.domain.Position"
 		useGeneratedKeys="true" keyProperty="positionSeq">
 		INSERT INTO TB_POSITION
 		(
@@ -62,7 +62,7 @@
 	</insert>		
 
 	<!-- 직급 수정 -->
-	<update id="update" parameterType="com.iwi.iwms.api.comp.domain.Position">
+	<update id="updatePosition" parameterType="com.iwi.iwms.api.comp.domain.Position">
 		UPDATE TB_POSITION 
 		SET
 		    POSITION_NM = #{positionNm}
@@ -73,7 +73,7 @@
 	</update>	
 
 	<!-- 직급 삭제 -->	
-	<delete id="delete" parameterType="com.iwi.iwms.api.comp.domain.Position">
+	<delete id="deletePosition" parameterType="com.iwi.iwms.api.comp.domain.Position">
 		DELETE 
 		FROM TB_POSITION
 		WHERE POSITION_SEQ = #{positionSeq}	 

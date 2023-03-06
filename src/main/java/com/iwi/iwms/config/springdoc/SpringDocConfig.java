@@ -27,7 +27,7 @@ public class SpringDocConfig {
         Info info = new Info()
             .title("openapi docs")
             .version(appVersion)
-            .description("잘못된 부분이나 오류 발생 시 <a href='#' title='admin@admin.com'>담당 개발자</a>에게 문의 바랍니다.");
+            .description("잘못된 부분이나 오류 발생 시 <a href='#' title='khj@iwi.co.kr'>담당 개발자</a>에게 문의 바랍니다.");
 
 	    // Security 스키마 설정
         SecurityScheme bearerAuth = new SecurityScheme() 

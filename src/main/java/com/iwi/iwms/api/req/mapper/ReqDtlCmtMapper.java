@@ -10,14 +10,14 @@ import com.iwi.iwms.api.req.domain.ReqDtlCmtInfo;
 @Mapper
 public interface ReqDtlCmtMapper {
 	
-	List<ReqDtlCmtInfo> findAllByReqDtlSeq(long reqDtlSeq);
+	List<ReqDtlCmtInfo> listReqDtlCmtByReqDtlSeq(long reqDtlSeq);
 	
-	ReqDtlCmtInfo findBySeq(long reqDtlCmtSeq);
+	ReqDtlCmtInfo getReqDtlCmtBySeq(long reqDtlCmtSeq);
 
-	void save(ReqDtlCmt reqDtlCmt);
+	void insertReqDtlCmt(ReqDtlCmt reqDtlCmt);
 	
-	int update(ReqDtlCmt reqDtlCmt);
+	int updateReqDtlCmt(ReqDtlCmt reqDtlCmt);
 	
-	int delete(ReqDtlCmt reqDtlCmt);
+	int deleteReqDtlCmt(ReqDtlCmt reqDtlCmt);
 
 }

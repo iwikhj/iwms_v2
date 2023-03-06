@@ -23,7 +23,7 @@
 	</sql>
 
 	<!-- 참조 파일 목록 조회 -->	
-	<select id="findAllByRef" parameterType="com.iwi.iwms.api.file.domain.UploadFile"
+	<select id="listFileByRef" parameterType="com.iwi.iwms.api.file.domain.UploadFile"
 		resultType="com.iwi.iwms.api.file.domain.UploadFileInfo">
 		<include refid="selectFile"></include>
 			AND FILE.FILE_REF_TB = #{fileRefTb}
@@ -33,14 +33,14 @@
 	</select>	
 
 	<!-- 참조 파일 단일 조회 -->		
-	<select id="findBySeq" parameterType="long"
+	<select id="getFileBySeq" parameterType="long"
 		resultType="com.iwi.iwms.api.file.domain.UploadFileInfo">
 		<include refid="selectFile"></include>
 			AND FILE.FILE_SEQ = #{fileSeq}
 	</select>	
 
 	<!-- 참조 파일 등록 -->			
-	<insert id="save" parameterType="com.iwi.iwms.api.file.domain.UploadFile"
+	<insert id="insertFile" parameterType="com.iwi.iwms.api.file.domain.UploadFile"
 		useGeneratedKeys="true" keyProperty="fileSeq">
 		INSERT INTO TB_FILE
 		(
@@ -67,7 +67,7 @@
 	</insert>		
 
 	<!-- 참조 파일 삭제 -->	
-	<delete id="delete" parameterType="long">
+	<delete id="deleteFile" parameterType="long">
 		DELETE 
 		FROM TB_FILE
 		WHERE FILE_SEQ = #{fileSeq}	 

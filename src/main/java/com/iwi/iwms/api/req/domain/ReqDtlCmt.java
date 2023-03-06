@@ -21,19 +21,22 @@ import lombok.ToString;
 @AllArgsConstructor
 public class ReqDtlCmt {
 
-	@Schema(hidden = true, description = "요구사항 코멘트 SEQ")
+	@Schema(hidden = true, description = "요청사항 상세 코멘트 SEQ")
 	private Long reqDtlCmtSeq;
 	
-	@Schema(hidden = true, description = "유지보수 SEQ")
+	@Schema(hidden = true, description = "요청사항 SEQ")
 	private long reqSeq;
 	
-	@Schema(hidden = true, description = "요구사항 SEQ")
+	@Schema(hidden = true, description = "요청사항 상세 SEQ")
 	private long reqDtlSeq;
 	
-	@Schema(hidden = true, description = "요구사항 번호") 
+	@Schema(hidden = true, description = "요청사항 상세 번호") 
 	private String reqDtlNo;
+	
+	@Schema(hidden = true, description = "요청사항 상세 담당자 SEQ") 
+	private long userSeq;
 
-	@Schema(description = "요구사항 코멘트") 
+	@Schema(description = "요청사항 상세 코멘트") 
 	private String reqDtlCmt;
 	
 	@Schema(hidden = true, description = "삭제 여부", allowableValues = {"Y", "N"}) 
@@ -55,6 +58,7 @@ public class ReqDtlCmt {
 	private long updtSeq;
 	
 	public ReqDtlCmt of(final LoginUserInfo loginUserInfo) {
+		this.userSeq = loginUserInfo.getUserSeq();
 		this.regSeq = loginUserInfo.getUserSeq();
 		this.updtSeq = loginUserInfo.getUserSeq();
 		

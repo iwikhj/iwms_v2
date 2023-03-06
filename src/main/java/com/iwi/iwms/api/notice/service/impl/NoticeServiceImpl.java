@@ -33,17 +33,17 @@ public class NoticeServiceImpl implements NoticeService {
 	
 	@Override
 	public List<NoticeInfo> listNotice(Map<String, Object> map) {
-		return noticeMapper.findAll(map);
+		return noticeMapper.listNotice(map);
 	}
 
 	@Override
 	public int countNotice(Map<String, Object> map) {
-		return noticeMapper.count(map);
+		return noticeMapper.countNotice(map);
 	}
 
 	@Override
 	public NoticeInfo getNoticeBySeq(long noticeSeq) {
-		return Optional.ofNullable(noticeMapper.findBySeq(noticeSeq))
+		return Optional.ofNullable(noticeMapper.getNoticeBySeq(noticeSeq))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "공지사항을 찾을 수 없습니다."));
 	}
 
@@ -51,7 +51,7 @@ public class NoticeServiceImpl implements NoticeService {
 	@Override
 	public void insertNotice(Notice notice) {
 		
-		noticeMapper.save(notice);
+		noticeMapper.insertNotice(notice);
 		
 		// 첨부파일 저장
 		if(notice.getFiles() != null && !notice.getFiles().isEmpty()) {
@@ -65,10 +65,10 @@ public class NoticeServiceImpl implements NoticeService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateNotice(Notice notice) {
-		Optional.ofNullable(noticeMapper.findBySeq(notice.getNoticeSeq()))
+		Optional.ofNullable(noticeMapper.getNoticeBySeq(notice.getNoticeSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "공지사항을 찾을 수 없습니다."));
 		
-		int result = noticeMapper.update(notice);
+		int result = noticeMapper.updateNotice(notice);
 
 		// 첨부파일 삭제
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(notice.getFileInfo());
@@ -89,10 +89,10 @@ public class NoticeServiceImpl implements NoticeService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int deleteNotice(Notice notice) {
-		Optional.ofNullable(noticeMapper.findBySeq(notice.getNoticeSeq()))
+		Optional.ofNullable(noticeMapper.getNoticeBySeq(notice.getNoticeSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "공지사항을 찾을 수 없습니다."));
 		
-		int result = noticeMapper.delete(notice);
+		int result = noticeMapper.deleteNotice(notice);
 		
 		// 첨부파일 삭제(디렉토리까지)
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(notice.getFileInfo());

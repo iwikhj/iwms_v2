@@ -18,7 +18,7 @@
 	</resultMap>
 
 	<!-- 공통 코드 부모 목록 조회 -->	
-	<select id="findAll" parameterType="hashMap"
+	<select id="listCode" parameterType="hashMap"
 		resultMap="resultCodeMap">
 		SELECT 
 			CODE.CODE_SEQ AS codeSeq
@@ -65,7 +65,7 @@
 	</select>
 
 	<!-- 공통 코드 등록 -->	
-	<insert id="save" parameterType="com.iwi.iwms.api.code.domain.Code"
+	<insert id="insertCode" parameterType="com.iwi.iwms.api.code.domain.Code"
 		useGeneratedKeys="true" keyProperty="codeSeq">
 		INSERT INTO TB_CODE
 		(
@@ -90,7 +90,7 @@
 	</insert>		
 
 	<!-- 공통 코드 수정 -->
-	<update id="update" parameterType="com.iwi.iwms.api.code.domain.Code">
+	<update id="updateCode" parameterType="com.iwi.iwms.api.code.domain.Code">
 		UPDATE TB_CODE 
 		SET
 		    CODE_NM = #{CODE_NM}
@@ -104,7 +104,7 @@
 	</update>	
 
 	<!-- 공통 코드 삭제 -->	
-	<delete id="delete" parameterType="com.iwi.iwms.api.code.domain.Code">
+	<delete id="deleteCode" parameterType="com.iwi.iwms.api.code.domain.Code">
 		DELETE 
 		FROM TB_CODE
 		WHERE CODE_SEQ = #{codeSeq}	 

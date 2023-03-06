@@ -20,22 +20,22 @@ public class CodeServiceImpl implements CodeService {
 	
 	@Override
 	public List<CodeInfo> listCode(Map<String, Object> map) {
-		return codeMapper.findAll(map);
+		return codeMapper.listCode(map);
 	}
 
 	@Override
 	public void insertCode(Code code) {
-		codeMapper.save(code);
+		codeMapper.insertCode(code);
 	}
 
 	@Override
 	public int updateCode(Code code) {
-		return codeMapper.update(code);
+		return codeMapper.updateCode(code);
 	}
 
 	@Override
 	public int deleteCode(Code code) {
-		return codeMapper.delete(code);
+		return codeMapper.deleteCode(code);
 	}
 
 }

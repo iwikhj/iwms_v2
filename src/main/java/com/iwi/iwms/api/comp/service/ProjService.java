@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.iwi.iwms.api.comp.domain.Proj;
 import com.iwi.iwms.api.comp.domain.ProjInfo;
+import com.iwi.iwms.api.comp.domain.ProjUserList;
 
 public interface ProjService {
 
@@ -12,11 +13,15 @@ public interface ProjService {
 	
 	int countProj(Map<String, Object> map);
 
-	ProjInfo getProjBySeq(Proj proj);
+	ProjInfo getProjBySeq(long projSeq);
 	
 	void insertProj(Proj proj);
 	
 	int updateProj(Proj proj);
 	
 	int deleteProj(Proj proj);
+	
+	Map<String, Object> listProjUser(long projSeq);
+
+	int updateProjUser(ProjUserList projUserList);
 }

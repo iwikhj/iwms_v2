@@ -23,7 +23,7 @@ public class Proj {
 	private long projSeq;
 	
 	@NotNull(message = "소속은 필수 입력 사항입니다")
-	@Schema(hidden = true, description = "소속 SEQ")
+	@Schema(description = "소속 SEQ")
 	private long compSeq;
 	
 	@NotNull(message = "프로젝트 이름은 필수 입력 사항입니다")

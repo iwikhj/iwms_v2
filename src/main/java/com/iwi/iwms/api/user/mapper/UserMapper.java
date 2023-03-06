@@ -13,19 +13,19 @@ import com.iwi.iwms.api.user.domain.UserUpdate;
 @Mapper
 public interface UserMapper {
 
-	List<UserInfo> findAll(Map<String, Object> map);
+	List<UserInfo> listUser(Map<String, Object> map);
 	
-	int count(Map<String, Object> map);
+	int countUser(Map<String, Object> map);
 	
-	UserInfo findBySeq(long userSeq);
+	UserInfo getUserBySeq(long userSeq);
 	
-	UserInfo findById(String userId);
+	UserInfo getUserById(String userId);
 	
-	void save(User user);
+	void insertUser(User user);
 	
-	int update(UserUpdate userUpdate);
+	int updateUser(UserUpdate userUpdate);
 	
-	int delete(User user);
+	int deleteUser(User user);
 	
 	int updatePassword(User user);
 	
@@ -33,8 +33,6 @@ public interface UserMapper {
 	
 	int updateLoginFailure(User user);
 	
-	LoginUserInfo findLoginUser(String ssoId);
-	
-	
+	LoginUserInfo getLoginUser(String ssoId);
 
 }

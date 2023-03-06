@@ -21,22 +21,22 @@ public class ReqDtlCmtInfo {
 	@Schema(description = "번호")
 	private long rowNum;
 	
-	@Schema(description = "요구사항 코멘트 SEQ")
+	@Schema(description = "요청사항 상세 코멘트 SEQ")
 	private Long reqDtlCmtSeq;
 	
-	@Schema(description = "유지보수 SEQ")
+	@Schema(description = "요청사항 SEQ")
 	private long reqSeq;
 	
-	@Schema(description = "유지보수 번호") 
+	@Schema(description = "요청사항 번호") 
 	private String reqNo;
 	
-	@Schema(description = "요구사항 SEQ")
+	@Schema(description = "요청사항 상세 SEQ")
 	private long reqDtlSeq;
 	
-	@Schema(description = "요구사항 번호") 
+	@Schema(description = "요청사항 상세 번호") 
 	private String reqDtlNo;
 	
-	@Schema(description = "요구사항 코멘트") 
+	@Schema(description = "요청사항 상세 코멘트") 
 	private String reqDtlCmt;
 	
 	@Schema(description = "코멘트 입력 유저 SEQ") 

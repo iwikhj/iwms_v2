@@ -1,6 +1,5 @@
 package com.iwi.iwms.api.user.domain;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
@@ -23,7 +22,6 @@ public class User {
 	@Schema(hidden = true, description = "사용자 SEQ")
 	private long userSeq;
 
-	@Email(message = "사용자 아이디는 이메일 형식으로 입력해주세요")
 	@NotNull(message = "사용자 아이디는 필수 입력 사항입니다")
 	@Schema(description = "사용자 아이디(이메일 형식)")
 	private String userId;
@@ -40,16 +38,15 @@ public class User {
 	@Schema(description = "사용자 업무 코드: [PL: 기획, DS: 디자인, UI: 퍼블리싱, DV: 개발, ET: 기타]", allowableValues = {"PL", "DS", "UI", "DV", "ET"}) 
 	private String userBusiCd; 
 
-	@NotNull(message = "직급은 필수 입력 사항입니다")
 	@Schema(description = "직급 SEQ") 
-	private long positionSeq;
+	private Long positionSeq;
 	
 	@Schema(description = "직책 구분 코드") 
 	private String dutyGbCd;
 	
 	@NotNull(message = "소속은 필수 입력 사항입니다")
 	@Schema(description = "소속 SEQ") 
-	private long compSeq;
+	private Long compSeq;
 	
 	@Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$", message = "유효한 전화번호가 아닙니다")
 	@Schema(description = "전화번호") 

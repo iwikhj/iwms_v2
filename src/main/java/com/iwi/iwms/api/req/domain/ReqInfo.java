@@ -21,10 +21,10 @@ public class ReqInfo {
 	@Schema(description = "번호")
 	private long rowNum;
 	
-	@Schema(description = "유지보수 SEQ")
+	@Schema(description = "요청사항 SEQ")
 	private long reqSeq;
 	
-	@Schema(description = "유지보수 번호") 
+	@Schema(description = "요청사항 번호") 
 	private String reqNo;
 
 	@Schema(description = "소속 SEQ")
@@ -45,25 +45,25 @@ public class ReqInfo {
 	@Schema(description = "사이트 이름")
 	private String siteNm;
 	
-	@Schema(description = "유지보수 등록일")
+	@Schema(description = "요청사항 등록일")
 	private String reqYmd;
 	
-	@Schema(description = "유지보수 타입 코드") 
+	@Schema(description = "요청사항 타입 코드") 
 	private String reqTypeCd;
 	
-	@Schema(description = "유지보수 타입") 
+	@Schema(description = "요청사항 타입") 
 	private String reqType;
 	
-	@Schema(description = "유지보수 구분 코드") 
+	@Schema(description = "요청사항 구분 코드") 
 	private String reqGbCd;
 	
-	@Schema(description = "유지보수 구분") 
+	@Schema(description = "요청사항 구분") 
 	private String reqGb;
 
-	@Schema(description = "유지보수 완료일 예정일")
+	@Schema(description = "요청사항 완료일 예정일")
 	private String reqEndYmd;
 	
-	@Schema(description = "유지보수 내용") 
+	@Schema(description = "요청사항 내용") 
 	private String reqContentsTxt;
 	
 	@Schema(description = "합의 여부") 

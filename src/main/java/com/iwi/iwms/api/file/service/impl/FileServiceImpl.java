@@ -34,7 +34,7 @@ public class FileServiceImpl implements FileService {
 
 	@Override
 	public List<UploadFileInfo> listFileByRef(UploadFile uploadFile) {
-		return fileMapper.findAllByRef(uploadFile);
+		return fileMapper.listFileByRef(uploadFile);
 	}
 	
 	@Transactional(rollbackFor = {Exception.class})
@@ -45,7 +45,7 @@ public class FileServiceImpl implements FileService {
 				uploadFile.setFileOrgNm(multipartFile.getOriginalFilename());
 				uploadFile.setFileRealNm(FilePolicy.rename(multipartFile.getOriginalFilename()));
 				
-				fileMapper.save(uploadFile);
+				fileMapper.insertFile(uploadFile);
 				fileStorageService.store(multipartFile, Paths.get(uploadFile.getFileRealPath()), uploadFile.getFileRealNm());
 			});
 	
@@ -58,7 +58,7 @@ public class FileServiceImpl implements FileService {
 		oldAttachedFiles.stream()
 			.filter(v -> currentAttachedFilesSeq == null || !currentAttachedFilesSeq.contains(v.getFileSeq()))
 			.forEach(v -> {
-				fileMapper.delete(v.getFileSeq());
+				fileMapper.deleteFile(v.getFileSeq());
 				fileStorageService.delete(Paths.get(v.getFileRealPath()).resolve(v.getFileRealNm()));
 			});
 	}
@@ -68,7 +68,7 @@ public class FileServiceImpl implements FileService {
 	public void deleteAttachAll(List<UploadFileInfo> attachedFiles) {
 		attachedFiles.stream()
 			.forEach(v -> {
-				fileMapper.delete(v.getFileSeq());
+				fileMapper.deleteFile(v.getFileSeq());
 			});
 		fileStorageService.deleteAll(Paths.get(attachedFiles.get(0).getFileRealPath()));
 	}
@@ -86,7 +86,7 @@ public class FileServiceImpl implements FileService {
 	
 	@Override
 	public UploadFileInfo getFileBySeq(long fileSeq) {
-		return Optional.ofNullable(fileMapper.findBySeq(fileSeq))
+		return Optional.ofNullable(fileMapper.getFileBySeq(fileSeq))
 					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "파일을 찾을 수 없습니다."));
 	}
 

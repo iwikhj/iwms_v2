@@ -18,7 +18,7 @@ import lombok.ToString;
 @AllArgsConstructor
 public class ReqAgree {
 
-	@Schema(hidden = true, description = "유지보수 SEQ")
+	@Schema(hidden = true, description = "요청사항 SEQ")
 	private long reqSeq;
 	
 	@NotNull

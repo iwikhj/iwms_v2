@@ -18,7 +18,7 @@
 		<result property="updtNm" column="updtNm"/>
 		
 	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=noticeSeq" 
-			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.findAllByRef"/>
+			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>
 	</resultMap>
 		
 	<sql id="selectNotice">
@@ -47,7 +47,7 @@
 	</sql>
 
 	<!-- 공지사항 목록 조회 -->	
-	<select id="findAll" parameterType="hashMap"
+	<select id="listNotice" parameterType="hashMap"
 		resultMap="resultNoticeMap">
 		<include refid="selectNotice"></include>
 		<if test='compSeq != null and compSeq != ""'>
@@ -65,7 +65,7 @@
 	</select>	
 	
 	<!-- 공지사항 수 조회 -->
-	<select id="count" parameterType="hashMap"
+	<select id="countNotice" parameterType="hashMap"
 		resultType="int">
 		SELECT 
 			COUNT(NOTI.NOTICE_SEQ)
@@ -83,14 +83,14 @@
 	</select>		
 
 	<!-- 공지사항 단일 조회 -->	
-	<select id="findBySeq" parameterType="long"
+	<select id="getNoticeBySeq" parameterType="long"
 		resultMap="resultNoticeMap">
 		<include refid="selectNotice"></include>
 		AND NOTI.NOTICE_SEQ = #{noticeSeq}
 	</select>	
 
 	<!-- 공지사항 등록 -->	
-	<insert id="save" parameterType="com.iwi.iwms.api.notice.domain.Notice"
+	<insert id="insertNotice" parameterType="com.iwi.iwms.api.notice.domain.Notice"
 		useGeneratedKeys="true" keyProperty="noticeSeq">
 		INSERT INTO TB_NOTICE
 		(
@@ -117,7 +117,7 @@
 	</insert>		
 
 	<!-- 공지사항 수정 -->	
-	<update id="update" parameterType="com.iwi.iwms.api.notice.domain.Notice">
+	<update id="updateNotice" parameterType="com.iwi.iwms.api.notice.domain.Notice">
 		UPDATE TB_NOTICE 
 		SET
 			COMP_SEQ = #{compSeq}
@@ -132,7 +132,7 @@
 	</update>	
 
 	<!-- 공지사항 삭제 -->		
-	<delete id="delete" parameterType="com.iwi.iwms.api.notice.domain.Notice">
+	<delete id="deleteNotice" parameterType="com.iwi.iwms.api.notice.domain.Notice">
 		DELETE 
 		FROM TB_NOTICE
 		WHERE NOTICE_SEQ = #{noticeSeq}	 

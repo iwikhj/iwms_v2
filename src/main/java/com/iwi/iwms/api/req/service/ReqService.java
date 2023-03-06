@@ -24,5 +24,5 @@ public interface ReqService {
 	
 	int cancelReq(ReqCancel reqCancel);
 	
-	int updateReqAgree(ReqAgree reqAgree);
+	int agreeReq(ReqAgree reqAgree);
 }

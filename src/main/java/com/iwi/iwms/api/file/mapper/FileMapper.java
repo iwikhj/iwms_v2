@@ -10,13 +10,13 @@ import com.iwi.iwms.api.file.domain.UploadFileInfo;
 @Mapper
 public interface FileMapper {
 
-	List<UploadFileInfo> findAllByRef(UploadFile uploadFile);
+	List<UploadFileInfo> listFileByRef(UploadFile uploadFile);
 	
-	UploadFileInfo findBySeq(long fileSeq);
+	UploadFileInfo getFileBySeq(long fileSeq);
 	
-	void save(UploadFile uploadFile);
+	void insertFile(UploadFile uploadFile);
 	
-	int delete(long fileSeq);
+	int deleteFile(long fileSeq);
 	
 	int updateOrderNum(UploadFile uploadFile);
 }

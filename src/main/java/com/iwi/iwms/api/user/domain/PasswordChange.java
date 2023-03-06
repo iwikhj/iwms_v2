@@ -26,8 +26,9 @@ public class PasswordChange {
 	private long userSeq;
 	
 	@NotNull(message = "비밀번호는 필수 입력 사항입니다")
-	@Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,20}$", message = "비밀번호는 영문 숫자 특수문자를 모두 포함하여 공백없이 8 20자로 입력해주세요")
-	@Schema(description = "비밀번호: 8~20자의 숫자, 영문자, 특수문자를 포함") 
+	//@Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[@$!%*#?&])[A-Za-z\\d@$!%*#?&]{8,20}$", message = "비밀번호는 영문 숫자 특수문자를 모두 포함하여 공백없이 8 20자로 입력해주세요")
+	//@Schema(description = "비밀번호: 8~20자의 숫자, 영문자, 특수문자를 포함") 
+	@Schema(description = "비밀번호")
 	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	private String userPwd;
 	

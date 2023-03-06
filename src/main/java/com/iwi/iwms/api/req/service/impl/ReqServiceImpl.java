@@ -35,17 +35,17 @@ public class ReqServiceImpl implements ReqService {
     
 	@Override
 	public List<ReqInfo> listReq(Map<String, Object> map) {
-		return reqMapper.findAll(map);
+		return reqMapper.listReq(map);
 	}
 
 	@Override
 	public int countReq(Map<String, Object> map) {
-		return reqMapper.count(map);
+		return reqMapper.countReq(map);
 	}
 
 	@Override
 	public ReqInfo getReqBySeq(long reqSeq) {
-		return Optional.ofNullable(reqMapper.findBySeq(reqSeq))
+		return Optional.ofNullable(reqMapper.getReqBySeq(reqSeq))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항을 찾을 수 없습니다."));
 	}
 
@@ -53,7 +53,7 @@ public class ReqServiceImpl implements ReqService {
 	@Override
 	public void insertReq(Req req) {
 	
-		reqMapper.save(req);
+		reqMapper.insertReq(req);
 		
 		// 첨부파일 저장
 		if(req.getFiles() != null && !req.getFiles().isEmpty()) {
@@ -67,10 +67,10 @@ public class ReqServiceImpl implements ReqService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateReq(Req req) {
-		Optional.ofNullable(reqMapper.findBySeq(req.getReqSeq()))
+		Optional.ofNullable(reqMapper.getReqBySeq(req.getReqSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항을 찾을 수 없습니다."));
 		
-		int result = reqMapper.update(req);
+		int result = reqMapper.updateReq(req);
 		
 		// 첨부파일 삭제
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(req.getFileInfo());
@@ -91,10 +91,10 @@ public class ReqServiceImpl implements ReqService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int deleteReq(Req req) {
-		Optional.ofNullable(reqMapper.findBySeq(req.getReqSeq()))
+		Optional.ofNullable(reqMapper.getReqBySeq(req.getReqSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항을 찾을 수 없습니다."));
 		
-		int result = reqMapper.delete(req);
+		int result = reqMapper.deleteReq(req);
 		
 		// 첨부파일 삭제(디렉토리까지)
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(req.getFileInfo());
@@ -107,18 +107,18 @@ public class ReqServiceImpl implements ReqService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int cancelReq(ReqCancel reqCancel) {
-		Optional.ofNullable(reqMapper.findBySeq(reqCancel.getReqSeq()))
+		Optional.ofNullable(reqMapper.getReqBySeq(reqCancel.getReqSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항을 찾을 수 없습니다."));
 		
-		return reqMapper.cancel(reqCancel);
+		return reqMapper.cancelReq(reqCancel);
 	}
 	
 	@Override
-	public int updateReqAgree(ReqAgree reqAgree) {
-		Optional.ofNullable(reqMapper.findBySeq(reqAgree.getReqSeq()))
+	public int agreeReq(ReqAgree reqAgree) {
+		Optional.ofNullable(reqMapper.getReqBySeq(reqAgree.getReqSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항을 찾을 수 없습니다."));
 		
-		return reqMapper.agree(reqAgree);
+		return reqMapper.agreeReq(reqAgree);
 	}
 
 }

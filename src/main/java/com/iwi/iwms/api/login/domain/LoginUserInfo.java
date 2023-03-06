@@ -27,10 +27,10 @@ public class LoginUserInfo {
 	@Schema(description = "사용자 이름")
 	private String userNm;
 	
-	@Schema(description = "사용자 구분 코드: [00: 유지보수, 01: 전산담당, 02: 현업담당, 99: 관리자]") 
+	@Schema(description = "사용자 구분 코드") 
 	private String userGbCd;
 	
-	@Schema(description = "사용자 업무 코드: [PL: 기획, DS: 디자인, UI: 퍼블리싱, DV: 개발, ET: 기타]") 
+	@Schema(description = "사용자 업무 코드") 
 	private String userBusiCd; 	
 
 	@Schema(description = "직급 SEQ") 

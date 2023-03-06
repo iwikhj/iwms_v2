@@ -11,11 +11,11 @@ import com.iwi.iwms.api.code.domain.CodeInfo;
 @Mapper
 public interface CodeMapper {
 
-	List<CodeInfo> findAll(Map<String, Object> map);
+	List<CodeInfo> listCode(Map<String, Object> map);
 	
-	void save(Code code);
+	void insertCode(Code code);
 	
-	int update(Code code);
+	int updateCode(Code code);
 	
-	int delete(Code code);
+	int deleteCode(Code code);
 }

@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -43,8 +44,6 @@ public class AuthenticationFilter extends GenericFilterBean {
 	
 	private final JwtDecoder jwtDecoder;
     
-    private final static String H_AUTHORIZATION = "Authorization";
-    
 	@Override
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
 		
@@ -58,25 +57,25 @@ public class AuthenticationFilter extends GenericFilterBean {
         log.info("[Token status] <{}>", tokenStatus.name());
         
         if(AuthCode.VERIFIED.equals(tokenStatus)) {
-        	//
+        	//ok
         } else if(AuthCode.EXPIRED.equals(tokenStatus)) {
 			//sendError(request, response, HttpStatus.UNAUTHORIZED, tokenStatus.name());
 			//return;
-        	passAuthentication("fdca608f-b7a7-4b87-8a61-273b70bcc88a", Arrays.asList("ROLE_IWMS_ADMIN"));
-    		request = ignoreRequestHeader(servletRequest, request, H_AUTHORIZATION);
+        	passAuthentication("49a64649-08ce-47f5-95c6-dc806ddc650b", Arrays.asList("ROLE_IWMS_ADMIN"));
+    		request = ignoreRequestHeader(servletRequest, request, HttpHeaders.AUTHORIZATION);
     		
         } else if(AuthCode.INVALID.equals(tokenStatus)) {
 			//sendError(request, response, HttpStatus.BAD_REQUEST, tokenStatus.name());
 			//return;
-        	passAuthentication("fdca608f-b7a7-4b87-8a61-273b70bcc88a", Arrays.asList("ROLE_IWMS_ADMIN"));
-    		request = ignoreRequestHeader(servletRequest, request, H_AUTHORIZATION);
+        	passAuthentication("49a64649-08ce-47f5-95c6-dc806ddc650b", Arrays.asList("ROLE_IWMS_ADMIN"));
+    		request = ignoreRequestHeader(servletRequest, request, HttpHeaders.AUTHORIZATION);
         }
 
         chain.doFilter(request, response);
 	}
     
     private String resolveAuthHeader(HttpServletRequest request) {
-    	String bearerToken = request.getHeader(H_AUTHORIZATION);
+    	String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (StringUtils.hasText(bearerToken) && bearerToken.length() > 7 && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }

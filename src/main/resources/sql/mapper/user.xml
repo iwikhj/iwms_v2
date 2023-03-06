@@ -9,9 +9,9 @@
 			, USER.USER_ID AS userId
 			, USER.USER_NM AS userNm
 			, USER.USER_GB_CD AS userGbCd
-			, USER_GB_CODE.CODE_NM AS userGb
+			, CODE1.CODE_NM AS userGb
 			, USER.USER_BUSI_CD AS userBusiCd
-			, USER_BUSI_CODE.CODE_NM AS userBusi
+			, CODE2.CODE_NM AS userBusi
 			, USER.POSITION_SEQ AS positionSeq
 			, POSI.POSITION_NM AS positionNm
 			, USER.DUTY_GB_CD AS dutyGbCd
@@ -40,16 +40,18 @@
 			, UPDT_USER.USER_NM AS updtNm				
 		FROM TB_USER USER
 		INNER JOIN TB_COMPANY COMP ON USER.COMP_SEQ = COMP.COMP_SEQ
-		INNER JOIN TB_POSITION POSI ON USER.POSITION_SEQ = POSI.POSITION_SEQ
-        LEFT JOIN TB_CODE USER_GB_CODE ON USER.USER_GB_CD = USER_GB_CODE.CODE_CD AND USER_GB_CODE.UP_CODE_CD = 'USER_GB_CD'       
-        LEFT JOIN TB_CODE USER_BUSI_CODE ON USER.USER_BUSI_CD = USER_BUSI_CODE.CODE_CD AND USER_BUSI_CODE.UP_CODE_CD = 'BUSI_ROLL_CD'  		
+		LEFT JOIN TB_POSITION POSI ON USER.POSITION_SEQ = POSI.POSITION_SEQ
+        LEFT JOIN TB_CODE CODE1 ON USER.USER_GB_CD = CODE1.CODE_CD 
+        	AND CODE1.UP_CODE_CD = 'USER_GB_CD'       
+        LEFT JOIN TB_CODE CODE2 ON USER.USER_BUSI_CD = CODE2.CODE_CD 
+        	AND CODE2.UP_CODE_CD = 'BUSI_ROLL_CD'  		
 		LEFT JOIN TB_USER REG_USER ON USER.REG_SEQ = REG_USER.USER_SEQ
 		LEFT JOIN TB_USER UPDT_USER ON USER.UPDT_SEQ = UPDT_USER.USER_SEQ 		
 		WHERE USER.USE_YN = 'Y'
 	</sql>
 	
 	<!-- 사용자 목록 조회 -->
-	<select id="findAll" parameterType="hashMap"
+	<select id="listUser" parameterType="hashMap"
 		resultType="com.iwi.iwms.api.user.domain.UserInfo">
 		<include refid="selectUser"></include>
 		<if test='search != null and search != ""'>
@@ -64,13 +66,13 @@
 	</select>	
 	
 	<!-- 사용자 수 -->
-	<select id="count" parameterType="hashMap"
+	<select id="countUser" parameterType="hashMap"
 		resultType="int">
 		SELECT 
 			COUNT(USER.USER_SEQ)
 		FROM TB_USER USER
 		INNER JOIN TB_COMPANY COMP ON USER.COMP_SEQ = COMP.COMP_SEQ
-		INNER JOIN TB_POSITION POSI ON USER.POSITION_SEQ = POSI.POSITION_SEQ
+		LEFT JOIN TB_POSITION POSI ON USER.POSITION_SEQ = POSI.POSITION_SEQ
 		<if test='search != null and search != ""'>
 			AND USER.USER_NM LIKE CONCAT('%', #{search}, '%') 
 			OR COMP.COMP_NM LIKE CONCAT('%', #{search}, '%')
@@ -79,7 +81,7 @@
 	</select>	
 		
 	<!-- 소속별 사용자 목록 조회 -->
-	<select id="findAllByCompSeq" parameterType="long"
+	<select id="listUserByCompSeq" parameterType="long"
 		resultType="com.iwi.iwms.api.user.domain.UserInfo">
 		<include refid="selectUser"></include>
 			AND USER.COMP_SEQ = #{compSeq}		
@@ -87,21 +89,21 @@
 	</select>	
 	
 	<!-- 사용자 단일 조회 -->
-	<select id="findBySeq" parameterType="long"
+	<select id="getUserBySeq" parameterType="long"
 		resultType="com.iwi.iwms.api.user.domain.UserInfo">
 		<include refid="selectUser"></include>
 		AND USER.USER_SEQ = #{userSeq}
 	</select>	
 	
 	<!-- 아이디와 일치하는 사용자 조회 -->
-	<select id="findById" parameterType="String"
+	<select id="getUserById" parameterType="String"
 		resultType="com.iwi.iwms.api.user.domain.UserInfo">
 		<include refid="selectUser"></include>
 		AND USER.USER_ID = #{userId}
 	</select>	
 	
 	<!-- 사용자 정보 등록 -->
-	<insert id="save" parameterType="com.iwi.iwms.api.user.domain.User"
+	<insert id="insertUser" parameterType="com.iwi.iwms.api.user.domain.User"
 		useGeneratedKeys="true" keyProperty="userSeq">
 		INSERT INTO TB_USER
 		(
@@ -156,7 +158,7 @@
 	</insert>		
 
 	<!-- 사용자 정보 수정 -->
-	<update id="update" parameterType="com.iwi.iwms.api.user.domain.UserUpdate">
+	<update id="updateUser" parameterType="com.iwi.iwms.api.user.domain.UserUpdate">
 		UPDATE TB_USER 
 		SET
 		    USER_NM = #{userNm}
@@ -181,7 +183,7 @@
 	</update>	
 	
 	<!-- 사용자 정보 삭제 -->
-	<delete id="delete" parameterType="com.iwi.iwms.api.user.domain.User">
+	<delete id="deleteUser" parameterType="com.iwi.iwms.api.user.domain.User">
 		DELETE 
 		FROM TB_USER
 		WHERE USER_SEQ = #{userSeq}	 
@@ -205,8 +207,6 @@
 		    LOGIN_ERR_CNT = 0
 			, LAST_LOGIN_IP = #{lastLoginIp}
 			, LAST_LOGIN_DT = CURRENT_TIMESTAMP
-			, UPDT_DT = CURRENT_TIMESTAMP
-			, UPDT_SEQ = #{updtSeq}
 		WHERE USER_SEQ = #{userSeq}	
 	</update>	
 	
@@ -215,8 +215,6 @@
 		UPDATE TB_USER 
 		SET
 		    LOGIN_ERR_CNT = LOGIN_ERR_CNT + 1
-		    , UPDT_DT = CURRENT_TIMESTAMP
-			, UPDT_SEQ = USER_SEQ
 		WHERE USER_ID = #{userId}	
 	</update>		
 	
@@ -252,7 +250,7 @@
 			ofType="com.iwi.iwms.api.user.domain.MenuInfo" select="childPermissionsMenu"/>
 	</resultMap>	
 	
-	<select id="findLoginUser" parameterType="String"
+	<select id="getLoginUser" parameterType="String"
 		resultMap="resultLoginUserMap">
 		SELECT 
 			USER.USER_SEQ AS userSeq

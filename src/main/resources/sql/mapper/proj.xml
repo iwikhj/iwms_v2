@@ -24,11 +24,13 @@
 		WHERE PROJ.USE_YN = 'Y'
 	</sql>
 
-	<!-- 소속 프로젝트 목록 조회 -->	
-	<select id="findAll" parameterType="hashMap"
+	<!-- 프로젝트 목록 조회 -->	
+	<select id="listProj" parameterType="hashMap"
 		resultType="com.iwi.iwms.api.comp.domain.ProjInfo">
 		<include refid="selectProj"></include>
+		<if test='compSeq != null and compSeq != ""'>
 			AND PROJ.COMP_SEQ = #{compSeq}
+		</if>
 		<if test='search != null and search != ""'>
 			AND PROJ.PROJ_NM LIKE CONCAT('%', #{search}, '%') 
 			OR PROJ.PROJ_SW_NM LIKE CONCAT('%', #{search}, '%') 
@@ -40,15 +42,17 @@
 		</if>
 	</select>	
 
-	<!-- 소속 프로젝트 수 -->	
-	<select id="count" parameterType="hashMap"
+	<!-- 프로젝트 수 -->	
+	<select id="countProj" parameterType="hashMap"
 		resultType="int">
 		SELECT 
 			COUNT(PROJ.PROJ_SEQ)
 		FROM TB_PROJ PROJ
 		INNER JOIN TB_COMPANY COMP ON PROJ.COMP_SEQ = COMP.COMP_SEQ
 		WHERE PROJ.USE_YN = 'Y'
+		<if test='compSeq != null and compSeq != ""'>
 			AND PROJ.COMP_SEQ = #{compSeq}
+		</if>
 		<if test='search != null and search != ""'>
 			AND PROJ.PROJ_NM LIKE CONCAT('%', #{search}, '%') 
 			OR PROJ.PROJ_SW_NM LIKE CONCAT('%', #{search}, '%') 
@@ -56,15 +60,15 @@
 		</if>				
 	</select>		
 
-	<!-- 소속 프로젝트 단일 조회 -->	
-	<select id="findBySeq" parameterType="com.iwi.iwms.api.comp.domain.Proj"
+	<!-- 프로젝트 단일 조회 -->	
+	<select id="getProjBySeq" parameterType="long"
 		resultType="com.iwi.iwms.api.comp.domain.ProjInfo">
 		<include refid="selectProj"></include>
 			AND PROJ.PROJ_SEQ = #{projSeq}
 	</select>	
 
-	<!-- 소속 프로젝트 등록 -->
-	<insert id="save" parameterType="com.iwi.iwms.api.comp.domain.Proj"
+	<!-- 프로젝트 등록 -->
+	<insert id="insertProj" parameterType="com.iwi.iwms.api.comp.domain.Proj"
 		useGeneratedKeys="true" keyProperty="projSeq">
 		INSERT INTO TB_PROJ
 		(
@@ -88,8 +92,8 @@
 		)		
 	</insert>		
 
-	<!-- 소속 프로젝트 수정 -->
-	<update id="update" parameterType="com.iwi.iwms.api.comp.domain.Proj">
+	<!-- 프로젝트 수정 -->
+	<update id="updateProj" parameterType="com.iwi.iwms.api.comp.domain.Proj">
 		UPDATE TB_PROJ 
 		SET
 		    PROJ_NM = #{projNm}
@@ -102,11 +106,104 @@
 		WHERE PROJ_SEQ = #{projSeq}	
 	</update>	
 
-	<!-- 소속 프로젝트 삭제 -->	
-	<delete id="delete" parameterType="com.iwi.iwms.api.comp.domain.Proj">
+	<!-- 프로젝트 삭제 -->	
+	<delete id="deleteProj" parameterType="com.iwi.iwms.api.comp.domain.Proj">
 		DELETE 
 		FROM TB_PROJ
 		WHERE PROJ_SEQ = #{projSeq}	 
 	</delete>
-		
+
+	<resultMap id="resultProjUserMap" type="map">
+	   	<collection property="unassignedUsers" column="projSeq" 
+			ofType="com.iwi.iwms.api.comp.domain.ProjUserInfo" select="listUnassignedProjUser"/>
+			
+	   	<collection property="assignedUsers" column="projSeq" 
+			ofType="com.iwi.iwms.api.comp.domain.ProjUserInfo" select="listAssignedProjUser"/>			
+	</resultMap>	
+	
+	<!-- 프로젝트별 배정된 담당자와 배정 가능한 담당자 목록 조회 -->	
+	<select id="listProjUser" parameterType="long"
+		resultMap="resultProjUserMap">
+		SELECT 
+			PROJ.PROJ_SEQ AS projSeq
+		FROM TB_PROJ PROJ
+		WHERE PROJ.PROJ_SEQ = #{projSeq}
+	</select>
+	
+	<!-- 프로젝트별 배정 가능한 담당자 목록 조회 -->	
+	<select id="listUnassignedProjUser" parameterType="long"
+		resultType="com.iwi.iwms.api.comp.domain.ProjUserInfo">
+		SELECT 
+			ROW_NUMBER() OVER(ORDER BY USER.USER_SEQ) AS rowNum
+			, USER.USER_SEQ AS userSeq
+			, USER.USER_NM AS userNm
+			, USER.USER_BUSI_CD AS busiRollCd
+            , CODE1.CODE_NM AS busiRoll
+            , POSI.POSITION_NM AS positionNm
+		FROM TB_USER USER
+        LEFT JOIN TB_PROJ_USER PROJ_USER ON USER.USER_SEQ = PROJ_USER.USER_SEQ 
+			AND PROJ_USER.PROJ_SEQ = #{projSeq}
+		LEFT JOIN TB_POSITION POSI ON USER.POSITION_SEQ = POSI.POSITION_SEQ   
+		LEFT JOIN TB_CODE CODE1 ON USER.USER_BUSI_CD = CODE1.CODE_CD 
+			AND CODE1.UP_CODE_CD = 'BUSI_ROLL_CD' 
+        WHERE PROJ_USER.PROJ_USER_SEQ IS NULL
+		ORDER BY USER.USER_SEQ DESC
+	</select>
+
+	<!-- 프로젝트별 배정된 담당자 목록 조회 -->	
+	<select id="listAssignedProjUser" parameterType="long"
+		resultType="com.iwi.iwms.api.comp.domain.ProjUserInfo">
+		SELECT 
+			ROW_NUMBER() OVER(ORDER BY PROJ_USER.PROJ_USER_SEQ) AS rowNum
+			, PROJ_USER.USER_SEQ AS userSeq
+			, USER.USER_NM AS userNm
+			, PROJ_USER.REP_USER_YN AS repUserYn
+			, PROJ_USER.BUSI_ROLL_CD AS busiRollCd
+			, CODE1.CODE_NM AS busiRoll
+			, POSI.POSITION_NM AS positionNm
+		FROM TB_PROJ PROJ
+		INNER JOIN TB_PROJ_USER PROJ_USER ON PROJ.PROJ_SEQ = PROJ_USER.PROJ_SEQ
+		INNER JOIN TB_USER USER ON PROJ_USER.USER_SEQ = USER.USER_SEQ
+		LEFT JOIN TB_POSITION POSI ON USER.POSITION_SEQ = POSI.POSITION_SEQ   
+		LEFT JOIN TB_CODE CODE1 ON PROJ_USER.BUSI_ROLL_CD = CODE1.CODE_CD 
+			AND CODE1.UP_CODE_CD = 'BUSI_ROLL_CD'  		
+		LEFT JOIN TB_USER REG_USER ON PROJ_USER.REG_SEQ = REG_USER.USER_SEQ
+		WHERE PROJ.USE_YN = 'Y'
+			AND PROJ_USER.USE_YN = 'Y'
+			AND PROJ.PROJ_SEQ = #{projSeq}
+		ORDER BY PROJ_USER.PROJ_USER_SEQ DESC	
+	</select>	
+
+	<!-- 프로젝트 담당자 등록 -->
+	<insert id="updateProjUser" parameterType="list">
+		INSERT INTO TB_PROJ_USER
+		(
+		    PROJ_SEQ
+		    , USER_SEQ
+		    , REP_USER_YN
+		    , BUSI_ROLL_CD
+		    , USE_YN
+			, REG_DT
+			, REG_SEQ
+		) 
+		VALUES 
+		<foreach collection="list" item="item" separator="," >
+		(
+		    #{item.projSeq}
+			, #{item.userSeq}
+			, #{item.repUserYn}
+			, (SELECT USER_BUSI_CD FROM TB_USER WHERE USER_SEQ = #{item.userSeq})
+			, #{item.useYn}
+			, CURRENT_TIMESTAMP
+			, #{item.regSeq}
+		)			
+		</foreach>
+	</insert>		
+	
+	<!-- 프로젝트 삭제 -->	
+	<delete id="deleteProjUser" parameterType="long">
+		DELETE 
+		FROM TB_PROJ_USER
+		WHERE PROJ_SEQ = #{projSeq}	 
+	</delete>		
 </mapper>

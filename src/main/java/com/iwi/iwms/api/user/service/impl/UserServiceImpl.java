@@ -32,17 +32,17 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public List<UserInfo> listUser(Map<String, Object> map) {
-		return userMapper.findAll(map);
+		return userMapper.listUser(map);
 	}
 
 	@Override
 	public int countUser(Map<String, Object> map) {
-		return userMapper.count(map);
+		return userMapper.countUser(map);
 	}
 
 	@Override
 	public UserInfo getUserBySeq(long userSeq) {
-		return Optional.ofNullable(userMapper.findBySeq(userSeq))
+		return Optional.ofNullable(userMapper.getUserBySeq(userSeq))
 					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다"));
 	}
 	
@@ -59,7 +59,7 @@ public class UserServiceImpl implements UserService {
 		String password = user.getUserId();
 		String lastName = "iwms"; 
 		String firstName = user.getUserNm(); 
-		String email = username;
+		String email = null;
 		String role = user.getUserRole();
 		
 		if(keycloakProvider.existsUsername(username)) {
@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
 		
 		try {
 			user.setSsoId(ssoId);
-			userMapper.save(user);
+			userMapper.insertUser(user);
 		} catch(Exception e) {
 			keycloakProvider.deleteUser(ssoId);
 		}
@@ -79,10 +79,10 @@ public class UserServiceImpl implements UserService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateUser(UserUpdate userUpdate) {
-		UserInfo userInfo = Optional.ofNullable(userMapper.findBySeq(userUpdate.getUserSeq()))
+		UserInfo userInfo = Optional.ofNullable(userMapper.getUserBySeq(userUpdate.getUserSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
 		
-		int result = userMapper.update(userUpdate);
+		int result = userMapper.updateUser(userUpdate);
 		
 		if(result > 0) {
 			
@@ -105,10 +105,10 @@ public class UserServiceImpl implements UserService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int deleteUser(User user) {
-		UserInfo userInfo = Optional.ofNullable(userMapper.findBySeq(user.getUserSeq()))
+		UserInfo userInfo = Optional.ofNullable(userMapper.getUserBySeq(user.getUserSeq()))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
 		
-		int result = userMapper.delete(user);
+		int result = userMapper.deleteUser(user);
 		
 		if(result > 0) {
 			
@@ -121,7 +121,7 @@ public class UserServiceImpl implements UserService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int changePassword(PasswordChange passwordChange) {
-		UserInfo userInfo = Optional.ofNullable(userMapper.findBySeq(passwordChange.getUserSeq()))
+		UserInfo userInfo = Optional.ofNullable(userMapper.getUserBySeq(passwordChange.getUserSeq()))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다"));
 		
 		int result = userMapper.updatePassword(passwordChange.asUser());
@@ -137,7 +137,7 @@ public class UserServiceImpl implements UserService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int resetPassword(PasswordChange passwordChange) {
-		UserInfo userInfo = Optional.ofNullable(userMapper.findBySeq(passwordChange.getUserSeq()))
+		UserInfo userInfo = Optional.ofNullable(userMapper.getUserBySeq(passwordChange.getUserSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다"));
 		
 		int result = userMapper.updatePassword(passwordChange.asUser());
@@ -152,7 +152,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public LoginUserInfo getLoginUser(String ssoId) {
-		return Optional.ofNullable(userMapper.findLoginUser(ssoId))
+		return Optional.ofNullable(userMapper.getLoginUser(ssoId))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "사용자를 찾을 수 없습니다"));
 	}
 	

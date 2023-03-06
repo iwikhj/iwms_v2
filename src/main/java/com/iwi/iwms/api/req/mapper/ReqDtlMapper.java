@@ -8,14 +8,14 @@ import com.iwi.iwms.api.req.domain.ReqDtlInfo;
 @Mapper
 public interface ReqDtlMapper {
 
-	ReqDtlInfo findBySeq(long reqSeq);
+	ReqDtlInfo getReqDtlBySeq(long reqSeq);
 	
-	void save(ReqDtl reqDtl);
+	void insertReqDtl(ReqDtl reqDtl);
 	
-	int update(ReqDtl reqDtl);
+	int updateReqDtl(ReqDtl reqDtl);
 	
-	int delete(ReqDtl reqDtl);
+	int deleteReqDtl(ReqDtl reqDtl);
 	
-	void saveHistory(ReqDtl reqDtl);
+	void insertReqDtlHis(ReqDtl reqDtl);
 
 }

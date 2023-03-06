@@ -28,65 +28,68 @@ public class CompServiceImpl implements CompService {
 	
 	@Override
 	public List<CompInfo> listComp(Map<String, Object> map) {
-		return compMapper.findAll(map);
+		return compMapper.listComp(map);
 	}
 
 	@Override
 	public int countComp(Map<String, Object> map) {
-		return compMapper.count(map);
+		return compMapper.countComp(map);
 	}
 
 	@Override
 	public CompInfo getCompBySeq(long compSeq) {
-		return Optional.ofNullable(compMapper.findBySeq(compSeq))
+		return Optional.ofNullable(compMapper.getCompBySeq(compSeq))
 					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "소속을 찾을 수 없습니다."));
 	}
 
 	@Override
 	public void insertComp(Comp comp) {
-		compMapper.save(comp);
+		compMapper.insertComp(comp);
 	}
 
 	@Override
 	public int updateComp(Comp comp) {
-		Optional.ofNullable(compMapper.findBySeq(comp.getCompSeq()))
+		Optional.ofNullable(compMapper.getCompBySeq(comp.getCompSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "소속을 찾을 수 없습니다."));
 		
-		return compMapper.update(comp);
+		return compMapper.updateComp(comp);
 	}
 
 	@Override
 	public int deleteComp(Comp comp) {
-		Optional.ofNullable(compMapper.findBySeq(comp.getCompSeq()))
+		Optional.ofNullable(compMapper.getCompBySeq(comp.getCompSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "소속을 찾을 수 없습니다."));
 		
-		return compMapper.delete(comp);
+		return compMapper.deleteComp(comp);
 	}
 
 	@Override
 	public List<PositionInfo> listPosition(Map<String, Object> map) {
-		return positionMapper.findAll(map);
+		return positionMapper.listPosition(map);
 	}
 
 	@Override
 	public void insertPosition(Position position) {
-		positionMapper.save(position);
+		Optional.ofNullable(compMapper.getCompBySeq(position.getCompSeq()))
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "소속을 찾을 수 없습니다."));
+		
+		positionMapper.insertPosition(position);
 	}
 
 	@Override
 	public int updatePosition(Position position) {
-		Optional.ofNullable(positionMapper.findBySeq(position))
+		Optional.ofNullable(positionMapper.getPositionBySeq(position))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "직급을 찾을 수 없습니다."));
 		
-		return positionMapper.update(position);
+		return positionMapper.updatePosition(position);
 	}
 
 	@Override
 	public int deletePosition(Position position) {
-		Optional.ofNullable(positionMapper.findBySeq(position))
+		Optional.ofNullable(positionMapper.getPositionBySeq(position))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "직급을 찾을 수 없습니다."));
 		
-		return positionMapper.delete(position);
+		return positionMapper.deletePosition(position);
 	}
 
 }

@@ -3,6 +3,7 @@ package com.iwi.iwms.api.comp.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,6 +25,8 @@ import com.iwi.iwms.api.common.response.ApiListResponse;
 import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.comp.domain.Proj;
 import com.iwi.iwms.api.comp.domain.ProjInfo;
+import com.iwi.iwms.api.comp.domain.ProjUserInfo;
+import com.iwi.iwms.api.comp.domain.ProjUserList;
 import com.iwi.iwms.api.comp.service.ProjService;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.utils.Pagination;
@@ -31,19 +35,21 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-@Tag(name = "Company Project", description = "IWMS 프로젝트 관리")
+@Slf4j
+@Tag(name = "Project", description = "IWMS 프로젝트 관리")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/v1/company/")
+@RequestMapping("/v1/project")
 public class ProjController {
 	
 	private final ProjService projService; 
 
 	@Operation(summary = "프로젝트 목록", description = "프로젝트 목록")
-	@GetMapping(value = {"/{compSeq}/project"})
+	@GetMapping(value = "")
 	public ResponseEntity<ApiListResponse<List<ProjInfo>>> listProj(HttpServletRequest request
-			, @PathVariable String compSeq
+			, @RequestParam(value = "compSeq", required = false) Optional<String> compSeq
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
 			, @RequestParam(value = "search", required = false) String search
@@ -51,7 +57,9 @@ public class ProjController {
 			, @RequestParam(value = "endDate", required = false) String endDate) {
 		
 		Map<String, Object> map = new HashMap<>();
-		map.put("compSeq", compSeq);
+		if(compSeq.isPresent()) {
+			map.put("compSeq", compSeq.get());
+		}
 		map.put("search", search);
 		map.put("startDate", startDate);
 		map.put("endDate", endDate);
@@ -67,13 +75,11 @@ public class ProjController {
 	}
 	
     @Operation(summary = "프로젝트 정보", description = "프로젝트 정보")
-    @GetMapping(value = "/{compSeq}/project/{projSeq}")
+    @GetMapping(value = "/{projSeq}")
     public ResponseEntity<ApiResponse<ProjInfo>> getProjBySeq(HttpServletRequest request
-    		, @PathVariable long compSeq
-    		, @PathVariable long projSeq
-			, @Parameter(hidden = true) Proj proj) {
+    		, @PathVariable long projSeq) {
     	
-    	ProjInfo project = projService.getProjBySeq(proj);
+    	ProjInfo project = projService.getProjBySeq(projSeq);
     	
 		return ResponseEntity.ok(ApiResponse.<ProjInfo>builder()
 				.request(request)
@@ -82,10 +88,9 @@ public class ProjController {
     }
     
     @Operation(summary = "프로젝트 등록", description = "프로젝트 등록")
-	@PostMapping(value = "/{compSeq}/project", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> insertProj(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
-    		, @PathVariable long compSeq
 			, @ModelAttribute @Valid Proj proj) {
     	
     	projService.insertProj(proj.of(loginUserInfo));
@@ -97,10 +102,9 @@ public class ProjController {
 	}
     
     @Operation(summary = "프로젝트 수정", description = "프로젝트 수정")
-	@PutMapping(value = "/{compSeq}/project/{projSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PutMapping(value = "/{projSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> updateProj(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
-			, @PathVariable long compSeq
 			, @PathVariable long projSeq
 			, @ModelAttribute @Valid Proj proj) {
     	
@@ -113,14 +117,43 @@ public class ProjController {
 	}
     
     @Operation(summary = "프로젝트 삭제", description = "프로젝트 삭제")
-	@DeleteMapping(value = "/{compSeq}/project/{projSeq}")
+	@DeleteMapping(value = "/{projSeq}")
 	public ResponseEntity<ApiResponse<Boolean>> deleteProj(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
-			, @PathVariable long compSeq
 			, @PathVariable long projSeq
 			, @Parameter(hidden = true) Proj proj) {
     	
     	boolean result = projService.deleteProj(proj.of(loginUserInfo)) > 0 ? true : false;
+
+		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+				.request(request)
+				.data(result)
+				.build());
+	}
+    
+    @Operation(summary = "프로젝트 담당자 목록 조회", description = "프로젝트 담당자 목록 조회")
+	@GetMapping(value = "/{projSeq}/assign")
+	public ResponseEntity<ApiResponse<Map<String, Object>>> listProjUser(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
+			, @PathVariable long projSeq) {
+    	
+    	Map<String, Object> projUserList = projService.listProjUser(projSeq);
+    	
+		return ResponseEntity.ok(ApiResponse.<Map<String, Object>>builder()
+				.request(request)
+				.data(projUserList)
+				.build());
+	}
+    
+    @Operation(summary = "프로젝트 담당자 등록", description = "프로젝트 담당자 등록")
+	@PostMapping(value = "/{projSeq}/assign", consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<ApiResponse<Boolean>> updateProjUser(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
+			, @PathVariable long projSeq
+			, @RequestBody @Valid ProjUserList projUserList) {
+    	
+    	projUserList.setProjSeq(projSeq);
+    	boolean result = projService.updateProjUser(projUserList.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
 				.request(request)

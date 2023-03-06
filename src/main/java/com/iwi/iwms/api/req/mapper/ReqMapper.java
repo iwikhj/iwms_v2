@@ -13,19 +13,19 @@ import com.iwi.iwms.api.req.domain.ReqInfo;
 @Mapper
 public interface ReqMapper {
 
-	List<ReqInfo> findAll(Map<String, Object> map);
+	List<ReqInfo> listReq(Map<String, Object> map);
 	
-	int count(Map<String, Object> map);
+	int countReq(Map<String, Object> map);
 	
-	ReqInfo findBySeq(long reqSeq);
+	ReqInfo getReqBySeq(long reqSeq);
 	
-	void save(Req req);
+	void insertReq(Req req);
 	
-	int update(Req req);
+	int updateReq(Req req);
 	
-	int delete(Req req);
+	int deleteReq(Req req);
 	
-	int cancel(ReqCancel reqCancel);
+	int cancelReq(ReqCancel reqCancel);
 	
-	int agree(ReqAgree reqAgree);
+	int agreeReq(ReqAgree reqAgree);
 }
