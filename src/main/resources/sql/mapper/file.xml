@@ -13,7 +13,7 @@
 			, FILE.FILE_ORG_NM AS fileOrgNm
 			, FILE.FILE_REAL_NM AS fileRealNm
 			, FILE.FILE_REAL_PATH AS fileRealPath
-			, CONCAT('/iwms/file/download/', FILE.FILE_SEQ) AS fileDownloadUri			
+			, CONCAT('/iwms/v1/file/download/', FILE.FILE_SEQ) AS fileDownloadUri			
 			, FILE.DEL_YN AS delYn
 			, DATE_FORMAT(FILE.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 			, REG_USER.USER_NM AS regNm
