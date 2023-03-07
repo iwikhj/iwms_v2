@@ -1,5 +1,7 @@
 package com.iwi.iwms.api.file.domain;
 
+import org.springframework.beans.factory.annotation.Value;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,14 +10,13 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 @Getter
-@Builder
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
 public class UploadFileInfo {
 	
 	@Schema(description = "파일 SEQ")
-	private long fileSeq;
+	private Long fileSeq;
 	
 	@Schema(description = "첨부 파일 테이블명")
 	private String fileRefTb;

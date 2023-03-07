@@ -24,7 +24,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Login", description = "IWMS 로그인 관리")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/iwms")
+@RequestMapping("${app.root}/${app.version}")
 public class LoginController {
 	
 	private final LoginService loginService;

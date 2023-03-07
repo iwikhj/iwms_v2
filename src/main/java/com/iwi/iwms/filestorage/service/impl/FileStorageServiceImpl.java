@@ -31,6 +31,9 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class FileStorageServiceImpl implements FileStorageService {
 	
+	@Value("${app.root}/${app.version}")
+	private String root;
+	
 	private final Tika tika = new Tika();
 	
 	private Path rootPath;
@@ -67,7 +70,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         	return FileStorageResponse.builder()
         		.originalFilename(originalFilename)
         		.filename(filename)
-        		.link("/iwms/file/link/" + path.toString().replace("\\", "/") + "/" + filename)
+        		.link(root + "/file/link/" + path.toString().replace("\\", "/") + "/" + filename)
         		.type(tika.detect(file))
         		.size(file.length())
         		.lastModified(sdf.format(file.lastModified()))

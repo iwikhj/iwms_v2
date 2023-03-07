@@ -36,7 +36,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Site", description = "IWMS 사이트 관리")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/iwms/site")
+@RequestMapping("${app.root}/${app.version}/site")
 public class SiteController {
 	
 	private final SiteService siteService; 

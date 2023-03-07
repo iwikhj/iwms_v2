@@ -46,7 +46,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Request", description = "IWMS 유지보수 관리")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/iwms/request")
+@RequestMapping("${app.root}/${app.version}/request")
 public class ReqController {
 
 	private final ReqService reqService;

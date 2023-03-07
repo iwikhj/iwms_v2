@@ -37,7 +37,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Company", description = "IWMS 소속 관리")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/iwms/company")
+@RequestMapping("${app.root}/${app.version}/company")
 public class CompController {
 	
 	private final CompService compService; 

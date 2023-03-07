@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Page", description = "IWMS 페이지 정보")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/iwms/page")
+@RequestMapping("${app.root}/${app.version}/page")
 public class PageController {
 	
 	private final CompService compService;

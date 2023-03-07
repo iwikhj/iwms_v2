@@ -37,6 +37,9 @@ import lombok.extern.slf4j.Slf4j;
 @EnableWebSecurity
 public class SecurityConfig {
 
+	@Value("${app.root}/${app.version}")
+	private String root;
+	
 	private String jwkSetUri;
 	
 	@Value("${keycloak.jwk-set-uri}")
@@ -84,15 +87,15 @@ public class SecurityConfig {
         */
 		http
 		 	.authorizeRequests()
-		 	.antMatchers(HttpMethod.POST, "/iwms/code").hasRole("IWMS_ADMIN")
-		 	.antMatchers(HttpMethod.GET, "/iwms/user/me").hasAnyRole("IWMS_ADMIN", "IWMS_USER");
+		 	.antMatchers(HttpMethod.POST, root + "/code").hasRole("IWMS_ADMIN")
+		 	.antMatchers(HttpMethod.GET, root + "/user/me").hasAnyRole("IWMS_ADMIN", "IWMS_USER");
 		
 	}
 	
 	@Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
 	    return (web) -> web.ignoring()
-	    		.antMatchers("/iwms/login", "/iwms/reissue", "/apidocs/**", "/swagger-ui/**")
+	    		.antMatchers(root + "/login", root + "/reissue", "/apidocs/**", "/swagger-ui/**")
 	    		.requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 

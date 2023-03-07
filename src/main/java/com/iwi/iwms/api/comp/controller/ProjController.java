@@ -42,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Project", description = "IWMS 프로젝트 관리")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/iwms/project")
+@RequestMapping("${app.root}/${app.version}/project")
 public class ProjController {
 	
 	private final ProjService projService; 

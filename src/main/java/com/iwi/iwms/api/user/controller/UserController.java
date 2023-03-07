@@ -41,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "User", description = "IWMS 사용자 관리")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/iwms/user")
+@RequestMapping("${app.root}/${app.version}/user")
 public class UserController {
 	
 	private final UserService userService;
