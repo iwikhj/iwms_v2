@@ -14,7 +14,7 @@
 ## API 요청 플로우
  - Filter 
 1. CorsFilter: allow cross origin 
-2. JwtAuthenticationFilter: Spring security filter을 통한 인증전에 refresh token 확인을 위한 filter
+2. JwtAuthenticationFilter: Spring security filter전에 유효한 토큰인지 검증을 위한 filter. (refresh token 요청을 위한 검증)
 3. UsernamePasswordAuthenticationFilter: Spring security filter. access token 검증(keycloak)
 
  - ArgumentResolver
