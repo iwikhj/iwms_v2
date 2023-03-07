@@ -14,7 +14,7 @@
 ## API 요청 플로우
  - Filter 
 1. CorsFilter: allow cross origin 
-2. JwtAuthenticationFilter: Spring security filter전에 유효한 토큰인지 검증을 위한 filter. (refresh token 요청을 위한 검증)
+2. JwtAuthenticationFilter: Spring security filter전에 호출. Access token validation check. (EXPIRED: refresh token 요청. INVALID: reject)
 3. UsernamePasswordAuthenticationFilter: Spring security filter. access token 검증(keycloak)
 
  - ArgumentResolver
@@ -33,9 +33,9 @@
 1. 로그인 요청: ID, PWD
 2. IWMS DB 서버에 등록된 ID인지 확인
 3. 인증 서버(Keycloak)에 인증 토큰 발급 요청
-4. 발급된 Access Token 및 Refresh Token을 응답 헤더에 등록
-5. 발급된 Refresh Token을 쿠키에 저장: httpOnly
-6. Redis 서버에 로그인 사용자의 정보를 저장: 사용자 기본 정보, 허가된 메뉴 정보, 허가된 프로젝트 or 사이트 정보
+4. Access Token 및 Refresh Token 발행
+5. 발급된 Refresh Token은 Redis에 저장
+6. Redis에 로그인 사용자의 정보를 저장: 사용자 기본 정보, 허가된 메뉴 정보, 허가된 프로젝트 or 사이트 정보
 7. 로그인 성공 기록 DB에 저장: 접속 아이피, 로그인 에러 카운트 초기화
 
  - 인증, 인가
