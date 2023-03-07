@@ -41,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "User", description = "IWMS 사용자 관리")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("${app.root}/${app.version}/user")
+@RequestMapping("${app.root}/${app.version}/users")
 public class UserController {
 	
 	private final UserService userService;
@@ -154,7 +154,7 @@ public class UserController {
     }
     
     @Operation(summary = "내 비밀번호 변경", description = "내 비밀번호 변경")
-	@PatchMapping(value = "/passwordChange", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PatchMapping(value = "/password-change", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> passwordChange(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
 			, @ModelAttribute @Valid UserPwd userPwd) {
@@ -170,7 +170,7 @@ public class UserController {
 	}
     
     @Operation(summary = "사용자 비밀번호 초기화", description = "사용자 비밀번호 초기화")
-    @PatchMapping(value = "/passwordReset", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @PatchMapping(value = "/password-reset", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> passwordReset(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
 			, @ModelAttribute @Valid UserPwd userPwd) {

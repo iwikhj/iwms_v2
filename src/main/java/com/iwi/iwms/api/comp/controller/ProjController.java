@@ -42,7 +42,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Project", description = "IWMS 프로젝트 관리")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("${app.root}/${app.version}/project")
+@RequestMapping("${app.root}/${app.version}/projects")
 public class ProjController {
 	
 	private final ProjService projService; 
@@ -133,7 +133,7 @@ public class ProjController {
 	}
     
     @Operation(summary = "프로젝트 담당자 목록 조회", description = "프로젝트 담당자 목록 조회")
-	@GetMapping(value = "/{projSeq}/projUser")
+	@GetMapping(value = "/{projSeq}/users")
 	public ResponseEntity<ApiResponse<List<ProjUserInfo>>> listProjUser(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long projSeq
@@ -154,7 +154,7 @@ public class ProjController {
 	}
     
     @Operation(summary = "프로젝트 담당자 등록", description = "프로젝트 담당자 등록")
-	@PostMapping(value = "/{projSeq}/projUser", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/{projSeq}/users", consumes = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> updateProjUser(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long projSeq

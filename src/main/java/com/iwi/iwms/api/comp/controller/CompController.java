@@ -37,7 +37,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Company", description = "IWMS 소속 관리")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("${app.root}/${app.version}/company")
+@RequestMapping("${app.root}/${app.version}/companies")
 public class CompController {
 	
 	private final CompService compService; 
@@ -124,7 +124,7 @@ public class CompController {
 	}
     
 	@Operation(summary = "소속 직급 목록", description = "소속 직급 목록")
-	@GetMapping(value = "/{compSeq}/position")
+	@GetMapping(value = "/{compSeq}/positions")
 	public ResponseEntity<ApiListResponse<List<PositionInfo>>> listPosition(HttpServletRequest request
 			, @PathVariable long compSeq
 			, @RequestParam(value = "search", required = false) String search) {
@@ -143,7 +143,7 @@ public class CompController {
 	}
     
     @Operation(summary = "소속 직급 등록", description = "소속 직급 등록")
-	@PostMapping(value = "/{compSeq}/position", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/{compSeq}/positions", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> insertPosition(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
     		, @PathVariable long compSeq
@@ -158,7 +158,7 @@ public class CompController {
 	}
     
     @Operation(summary = "소속 직급 수정", description = "소속 직급 수정")
-	@PutMapping(value = "/{compSeq}/position/{positionSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PutMapping(value = "/{compSeq}/positions/{positionSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> updatePosition(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long compSeq
@@ -174,7 +174,7 @@ public class CompController {
 	}
     
     @Operation(summary = "소속 직급 삭제", description = "소속 직급 삭제")
-	@DeleteMapping(value = "/{compSeq}/position/{positionSeq}")
+	@DeleteMapping(value = "/{compSeq}/positions/{positionSeq}")
 	public ResponseEntity<ApiResponse<Boolean>> deletePosition(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long compSeq

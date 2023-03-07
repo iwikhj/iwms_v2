@@ -46,7 +46,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Request", description = "IWMS 유지보수 관리")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("${app.root}/${app.version}/request")
+@RequestMapping("${app.root}/${app.version}/requests")
 public class ReqController {
 
 	private final ReqService reqService;
@@ -171,7 +171,7 @@ public class ReqController {
 	}
 
     @Operation(summary = "요청사항 코멘트 등록", description = "요청사항 코멘트 등록")
-	@PostMapping(value = "/{reqSeq}/comment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "/{reqSeq}/comments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> insertReqCmt(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long reqSeq
@@ -186,7 +186,7 @@ public class ReqController {
 	}
     
     @Operation(summary = "요청사항 코멘트 수정", description = "요청사항 코멘트 수정")
-	@PutMapping(value = "/{reqSeq}/comment/{reqCmtSeq}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PutMapping(value = "/{reqSeq}/comments/{reqCmtSeq}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> updateReqCmt(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long reqSeq
@@ -202,7 +202,7 @@ public class ReqController {
 	}
     
     @Operation(summary = "요청사항 코멘트 삭제", description = "요청사항 코멘트 삭제")
-	@DeleteMapping(value = "/{reqSeq}/comment/{reqCmtSeq}")
+	@DeleteMapping(value = "/{reqSeq}/comments/{reqCmtSeq}")
 	public ResponseEntity<ApiResponse<Boolean>> deleteReqCmt(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long reqSeq
@@ -218,7 +218,7 @@ public class ReqController {
 	}    
 
     @Operation(summary = "요청사항 상세 등록", description = "요청사항 상세 등록")
-	@PostMapping(value = "/{reqSeq}/detail", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/{reqSeq}/details", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> insertReqDtl(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long reqSeq
@@ -233,7 +233,7 @@ public class ReqController {
 	}
     
     @Operation(summary = "요청사항 상세 수정", description = "요청사항 상세 수정")
-	@PutMapping(value = "/{reqSeq}/detail/{reqDtlSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PutMapping(value = "/{reqSeq}/details/{reqDtlSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> updateReqDtl(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long reqSeq
@@ -249,7 +249,7 @@ public class ReqController {
 	}
     
     @Operation(summary = "요청사항 상세 삭제", description = "요청사항 상세 삭제")
-	@DeleteMapping(value = "/{reqSeq}/detail/{reqDtlSeq}")
+	@DeleteMapping(value = "/{reqSeq}/details/{reqDtlSeq}")
 	public ResponseEntity<ApiResponse<Boolean>> deleteReqDtl(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long reqSeq
@@ -265,7 +265,7 @@ public class ReqController {
 	}
     
     @Operation(summary = "요청사항 상세 코멘트 등록", description = "요청사항 상세 코멘트 등록")
-	@PostMapping(value = "/{reqSeq}/detail/{reqDtlSeq}/comment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PostMapping(value = "/{reqSeq}/details/{reqDtlSeq}/comments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> insertReqDtlCmt(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long reqSeq
@@ -281,7 +281,7 @@ public class ReqController {
 	}
     
     @Operation(summary = "요청사항 상세 코멘트 수정", description = "요청사항 상세 코멘트 수정")
-	@PutMapping(value = "/{reqSeq}/detail/{reqDtlSeq}/comment/{reqDtlCmtSeq}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@PutMapping(value = "/{reqSeq}/details/{reqDtlSeq}/comments/{reqDtlCmtSeq}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> updateReqDtlCmt(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long reqSeq
@@ -298,7 +298,7 @@ public class ReqController {
 	}
     
     @Operation(summary = "요청사항 상세 코멘트 삭제", description = "요청사항 상세 코멘트 삭제")
-	@DeleteMapping(value = "/{reqSeq}/detail/{reqDtlSeq}/comment/{reqDtlCmtSeq}")
+	@DeleteMapping(value = "/{reqSeq}/details/{reqDtlSeq}/comments/{reqDtlCmtSeq}")
 	public ResponseEntity<ApiResponse<Boolean>> deleteReqDtlCmt(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long reqSeq
@@ -316,7 +316,7 @@ public class ReqController {
     
     
     @Operation(summary = "요청사항 상세 담당자 처리 등록", description = "요청사항 상세 담당자 처리 등록")
-	@PostMapping(value = "/{reqSeq}/detail/{reqDtlSeq}/process", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "/{reqSeq}/details/{reqDtlSeq}/users", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> insertReqDtlUser(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long reqSeq
@@ -333,7 +333,7 @@ public class ReqController {
     
     
     @Operation(summary = "요청사항 상세 담당자 처리 수정", description = "요청사항 상세 담당자 처리 수정")
-	@PutMapping(value = "/{reqSeq}/detail/{reqDtlSeq}/process/{reqDtlUserSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PutMapping(value = "/{reqSeq}/details/{reqDtlSeq}/users/{reqDtlUserSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> updateReqDtlUser(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long reqSeq
@@ -350,7 +350,7 @@ public class ReqController {
 	}
     
     @Operation(summary = "요청사항 상세 담당자 처리 삭제", description = "요청사항 상세 담당자 처리 삭제")
-	@DeleteMapping(value = "/{reqSeq}/detail/{reqDtlSeq}/process/{reqDtlUserSeq}")
+	@DeleteMapping(value = "/{reqSeq}/details/{reqDtlSeq}/users/{reqDtlUserSeq}")
 	public ResponseEntity<ApiResponse<Boolean>> deleteReqDtlUser(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long reqSeq

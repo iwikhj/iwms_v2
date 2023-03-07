@@ -1,4 +1,4 @@
-package com.iwi.iwms.api.page.mapper;
+package com.iwi.iwms.api.menu.mapper;
 
 import java.util.List;
 import java.util.Map;

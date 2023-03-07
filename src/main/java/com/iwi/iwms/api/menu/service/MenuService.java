@@ -1,4 +1,4 @@
-package com.iwi.iwms.api.page.service;
+package com.iwi.iwms.api.menu.service;
 
 import java.util.List;
 import java.util.Map;

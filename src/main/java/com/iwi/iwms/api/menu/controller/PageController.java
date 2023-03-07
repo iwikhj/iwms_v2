@@ -1,4 +1,4 @@
-package com.iwi.iwms.api.page.controller;
+package com.iwi.iwms.api.menu.controller;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,7 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Page", description = "IWMS 페이지 정보")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("${app.root}/${app.version}/page")
+@RequestMapping("${app.root}/${app.version}/pages")
 public class PageController {
 	
 	private final CompService compService;
@@ -49,7 +49,7 @@ public class PageController {
 	
     @Operation(summary = "소속 목록 페이지 정보", description = "소속 목록 페이지 정보")
     @GetMapping(value = "/company")
-    public ResponseEntity<ListResponse<List<CompInfo>>> pageCompany(HttpServletRequest request
+    public ResponseEntity<ListResponse<List<CompInfo>>> company(HttpServletRequest request
     		, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
 			, @RequestParam(value = "search", required = false) String search
@@ -75,7 +75,7 @@ public class PageController {
     
     @Operation(summary = "소속 상세 페이지 정보", description = "소속 상세 페이지 정보")
     @GetMapping(value = "/company/{compSeq}")
-    public ResponseEntity<Response<CompInfo>> pageCompanyDetail(HttpServletRequest request
+    public ResponseEntity<Response<CompInfo>> companyDetail(HttpServletRequest request
     		, @PathVariable long compSeq
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
@@ -90,7 +90,7 @@ public class PageController {
     
     @Operation(summary = "사용자 목록 페이지 정보", description = "사용자 목록 페이지 정보")
     @GetMapping(value = "/user")
-    public ResponseEntity<ListResponse<List<UserInfo>>> pageUser(HttpServletRequest request
+    public ResponseEntity<ListResponse<List<UserInfo>>> user(HttpServletRequest request
     		, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
 			, @RequestParam(value = "search", required = false) String search
@@ -116,7 +116,7 @@ public class PageController {
     
     @Operation(summary = "사용자 상세 페이지 정보", description = "사용자 상세 페이지 정보")
     @GetMapping(value = "/user/{userSeq}")
-    public ResponseEntity<Response<UserInfo>> pageUserDetail(HttpServletRequest request
+    public ResponseEntity<Response<UserInfo>> userDetail(HttpServletRequest request
     		, @PathVariable long userSeq
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
@@ -132,7 +132,7 @@ public class PageController {
     
     @Operation(summary = "요청사항 목록 페이지 정보", description = "요청사항 목록 페이지 정보")
     @GetMapping(value = "/request")
-    public ResponseEntity<ListResponse<List<ReqInfo>>> pageReq(HttpServletRequest request
+    public ResponseEntity<ListResponse<List<ReqInfo>>> req(HttpServletRequest request
     		, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
 			, @RequestParam(value = "search", required = false) String search
@@ -158,7 +158,7 @@ public class PageController {
     
     @Operation(summary = "요청사항 상세 페이지 정보", description = "요청사항 상세 페이지 정보")
     @GetMapping(value = "/request/{reqSeq}")
-    public ResponseEntity<Response<ReqInfo>> pageReqDetail(HttpServletRequest request
+    public ResponseEntity<Response<ReqInfo>> reqDetail(HttpServletRequest request
     		, @PathVariable long reqSeq
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
@@ -173,7 +173,7 @@ public class PageController {
     
     @Operation(summary = "공지사항 목록 페이지 정보", description = "공지사항 목록 페이지 정보")
     @GetMapping(value = "/notice")
-    public ResponseEntity<ListResponse<List<NoticeInfo>>> pageNotice(HttpServletRequest request
+    public ResponseEntity<ListResponse<List<NoticeInfo>>> notice(HttpServletRequest request
     		, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
 			, @RequestParam(value = "search", required = false) String search
@@ -199,7 +199,7 @@ public class PageController {
     
     @Operation(summary = "공지사항 상세 페이지 정보", description = "공지사항 상세 페이지 정보")
     @GetMapping(value = "/notice/{noticeSeq}")
-    public ResponseEntity<Response<NoticeInfo>> pageNoticeDetail(HttpServletRequest request
+    public ResponseEntity<Response<NoticeInfo>> noticeDetail(HttpServletRequest request
     		, @PathVariable long noticeSeq
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	

@@ -38,7 +38,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Notice", description = "IWMS 공지사항 관리")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("${app.root}/${app.version}/notice")
+@RequestMapping("${app.root}/${app.version}/notices")
 public class NoticeController {
 
 	private final NoticeService noticeService;
