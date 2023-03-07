@@ -84,15 +84,15 @@ public class SecurityConfig {
         */
 		http
 		 	.authorizeRequests()
-		 	.antMatchers(HttpMethod.POST, "/v1/code").hasRole("IWMS_ADMIN")
-		 	.antMatchers(HttpMethod.GET, "/v1/user/me").hasAnyRole("IWMS_ADMIN", "IWMS_USER");
+		 	.antMatchers(HttpMethod.POST, "/iwms/code").hasRole("IWMS_ADMIN")
+		 	.antMatchers(HttpMethod.GET, "/iwms/user/me").hasAnyRole("IWMS_ADMIN", "IWMS_USER");
 		
 	}
 	
 	@Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
 	    return (web) -> web.ignoring()
-	    		.antMatchers("/v1/login", "/v1/reissue", "/apidocs/**", "/swagger-ui/**")
+	    		.antMatchers("/iwms/login", "/iwms/reissue", "/apidocs/**", "/swagger-ui/**")
 	    		.requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 

@@ -54,9 +54,6 @@ public class LoginUserInfo {
 	@Schema(description = "사용자 권한") 
 	private String userRole;
 	
-	@Schema(description = "리프레시 토큰")
-	private String refreshToken;
-	
 	@Schema(description = "메뉴 목록")
-	private List<MenuInfo> menuList;
+	private List<MenuInfo> menus;
 }

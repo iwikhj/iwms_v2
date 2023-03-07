@@ -28,7 +28,10 @@
 			
 	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=reqSeq" 
 			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>
-			
+
+	   	<collection property="comments" column="reqSeq" 
+			ofType="com.iwi.iwms.api.req.domain.ReqCmtInfo" select="com.iwi.iwms.api.req.mapper.ReqCmtMapper.listReqCmtByReqSeq"/>			
+						
 	   	<collection property="details" column="reqSeq" 
 			ofType="com.iwi.iwms.api.req.domain.ReqDtlInfo" select="com.iwi.iwms.api.req.mapper.ReqDtlMapper.listReqDtlByReqSeq"/>			
 			
@@ -146,7 +149,7 @@
 		    )
 			, #{siteSeq}
 			, #{projSeq}
-			, #{compSeq}
+			, (SELECT COMP_SEQ FROM TB_PROJ WHERE PROJ_SEQ = #{projSeq})
 			, DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
 			, #{reqTypeCd}
 			, #{reqGbCd}

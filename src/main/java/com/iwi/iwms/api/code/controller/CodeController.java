@@ -33,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Common Code", description = "IWMS 공통 코드 관리")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/v1/code")
+@RequestMapping("/iwms/code")
 public class CodeController {
 
 	private final CodeService codeService;

@@ -230,7 +230,7 @@
 	</delete>
 	
 	<!-- 사용자 비밀번호 변경 -->
-	<update id="updatePassword" parameterType="com.iwi.iwms.api.user.domain.User">
+	<update id="updatePassword" parameterType="com.iwi.iwms.api.user.domain.UserPwd">
 		UPDATE TB_USER 
 		SET
 		    LOGIN_ERR_CNT = 0
@@ -273,11 +273,11 @@
 		<result property="ssoId" column="ssoId"/>
 		<result property="userRole" column="userRole"/>
 		
-	   	<collection property="menuList" column="userSeq" 
-			ofType="com.iwi.iwms.api.user.domain.MenuInfo" select="findPermissionsMenu"/>
+	   	<collection property="menus" column="userSeq" 
+			ofType="com.iwi.iwms.api.user.domain.MenuInfo" select="listMenuByUserSeq"/>
 	</resultMap>
 
-	<resultMap id="resultPageMap" type="com.iwi.iwms.api.user.domain.MenuInfo">
+	<resultMap id="resultMenuMap" type="com.iwi.iwms.api.user.domain.MenuInfo">
 		<result property="menuSeq" column="menuSeq"/>
 		<result property="menuNm" column="menuNm"/>
 		<result property="menuOrderNo" column="menuOrderNo"/>
@@ -286,8 +286,8 @@
 		<result property="pageTarget" column="pageTarget"/>
 		<result property="hasPermission" column="hasPermission"/>
 		
-	   	<collection property="childMenuInfoList" column="menuSeq=menuSeq,userSeq=userSeq" 
-			ofType="com.iwi.iwms.api.user.domain.MenuInfo" select="childPermissionsMenu"/>
+	   	<collection property="subMenus" column="menuSeq=menuSeq,userSeq=userSeq" 
+			ofType="com.iwi.iwms.api.user.domain.MenuInfo" select="listSubMenu"/>
 	</resultMap>	
 	
 	<select id="getLoginUser" parameterType="String"
@@ -312,7 +312,8 @@
 			AND USER.SSO_ID = #{ssoId}
 	</select>
 	
-	<select id="findPermissionsMenu" resultType="com.iwi.iwms.api.user.domain.MenuInfo">
+	<select id="listMenuByUserSeq" parameterType="long" 
+		resultMap="resultMenuMap">
 		SELECT 
 			MENU.MENU_SEQ AS menuSeq
 			, MENU.MENU_NM AS menuNm
@@ -337,7 +338,8 @@
 		ORDER BY MENU.MENU_ORDER_NO
 	</select>
 	
-	<select id="childPermissionsMenu" resultType="com.iwi.iwms.api.user.domain.MenuInfo">
+	<select id="listSubMenu" parameterType="com.iwi.iwms.api.user.domain.Menu"
+		resultType="com.iwi.iwms.api.user.domain.MenuInfo">
 		SELECT 
 			MENU.MENU_SEQ AS menuSeq
 			, MENU.MENU_NM AS menuNm

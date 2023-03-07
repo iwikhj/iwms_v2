@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
-import com.iwi.iwms.api.user.domain.PasswordChange;
+import com.iwi.iwms.api.user.domain.UserPwd;
 import com.iwi.iwms.api.user.domain.User;
 import com.iwi.iwms.api.user.domain.UserInfo;
 import com.iwi.iwms.api.user.domain.UserUpdate;
@@ -17,7 +17,7 @@ public interface UserService {
 
 	UserInfo getUserBySeq(long userSeq);
 	
-	boolean checkDuplicateUserId(String userId);
+	boolean checkExistsUserId(String userId);
 	
 	void insertUser(User user);
 	
@@ -25,9 +25,9 @@ public interface UserService {
 	
 	int deleteUser(User user);
 	
-	int changePassword(PasswordChange passwordChange);
+	int passwordChange(UserPwd userPwd);
 	
-	int resetPassword(PasswordChange passwordChange);
+	int passwordReset(UserPwd userPwd);
 	
 	LoginUserInfo getLoginUser(String ssoId);
 }

@@ -24,12 +24,11 @@ import org.springframework.web.bind.annotation.RestController;
 import com.iwi.iwms.api.common.response.ApiListResponse;
 import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
-import com.iwi.iwms.api.user.domain.PasswordChange;
 import com.iwi.iwms.api.user.domain.User;
 import com.iwi.iwms.api.user.domain.UserInfo;
+import com.iwi.iwms.api.user.domain.UserPwd;
 import com.iwi.iwms.api.user.domain.UserUpdate;
 import com.iwi.iwms.api.user.service.UserService;
-import com.iwi.iwms.utils.CookieUtil;
 import com.iwi.iwms.utils.Pagination;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,7 +41,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "User", description = "IWMS 사용자 관리")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/v1/user")
+@RequestMapping("/iwms/user")
 public class UserController {
 	
 	private final UserService userService;
@@ -130,10 +129,10 @@ public class UserController {
     
     @Operation(summary = "사용자 아이디 중복 확인", description = "사용자 아이디 중복 확인. true: 중복된 아이디. 사용 불가, false: 사용 가능")
     @GetMapping(value = "/exists/{userId}")
-    public ResponseEntity<ApiResponse<Boolean>> checkDuplicateUserId(HttpServletRequest request
+    public ResponseEntity<ApiResponse<Boolean>> checkExistsUserId(HttpServletRequest request
     		, @PathVariable String userId) {
     	
-    	boolean result = userService.checkDuplicateUserId(userId);
+    	boolean result = userService.checkExistsUserId(userId);
     	
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
 				.request(request)
@@ -155,12 +154,14 @@ public class UserController {
     }
     
     @Operation(summary = "내 비밀번호 변경", description = "내 비밀번호 변경")
-	@PatchMapping(value = "/changePassword", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ApiResponse<Boolean>> changePassword(HttpServletRequest request
+	@PatchMapping(value = "/passwordChange", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<ApiResponse<Boolean>> passwordChange(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
-			, @ModelAttribute @Valid PasswordChange passwordChange) {
+			, @ModelAttribute @Valid UserPwd userPwd) {
     	
-    	boolean result = userService.changePassword(passwordChange.ofChange(loginUserInfo)) > 0 ? true : false;
+    	userPwd.setUserSeq(loginUserInfo.getUserSeq());
+    	userPwd.setPwdResetYn("N");
+    	boolean result = userService.passwordChange(userPwd.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
 				.request(request)
@@ -169,13 +170,13 @@ public class UserController {
 	}
     
     @Operation(summary = "사용자 비밀번호 초기화", description = "사용자 비밀번호 초기화")
-    @PatchMapping(value = "/{userSeq}/resetPassword")
-	public ResponseEntity<ApiResponse<Boolean>> resetPassword(HttpServletRequest request
+    @PatchMapping(value = "/passwordReset", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<ApiResponse<Boolean>> passwordReset(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
-    		, @PathVariable long userSeq
-			, @Parameter(hidden = true) PasswordChange passwordChange) {
+			, @ModelAttribute @Valid UserPwd userPwd) {
     	
-    	boolean result = userService.resetPassword(passwordChange.ofReset(loginUserInfo)) > 0 ? true : false;
+    	userPwd.setPwdResetYn("Y");
+    	boolean result = userService.passwordReset(userPwd.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
 				.request(request)

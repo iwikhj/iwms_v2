@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "File", description = "IWMS 파일 관리")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/v1/file")
+@RequestMapping("/iwms/file")
 public class FileController {
 	
 	private final FileService fileService;

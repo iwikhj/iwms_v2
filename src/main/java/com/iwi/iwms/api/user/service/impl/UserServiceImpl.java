@@ -10,9 +10,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
-import com.iwi.iwms.api.user.domain.PasswordChange;
 import com.iwi.iwms.api.user.domain.User;
 import com.iwi.iwms.api.user.domain.UserInfo;
+import com.iwi.iwms.api.user.domain.UserPwd;
 import com.iwi.iwms.api.user.domain.UserUpdate;
 import com.iwi.iwms.api.user.mapper.UserMapper;
 import com.iwi.iwms.api.user.service.UserService;
@@ -47,7 +47,7 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
-	public boolean checkDuplicateUserId(String userId) {
+	public boolean checkExistsUserId(String userId) {
 		return keycloakProvider.existsUsername(userId);
 	}
 
@@ -120,30 +120,28 @@ public class UserServiceImpl implements UserService {
 
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
-	public int changePassword(PasswordChange passwordChange) {
-		UserInfo userInfo = Optional.ofNullable(userMapper.getUserBySeq(passwordChange.getUserSeq()))
+	public int passwordChange(UserPwd userPwd) {
+		UserInfo userInfo = Optional.ofNullable(userMapper.getUserBySeq(userPwd.getUserSeq()))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다"));
 		
-		int result = userMapper.updatePassword(passwordChange.asUser());
+		int result = userMapper.updatePassword(userPwd);
 		
 		if(result > 0) {
-				
 			//인증 서버의 사용자 비밀번호 변경
-			keycloakProvider.changePassword(userInfo.getSsoId(), passwordChange.getUserPwd());
+			keycloakProvider.changePassword(userInfo.getSsoId(), userPwd.getUserPwd());
 		}
 		return result;
 	}
 	
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
-	public int resetPassword(PasswordChange passwordChange) {
-		UserInfo userInfo = Optional.ofNullable(userMapper.getUserBySeq(passwordChange.getUserSeq()))
+	public int passwordReset(UserPwd userPwd) {
+		UserInfo userInfo = Optional.ofNullable(userMapper.getUserBySeq(userPwd.getUserSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다"));
 		
-		int result = userMapper.updatePassword(passwordChange.asUser());
+		int result = userMapper.updatePassword(userPwd);
 		
 		if(result > 0) {
-			
 			//인증 서버의 사용자 비밀번호를 사용자 아이디로 초기화
 			keycloakProvider.changePassword(userInfo.getSsoId(), userInfo.getUserId());
 		}

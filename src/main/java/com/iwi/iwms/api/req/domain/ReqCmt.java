@@ -2,6 +2,8 @@ package com.iwi.iwms.api.req.domain;
 
 import java.util.List;
 
+import javax.validation.constraints.NotNull;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import com.iwi.iwms.api.file.domain.UploadFile;
@@ -19,25 +21,16 @@ import lombok.ToString;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReqDtlCmt {
+public class ReqCmt {
 
-	@Schema(hidden = true, description = "요청사항 상세 코멘트 SEQ")
-	private Long reqDtlCmtSeq;
+	@Schema(hidden = true, description = "요청사항 코멘트 SEQ")
+	private Long reqCmtSeq;
 	
 	@Schema(hidden = true, description = "요청사항 SEQ")
 	private long reqSeq;
-	
-	@Schema(hidden = true, description = "요청사항 상세 SEQ")
-	private long reqDtlSeq;
-	
-	@Schema(hidden = true, description = "요청사항 상세 번호") 
-	private String reqDtlNo;
-	
-	@Schema(hidden = true, description = "요청사항 상세 담당자 SEQ") 
-	private long userSeq;
 
-	@Schema(description = "요청사항 상세 코멘트") 
-	private String reqDtlCmt;
+	@Schema(description = "요청사항 코멘트") 
+	private String reqCmt;
 	
 	@Schema(description = "첨부할 파일")
 	private List<MultipartFile> files;
@@ -54,16 +47,15 @@ public class ReqDtlCmt {
 	@Schema(hidden = true, description = "수정자 SEQ") 
 	private long updtSeq;
 	
-	public ReqDtlCmt of(final LoginUserInfo loginUserInfo) {
-		this.userSeq = loginUserInfo.getUserSeq();
+	public ReqCmt of(final LoginUserInfo loginUserInfo) {
 		this.regSeq = loginUserInfo.getUserSeq();
 		this.updtSeq = loginUserInfo.getUserSeq();
 		
 		this.fileInfo = new UploadFile();
-		this.fileInfo.setFileRefTb("TB_REQ_DTL_CMT");
-		this.fileInfo.setFileRefCol("REQ_DTL_CMT_SEQ");
-		if(this.reqDtlCmtSeq != null && this.reqDtlCmtSeq != 0) {
-			this.fileInfo.setFileRefSeq(this.reqDtlCmtSeq);
+		this.fileInfo.setFileRefTb("TB_REQ_CMT");
+		this.fileInfo.setFileRefCol("REQ_CMT_SEQ");
+		if(this.reqCmtSeq != null && this.reqCmtSeq != 0) {
+			this.fileInfo.setFileRefSeq(this.reqCmtSeq);
 		}
 		this.fileInfo.setFileGbCd("01");
 		this.fileInfo.setRegSeq(loginUserInfo.getUserSeq());

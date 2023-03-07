@@ -29,18 +29,13 @@ public class Req {
 	
 	@Schema(hidden = true, description = "요청사항 번호") 
 	private String reqNo;
-
-	@NotNull(message = "소속은 필수 입력 사항입니다")
-	@Schema(description = "소속 SEQ")
-	private long compSeq;
 	
 	@NotNull(message = "프로젝트는 필수 입력 사항입니다")
 	@Schema(description = "프로젝트 SEQ")
 	private long projSeq;	
 	
-	@NotNull(message = "사이트는 필수 입력 사항입니다")
 	@Schema(description = "사이트 SEQ")
-	private long siteSeq;
+	private Long siteSeq;
 	
 	@NotNull
 	@Schema(description = "요청사항 타입 코드: [00: 일반, 99: 긴급]", allowableValues = {"00", "99"}) 

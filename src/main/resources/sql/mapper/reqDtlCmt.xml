@@ -19,7 +19,7 @@
 		<result property="updtNm" column="updtNm"/>
 			
 	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=reqDtlCmtSeq" 
-			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.findAllByRef"/>
+			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>
 			
 	</resultMap>
 
@@ -50,7 +50,7 @@
 		WHERE CMT.DEL_YN = 'N'
 	</sql>
 	
-	<!-- 요청사항 상세 코멘트 목록 조회 -->			
+	<!-- 요청사항 상세별 코멘트 목록 조회 -->			
 	<select id="listReqDtlCmtByReqDtlSeq" parameterType="long"
 		resultMap="resultReqDtlCmtMap">
 		<include refid="selectReqDtlCmt"></include>

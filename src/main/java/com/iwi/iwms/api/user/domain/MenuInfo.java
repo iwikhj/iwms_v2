@@ -38,5 +38,5 @@ public class MenuInfo {
 	private String hasPermission;
 	
 	@Schema(description = "하위 메뉴") 
-	private List<MenuInfo> childMenuInfoList;
+	private List<MenuInfo> subMenus;
 }

@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.user.domain.User;
 import com.iwi.iwms.api.user.domain.UserInfo;
+import com.iwi.iwms.api.user.domain.UserPwd;
 import com.iwi.iwms.api.user.domain.UserUpdate;
 
 @Mapper
@@ -27,7 +28,7 @@ public interface UserMapper {
 	
 	int deleteUser(User user);
 	
-	int updatePassword(User user);
+	int updatePassword(UserPwd userPwd);
 	
 	int updateLoginSuccess(User user);
 	

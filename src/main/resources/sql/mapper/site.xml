@@ -115,8 +115,8 @@
 		useGeneratedKeys="true" keyProperty="siteSeq">
 		INSERT INTO TB_SITE
 		(
-		    COMP_SEQ
-		    , PROJ_SEQ
+		    PROJ_SEQ
+		    , COMP_SEQ
 		    , SITE_NM
 		    , SITE_SW_NM
 		    , SITE_GB_CD
@@ -124,8 +124,8 @@
 			, REG_DT
 			, REG_SEQ
 		) VALUES (
-		    #{compSeq}
-			, #{projSeq}
+		   #{projSeq}
+			, (SELECT COMP_SEQ FROM TB_PROJ WHERE PROJ_SEQ = #{projSeq})
 			, #{siteNm}
 			, #{siteSwNm}
 			, #{siteGbCd}

@@ -67,7 +67,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         	return FileStorageResponse.builder()
         		.originalFilename(originalFilename)
         		.filename(filename)
-        		.link("/v1/file/link/" + path.toString().replace("\\", "/") + "/" + filename)
+        		.link("/iwms/file/link/" + path.toString().replace("\\", "/") + "/" + filename)
         		.type(tika.detect(file))
         		.size(file.length())
         		.lastModified(sdf.format(file.lastModified()))

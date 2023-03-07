@@ -65,9 +65,9 @@ public class LoginServiceImpl implements LoginService{
 				redis.delete(ssoId);
 			}
 			
-			loginUserInfo.setRefreshToken(accessTokenResponse.getRefreshToken());
 			long timeout = Duration.ofSeconds(accessTokenResponse.getRefreshExpiresIn()).toMillis();
 			redis.setHash(ssoId, "user", loginUserInfo, timeout);
+			redis.setHash(ssoId, "refreshToken", accessTokenResponse.getRefreshToken(), timeout);
 			
 			// 로그인한 사용자의 접속IP를 저장 및 LOGIN_ERR_CNT 초기화. 
 			userInfo.setLastLoginIp(login.getLoginIp());
@@ -97,8 +97,8 @@ public class LoginServiceImpl implements LoginService{
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 만료되었거나 유효하지 않습니다");
         }
         
-		LoginUserInfo loginUserInfo = objectMapper.convertValue(redis.getHash(introspect.getSub(), "user"), LoginUserInfo.class);
-		if(loginUserInfo == null || !loginUserInfo.getRefreshToken().equals(reissue.getRefreshToken())) {
+		String storedRefreshtoken = (String) redis.getHash(introspect.getSub(), "refreshToken");
+		if(storedRefreshtoken == null || !storedRefreshtoken.equals(reissue.getRefreshToken())) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 유효하지 않습니다");
 		}
     	

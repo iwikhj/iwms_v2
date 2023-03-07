@@ -26,10 +26,12 @@ import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.req.domain.Req;
 import com.iwi.iwms.api.req.domain.ReqAgree;
 import com.iwi.iwms.api.req.domain.ReqCancel;
+import com.iwi.iwms.api.req.domain.ReqCmt;
 import com.iwi.iwms.api.req.domain.ReqDtl;
 import com.iwi.iwms.api.req.domain.ReqDtlCmt;
 import com.iwi.iwms.api.req.domain.ReqDtlUser;
 import com.iwi.iwms.api.req.domain.ReqInfo;
+import com.iwi.iwms.api.req.service.ReqCmtService;
 import com.iwi.iwms.api.req.service.ReqDtlCmtService;
 import com.iwi.iwms.api.req.service.ReqDtlService;
 import com.iwi.iwms.api.req.service.ReqDtlUserService;
@@ -44,10 +46,12 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Request", description = "IWMS 유지보수 관리")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/v1/request")
+@RequestMapping("/iwms/request")
 public class ReqController {
 
 	private final ReqService reqService;
+	
+	private final ReqCmtService reqCmtService;
 	
 	private final ReqDtlService reqDtlService;
 	
@@ -165,7 +169,54 @@ public class ReqController {
 				.data(result)
 				.build());
 	}
+
+    @Operation(summary = "요청사항 코멘트 등록", description = "요청사항 코멘트 등록")
+	@PostMapping(value = "/{reqSeq}/comment", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<ApiResponse<Boolean>> insertReqCmt(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
+			, @PathVariable long reqSeq
+			, @ModelAttribute @Valid ReqCmt reqCmt) {
+    	
+    	reqCmtService.insertReqCmt(reqCmt.of(loginUserInfo));
+
+		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+				.request(request)
+				.data(true)
+				.build());
+	}
     
+    @Operation(summary = "요청사항 코멘트 수정", description = "요청사항 코멘트 수정")
+	@PutMapping(value = "/{reqSeq}/comment/{reqCmtSeq}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<ApiResponse<Boolean>> updateReqCmt(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
+			, @PathVariable long reqSeq
+			, @PathVariable long reqCmtSeq
+			, @ModelAttribute @Valid ReqCmt reqCmt) {
+    	
+    	boolean result = reqCmtService.updateReqCmt(reqCmt.of(loginUserInfo)) > 0 ? true : false;
+
+		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+				.request(request)
+				.data(result)
+				.build());
+	}
+    
+    @Operation(summary = "요청사항 코멘트 삭제", description = "요청사항 코멘트 삭제")
+	@DeleteMapping(value = "/{reqSeq}/comment/{reqCmtSeq}")
+	public ResponseEntity<ApiResponse<Boolean>> deleteReqCmt(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
+			, @PathVariable long reqSeq
+			, @PathVariable long reqCmtSeq
+			, @Parameter(hidden = true) ReqCmt reqCmt) {
+    	
+    	boolean result = reqCmtService.deleteReqCmt(reqCmt.of(loginUserInfo)) > 0 ? true : false;
+
+		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+				.request(request)
+				.data(result)
+				.build());
+	}    
+
     @Operation(summary = "요청사항 상세 등록", description = "요청사항 상세 등록")
 	@PostMapping(value = "/{reqSeq}/detail", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> insertReqDtl(HttpServletRequest request
