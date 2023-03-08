@@ -1,7 +1,5 @@
 package com.iwi.iwms.api.comp.domain;
 
-import java.util.List;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -37,9 +35,6 @@ public class ProjInfo {
 	
 	@Schema(description = "프로젝트 종료일: YYYYMMDD")
 	private String projEndYmd;
-	
-	@Schema(description = "프로젝트 사이트")
-	private List<Site> sites;	
 	
 	@Schema(description = "사용 여부")
 	private String useYn;

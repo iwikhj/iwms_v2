@@ -25,10 +25,12 @@ import com.iwi.iwms.api.common.response.ApiListResponse;
 import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.comp.domain.Proj;
 import com.iwi.iwms.api.comp.domain.ProjInfo;
-import com.iwi.iwms.api.comp.domain.ProjUser;
 import com.iwi.iwms.api.comp.domain.ProjUserInfo;
 import com.iwi.iwms.api.comp.domain.ProjUserList;
+import com.iwi.iwms.api.comp.domain.Site;
+import com.iwi.iwms.api.comp.domain.SiteInfo;
 import com.iwi.iwms.api.comp.service.ProjService;
+import com.iwi.iwms.api.comp.service.SiteService;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.utils.Pagination;
 
@@ -46,6 +48,8 @@ import lombok.extern.slf4j.Slf4j;
 public class ProjController {
 	
 	private final ProjService projService; 
+	
+	private final SiteService siteService; 
 
 	@Operation(summary = "프로젝트 목록", description = "프로젝트 목록")
 	@GetMapping(value = "")
@@ -168,4 +172,92 @@ public class ProjController {
 				.data(result)
 				.build());
 	}
+    
+	@Operation(summary = "사이트 목록", description = "사이트 목록")
+	@GetMapping(value = "/{projSeq}/sites")
+	public ResponseEntity<ApiListResponse<List<SiteInfo>>> listSite(HttpServletRequest request
+			, @PathVariable long projSeq
+			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
+			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
+			, @RequestParam(value = "search", required = false) String search
+			, @RequestParam(value = "startDate", required = false) String startDate
+			, @RequestParam(value = "endDate", required = false) String endDate) {
+		
+		Map<String, Object> map = new HashMap<>();
+		map.put("projSeq", projSeq);
+		map.put("search", search);
+		map.put("startDate", startDate);
+		map.put("endDate", endDate);
+		map.put("pagination", new Pagination(page, limit, siteService.countSite(map)));
+		
+		List<SiteInfo> SiteList = siteService.listSite(map);
+		
+		return ResponseEntity.ok(ApiListResponse.<List<SiteInfo>>builder()
+				.request(request)
+				.data(SiteList)
+				.query(map)
+				.build());
+	}
+	
+    @Operation(summary = "사이트 정보", description = "사이트 정보")
+    @GetMapping(value = "/{projSeq}/sites/{siteSeq}")
+    public ResponseEntity<ApiResponse<SiteInfo>> getSiteBySeq(HttpServletRequest request
+    		, @PathVariable long projSeq
+    		, @PathVariable long siteSeq
+			, @Parameter(hidden = true) Site site) {
+    	
+    	SiteInfo Siteect = siteService.getSiteBySeq(site);
+    	
+		return ResponseEntity.ok(ApiResponse.<SiteInfo>builder()
+				.request(request)
+				.data(Siteect)
+				.build());
+    }
+    
+    @Operation(summary = "사이트 등록", description = "사이트 등록")
+	@PostMapping(value = "/{projSeq}/sites", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<ApiResponse<Boolean>> insertSite(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
+			, @PathVariable long projSeq
+			, @ModelAttribute @Valid Site site) {
+    	
+    	siteService.insertSite(site.of(loginUserInfo));
+
+		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+				.request(request)
+				.data(true)
+				.build());
+	}
+    
+    @Operation(summary = "사이트 수정", description = "사이트 수정")
+	@PutMapping(value = "/{projSeq}/sites/{siteSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<ApiResponse<Boolean>> updateSite(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
+			, @PathVariable long projSeq
+			, @PathVariable long siteSeq
+			, @ModelAttribute @Valid Site site) {
+    	
+    	boolean result = siteService.updateSite(site.of(loginUserInfo)) > 0 ? true : false;
+
+		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+				.request(request)
+				.data(result)
+				.build());
+	}
+    
+    @Operation(summary = "사이트 삭제", description = "사이트 삭제")
+	@DeleteMapping(value = "/{projSeq}/sites/{siteSeq}")
+	public ResponseEntity<ApiResponse<Boolean>> deleteSite(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
+			, @PathVariable long projSeq
+			, @PathVariable long siteSeq
+			, @Parameter(hidden = true) Site site) {
+    	
+    	boolean result = siteService.deleteSite(site.of(loginUserInfo)) > 0 ? true : false;
+
+		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+				.request(request)
+				.data(result)
+				.build());
+	}    
 }

@@ -20,13 +20,13 @@ public class PropertyUtil implements ApplicationContextAware {
 	}
 
 	public static String getProperty(String propertyName, String defaultValue) {
-		String value = defaultValue;
-		if (applicationContext.getEnvironment().getProperty(propertyName) == null) {
-			//propertyName + " properties was not loaded."
-		} else {
-			value = applicationContext.getEnvironment().getProperty(propertyName).toString();
+		String propertyValue = applicationContext.getEnvironment().getProperty(propertyName);
+		
+		if (propertyValue == null) {
+			propertyValue = defaultValue == null ? "" : defaultValue;
+			//System.out.println(propertyName + " properties was not loaded.");
 		}
-		return value;
+		return propertyValue;
 	}
 
 }

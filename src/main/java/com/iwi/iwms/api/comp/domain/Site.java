@@ -21,8 +21,7 @@ public class Site {
 	@Schema(hidden = true, description = "사이트 SEQ")
 	private long siteSeq;
 	
-	@NotNull(message = "프로젝트는 필수 입력 사항입니다")
-	@Schema( description = "프로젝트 SEQ")
+	@Schema(hidden = true, description = "프로젝트 SEQ")
 	private long projSeq;
 	
 	@NotNull(message = "사이트 이름은 필수 입력 사항입니다")

@@ -39,8 +39,8 @@ public class FileStorageServiceImpl implements FileStorageService {
 	private Path rootPath;
 	
     @Value("${file.storage.root-path}")
-    private void setRootPath(String path) {
-		this.rootPath = Paths.get(path).toAbsolutePath();
+    private void setRootPath(String rootPath) {
+		this.rootPath = Paths.get(rootPath).toAbsolutePath();
         try {
         	if (!Files.exists(this.rootPath)) {
         		Files.createDirectories(this.rootPath);

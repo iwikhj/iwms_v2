@@ -38,10 +38,6 @@
 		<result property="regNm" column="regNm"/>
 		<result property="updtDt" column="updtDt"/>
 		<result property="updtNm" column="updtNm"/>
-			
-	   	<collection property="sites" column="projSeq" 
-			ofType="com.iwi.iwms.api.comp.domain.SiteInfo" select="com.iwi.iwms.api.comp.mapper.SiteMapper.listSiteByProjSeq"/>				
-		
 	</resultMap>
 	
 	<!-- 프로젝트 목록 조회 -->	
