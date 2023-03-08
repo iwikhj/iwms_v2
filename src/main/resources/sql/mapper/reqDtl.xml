@@ -2,46 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iwi.iwms.api.req.mapper.ReqDtlMapper">
 
-	<resultMap id="resultReqDtlMap" type="com.iwi.iwms.api.req.domain.ReqDtlInfo">
-		<result property="rowNum" column="rowNum"/>
-		<result property="reqSeq" column="reqSeq"/>
-		<result property="reqNo" column="reqNo"/>
-		<result property="reqDtlSeq" column="reqDtlSeq"/>
-		<result property="reqDtlNo" column="reqDtlNo"/>
-		<result property="reqDtlNm" column="reqDtlNm"/>
-		<result property="reqDtlContentTxt" column="reqDtlContentTxt"/>
-		<result property="dtlSiteGbCd" column="dtlSiteGbCd"/>
-		<result property="dtlSiteGb" column="dtlSiteGb"/>
-		<result property="reqGbCd" column="reqGbCd"/>
-		<result property="reqGb" column="reqGb"/>
-		<result property="siteGbCdStr" column="siteGbCdStr"/>
-		<result property="reqDtlStatCd" column="reqDtlStatCd"/>
-		<result property="reqDtlStat" column="reqDtlStat"/>
-		<result property="reqDtlStatCmt" column="reqDtlStatCmt"/>
-		<result property="tgtYmd" column="tgtYmd"/>
-		<result property="tgtMm" column="tgtMm"/>
-		<result property="mngOkYmd" column="mngOkYmd"/>
-		<result property="mngOkSeq" column="mngOkSeq"/>
-		<result property="cusOkYmd" column="cusOkYmd"/>
-		<result property="cusOkSeq" column="cusOkSeq"/>				
-		<result property="returnYmd" column="returnYmd"/>
-		<result property="returnSeq" column="returnSeq"/>			
-		<result property="reqDtlScore" column="reqDtlScore"/>
-		<result property="reqDtlEvalCotentCmt" column="reqDtlEvalCotentCmt"/>	
-		<result property="delDt" column="delDt"/>
-		<result property="delYn" column="delYn"/>
-		<result property="regDt" column="regDt"/>
-		<result property="regNm" column="regNm"/>
-		<result property="updtDt" column="updtDt"/>
-		<result property="updtNm" column="updtNm"/>
-		
-	   	<collection property="comments" column="reqDtlSeq" 
-			ofType="com.iwi.iwms.api.req.domain.ReqDtlCmtInfo" select="com.iwi.iwms.api.req.mapper.ReqDtlCmtMapper.listReqDtlCmtByReqDtlSeq"/>
-			
-		<collection property="users" column="reqDtlSeq" 
-			ofType="com.iwi.iwms.api.req.domain.ReqDtlUserInfo" select="com.iwi.iwms.api.req.mapper.ReqDtlUserMapper.listReqDtlUserByReqDtlSeq"/>
-	</resultMap>
-
 	<sql id="selectReqDtl">
 		SELECT
 			ROW_NUMBER() OVER(ORDER BY DTL.REQ_DTL_SEQ) AS rowNum
@@ -88,6 +48,46 @@
 		WHERE DTL.DEL_YN = 'N'
 	</sql>
 
+	<resultMap id="resultReqDtlMap" type="com.iwi.iwms.api.req.domain.ReqDtlInfo">
+		<result property="rowNum" column="rowNum"/>
+		<result property="reqSeq" column="reqSeq"/>
+		<result property="reqNo" column="reqNo"/>
+		<result property="reqDtlSeq" column="reqDtlSeq"/>
+		<result property="reqDtlNo" column="reqDtlNo"/>
+		<result property="reqDtlNm" column="reqDtlNm"/>
+		<result property="reqDtlContentTxt" column="reqDtlContentTxt"/>
+		<result property="dtlSiteGbCd" column="dtlSiteGbCd"/>
+		<result property="dtlSiteGb" column="dtlSiteGb"/>
+		<result property="reqGbCd" column="reqGbCd"/>
+		<result property="reqGb" column="reqGb"/>
+		<result property="siteGbCdStr" column="siteGbCdStr"/>
+		<result property="reqDtlStatCd" column="reqDtlStatCd"/>
+		<result property="reqDtlStat" column="reqDtlStat"/>
+		<result property="reqDtlStatCmt" column="reqDtlStatCmt"/>
+		<result property="tgtYmd" column="tgtYmd"/>
+		<result property="tgtMm" column="tgtMm"/>
+		<result property="mngOkYmd" column="mngOkYmd"/>
+		<result property="mngOkSeq" column="mngOkSeq"/>
+		<result property="cusOkYmd" column="cusOkYmd"/>
+		<result property="cusOkSeq" column="cusOkSeq"/>				
+		<result property="returnYmd" column="returnYmd"/>
+		<result property="returnSeq" column="returnSeq"/>			
+		<result property="reqDtlScore" column="reqDtlScore"/>
+		<result property="reqDtlEvalCotentCmt" column="reqDtlEvalCotentCmt"/>	
+		<result property="delDt" column="delDt"/>
+		<result property="delYn" column="delYn"/>
+		<result property="regDt" column="regDt"/>
+		<result property="regNm" column="regNm"/>
+		<result property="updtDt" column="updtDt"/>
+		<result property="updtNm" column="updtNm"/>
+		
+	   	<collection property="comments" column="reqDtlSeq" 
+			ofType="com.iwi.iwms.api.req.domain.ReqDtlCmtInfo" select="com.iwi.iwms.api.req.mapper.ReqDtlCmtMapper.listReqDtlCmtByReqDtlSeq"/>
+			
+		<collection property="users" column="reqDtlSeq" 
+			ofType="com.iwi.iwms.api.req.domain.ReqDtlUserInfo" select="com.iwi.iwms.api.req.mapper.ReqDtlUserMapper.listReqDtlUserByReqDtlSeq"/>
+	</resultMap>
+	
 	<!-- 요청사항 상세 목록 조회 -->		
 	<select id="listReqDtlByReqSeq" parameterType="long"
 		resultMap="resultReqDtlMap">

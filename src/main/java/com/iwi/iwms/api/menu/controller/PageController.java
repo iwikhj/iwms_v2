@@ -10,13 +10,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iwi.iwms.api.common.response.ListResponse;
 import com.iwi.iwms.api.common.response.Response;
 import com.iwi.iwms.api.comp.domain.CompInfo;
+import com.iwi.iwms.api.comp.domain.ProjInfo;
 import com.iwi.iwms.api.comp.service.CompService;
+import com.iwi.iwms.api.comp.service.ProjService;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.notice.domain.NoticeInfo;
 import com.iwi.iwms.api.notice.service.NoticeService;
@@ -39,165 +40,58 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("${app.root}/${app.version}/pages")
 public class PageController {
 	
-	private final CompService compService;
+	private static final int DEFAULT_PAGE = 1;
 	
-	private final UserService userService;
-	
-	private final ReqService reqService;
+	private static final int DEFAULT_LIMIT = 15;
 	
 	private final NoticeService noticeService;
 	
-    @Operation(summary = "소속 목록 페이지 정보", description = "소속 목록 페이지 정보")
-    @GetMapping(value = "/company")
-    public ResponseEntity<ListResponse<List<CompInfo>>> company(HttpServletRequest request
-    		, @RequestParam(value = "page", required = false, defaultValue = "1") int page
-			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
-			, @RequestParam(value = "search", required = false) String search
-			, @RequestParam(value = "startDate", required = false) String startDate
-			, @RequestParam(value = "endDate", required = false) String endDate
+	private final ReqService reqService;
+	
+	private final ProjService projService;
+	
+	private final UserService userService;
+	
+	private final CompService compService;
+    
+	/**
+	 * 메뉴 홈
+	 */
+    @Operation(summary = "홈", description = "홈")
+    @GetMapping(value = "/home")
+    public ResponseEntity<Response<Void>> home(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
-		Map<String, Object> map = new HashMap<>();
-		map.put("search", search);
-		map.put("startDate", startDate);
-		map.put("endDate", endDate);
-		map.put("pagination", new Pagination(page, limit, compService.countComp(map)));
+		// TODO 홈 비지니스 로직 없음
     	
-    	List<CompInfo> compList = compService.listComp(map);
-    	
-		return ResponseEntity.ok(ListResponse.<List<CompInfo>>builder()
+		return ResponseEntity.ok(Response.<Void>builder()
 				.request(request)
-				.data(compList)
-				.query(map)
 				.loginUserInfo(loginUserInfo)
 				.build());
     }
     
-    @Operation(summary = "소속 상세 페이지 정보", description = "소속 상세 페이지 정보")
-    @GetMapping(value = "/company/{compSeq}")
-    public ResponseEntity<Response<CompInfo>> companyDetail(HttpServletRequest request
-    		, @PathVariable long compSeq
-    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
-    	
-    	CompInfo comp = compService.getCompBySeq(compSeq);
-    	
-		return ResponseEntity.ok(Response.<CompInfo>builder()
-				.request(request)
-				.data(comp)
-				.loginUserInfo(loginUserInfo)
-				.build());
-    }
-    
-    @Operation(summary = "사용자 목록 페이지 정보", description = "사용자 목록 페이지 정보")
-    @GetMapping(value = "/user")
-    public ResponseEntity<ListResponse<List<UserInfo>>> user(HttpServletRequest request
-    		, @RequestParam(value = "page", required = false, defaultValue = "1") int page
-			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
-			, @RequestParam(value = "search", required = false) String search
-			, @RequestParam(value = "startDate", required = false) String startDate
-			, @RequestParam(value = "endDate", required = false) String endDate
-    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
-    	
-		Map<String, Object> map = new HashMap<>();
-		map.put("search", search);
-		map.put("startDate", startDate);
-		map.put("endDate", endDate);
-		map.put("pagination", new Pagination(page, limit, userService.countUser(map)));
-    	
-    	List<UserInfo> userList = userService.listUser(map);
-    	
-		return ResponseEntity.ok(ListResponse.<List<UserInfo>>builder()
-				.request(request)
-				.data(userList)
-				.query(map)
-				.loginUserInfo(loginUserInfo)
-				.build());
-    }
-    
-    @Operation(summary = "사용자 상세 페이지 정보", description = "사용자 상세 페이지 정보")
-    @GetMapping(value = "/user/{userSeq}")
-    public ResponseEntity<Response<UserInfo>> userDetail(HttpServletRequest request
-    		, @PathVariable long userSeq
-    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
-    	
-    	UserInfo user = userService.getUserBySeq(userSeq);
-    	
-		return ResponseEntity.ok(Response.<UserInfo>builder()
-				.request(request)
-				.data(user)
-				.loginUserInfo(loginUserInfo)
-				.build());
-    }
-    
-    
-    @Operation(summary = "요청사항 목록 페이지 정보", description = "요청사항 목록 페이지 정보")
-    @GetMapping(value = "/request")
-    public ResponseEntity<ListResponse<List<ReqInfo>>> req(HttpServletRequest request
-    		, @RequestParam(value = "page", required = false, defaultValue = "1") int page
-			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
-			, @RequestParam(value = "search", required = false) String search
-			, @RequestParam(value = "startDate", required = false) String startDate
-			, @RequestParam(value = "endDate", required = false) String endDate
-    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
-    	
-		Map<String, Object> map = new HashMap<>();
-		map.put("search", search);
-		map.put("startDate", startDate);
-		map.put("endDate", endDate);
-		map.put("pagination", new Pagination(page, limit, reqService.countReq(map)));
-    	
-    	List<ReqInfo> reqList = reqService.listReq(map);
-    	
-		return ResponseEntity.ok(ListResponse.<List<ReqInfo>>builder()
-				.request(request)
-				.data(reqList)
-				.query(map)
-				.loginUserInfo(loginUserInfo)
-				.build());
-    }
-    
-    @Operation(summary = "요청사항 상세 페이지 정보", description = "요청사항 상세 페이지 정보")
-    @GetMapping(value = "/request/{reqSeq}")
-    public ResponseEntity<Response<ReqInfo>> reqDetail(HttpServletRequest request
-    		, @PathVariable long reqSeq
-    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
-    	
-    	ReqInfo req = reqService.getReqBySeq(reqSeq);
-    	
-		return ResponseEntity.ok(Response.<ReqInfo>builder()
-				.request(request)
-				.data(req)
-				.loginUserInfo(loginUserInfo)
-				.build());
-    }
-    
-    @Operation(summary = "공지사항 목록 페이지 정보", description = "공지사항 목록 페이지 정보")
+	/**
+	 * 메뉴 공지사항
+	 */
+    @Operation(summary = "공지사항", description = "공지사항 목록")
     @GetMapping(value = "/notice")
     public ResponseEntity<ListResponse<List<NoticeInfo>>> notice(HttpServletRequest request
-    		, @RequestParam(value = "page", required = false, defaultValue = "1") int page
-			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
-			, @RequestParam(value = "search", required = false) String search
-			, @RequestParam(value = "startDate", required = false) String startDate
-			, @RequestParam(value = "endDate", required = false) String endDate
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
 		Map<String, Object> map = new HashMap<>();
-		map.put("search", search);
-		map.put("startDate", startDate);
-		map.put("endDate", endDate);
-		map.put("pagination", new Pagination(page, limit, noticeService.countNotice(map)));
+		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, noticeService.countNotice(map)));
     	
-    	List<NoticeInfo> noticeList = noticeService.listNotice(map);
+    	List<NoticeInfo> listNotice = noticeService.listNotice(map);
     	
 		return ResponseEntity.ok(ListResponse.<List<NoticeInfo>>builder()
 				.request(request)
-				.data(noticeList)
+				.data(listNotice)
 				.query(map)
 				.loginUserInfo(loginUserInfo)
 				.build());
     }
     
-    @Operation(summary = "공지사항 상세 페이지 정보", description = "공지사항 상세 페이지 정보")
+    @Operation(summary = "공지사항 상세", description = "공지사항 상세")
     @GetMapping(value = "/notice/{noticeSeq}")
     public ResponseEntity<Response<NoticeInfo>> noticeDetail(HttpServletRequest request
     		, @PathVariable long noticeSeq
@@ -208,6 +102,195 @@ public class PageController {
 		return ResponseEntity.ok(Response.<NoticeInfo>builder()
 				.request(request)
 				.data(notice)
+				.loginUserInfo(loginUserInfo)
+				.build());
+    }    
+    
+	/**
+	 * 메뉴 유지보수
+	 */
+    @Operation(summary = "유지보수 - 현황", description = "유지보수 현황")
+    @GetMapping(value = "/maintain/dashboard")
+    public ResponseEntity<Response<Void>> maintainDashboard(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+    	
+		// TODO 유지보수 현황 비지니스 로직 없음
+    	
+		return ResponseEntity.ok(Response.<Void>builder()
+				.request(request)
+				.loginUserInfo(loginUserInfo)
+				.build());
+    }
+    
+    @Operation(summary = "유지보수 - 유지보수", description = "유지보수 목록")
+    @GetMapping(value = "/maintain/request")
+    public ResponseEntity<ListResponse<List<ReqInfo>>> maintainRequest(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+    	
+		Map<String, Object> map = new HashMap<>();
+		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, reqService.countReq(map)));
+    	
+    	List<ReqInfo> listReq = reqService.listReq(map);
+    	
+		return ResponseEntity.ok(ListResponse.<List<ReqInfo>>builder()
+				.request(request)
+				.data(listReq)
+				.query(map)
+				.loginUserInfo(loginUserInfo)
+				.build());
+    }
+    
+    @Operation(summary = "유지보수 - 기능개발", description = "유지보수 기능개발")
+    @GetMapping(value = "/maintain/develop")
+    public ResponseEntity<Response<Void>> maintainDevelop(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+    	
+    	// TODO 유지보수 기능개발 비지니스 로직 없음
+    	
+		return ResponseEntity.ok(Response.<Void>builder()
+				.request(request)
+				.loginUserInfo(loginUserInfo)
+				.build());
+    }
+    
+    @Operation(summary = "유지보수 - 일정관리", description = "유지보수 일정관리")
+    @GetMapping(value = "/maintain/schedule")
+    public ResponseEntity<Response<Void>> maintainSchedule(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+    	
+    	// TODO 유지보수 일정관리 비지니스 로직 없음
+    	
+		return ResponseEntity.ok(Response.<Void>builder()
+				.request(request)
+				.loginUserInfo(loginUserInfo)
+				.build());
+    }
+    
+	/**
+	 * 메뉴 프로젝트
+	 */    
+    @Operation(summary = "프로젝트", description = "프로젝트 목록")
+    @GetMapping(value = "/project")
+    public ResponseEntity<ListResponse<List<ProjInfo>>> project(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+    	
+		Map<String, Object> map = new HashMap<>();
+		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, projService.countProj(map)));
+		
+		List<ProjInfo> listProj = projService.listProj(map);
+    	
+		return ResponseEntity.ok(ListResponse.<List<ProjInfo>>builder()
+				.request(request)
+				.data(listProj)
+				.query(map)
+				.loginUserInfo(loginUserInfo)
+				.build());
+    }
+    
+	/**
+	 * 메뉴 이력관리
+	 */
+    @Operation(summary = "이력관리", description = "이력관리")
+    @GetMapping(value = "/history")
+    public ResponseEntity<Response<Void>> history(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+    	
+    	// TODO 이력관리 비지니스 로직 없음
+    	
+		return ResponseEntity.ok(Response.<Void>builder()
+				.request(request)
+				.loginUserInfo(loginUserInfo)
+				.build());
+    }
+    
+    
+	/**
+	 * 메뉴 배포관리
+	 */
+    @Operation(summary = "배포관리", description = "배포관리")
+    @GetMapping(value = "/deploy")
+    public ResponseEntity<Response<Void>> deploy(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+    	
+    	// TODO 배포관리 비지니스 로직 없음
+    	
+		return ResponseEntity.ok(Response.<Void>builder()
+				.request(request)
+				.loginUserInfo(loginUserInfo)
+				.build());
+    }
+    
+    
+	/**
+	 * 메뉴 시스템관리
+	 */
+    @Operation(summary = "시스템관리 - 사용자 ", description = "사용자 목록")
+    @GetMapping(value = "/system/user")
+    public ResponseEntity<ListResponse<List<UserInfo>>> systemUser(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+    	
+		Map<String, Object> map = new HashMap<>();
+		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, userService.countUser(map)));
+    	
+    	List<UserInfo> listUser = userService.listUser(map);
+    	
+		return ResponseEntity.ok(ListResponse.<List<UserInfo>>builder()
+				.request(request)
+				.data(listUser)
+				.query(map)
+				.loginUserInfo(loginUserInfo)
+				.build());
+    }
+    
+    @Operation(summary = "시스템관리 - 소속 ", description = "소속 목록")
+    @GetMapping(value = "/system/company")
+    public ResponseEntity<ListResponse<List<CompInfo>>> systemCompany(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+    	
+		Map<String, Object> map = new HashMap<>();
+		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, compService.countComp(map)));
+    	
+		List<CompInfo> listComp = compService.listComp(map);
+    	
+		return ResponseEntity.ok(ListResponse.<List<CompInfo>>builder()
+				.request(request)
+				.data(listComp)
+				.query(map)
+				.loginUserInfo(loginUserInfo)
+				.build());
+    }
+    
+    @Operation(summary = "시스템관리 - 프로젝트 ", description = "프로젝트 목록")
+    @GetMapping(value = "/system/project")
+    public ResponseEntity<ListResponse<List<ProjInfo>>> systemProject(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+    	
+		Map<String, Object> map = new HashMap<>();
+		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, projService.countProj(map)));
+		
+		List<ProjInfo> listProj = projService.listProj(map);
+    	
+		return ResponseEntity.ok(ListResponse.<List<ProjInfo>>builder()
+				.request(request)
+				.data(listProj)
+				.query(map)
+				.loginUserInfo(loginUserInfo)
+				.build());
+    }
+    
+    @Operation(summary = "시스템관리 - 권한 ", description = "권한 목록")
+    @GetMapping(value = "/system/role")
+    public ResponseEntity<ListResponse<Void>> systemRole(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+    	
+		Map<String, Object> map = new HashMap<>();
+		//map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, projService.countProj(map)));
+		
+    	// TODO 시스템관리 권한 비지니스 로직 없음
+    	
+		return ResponseEntity.ok(ListResponse.<Void>builder()
+				.request(request)
+				.query(map)
 				.loginUserInfo(loginUserInfo)
 				.build());
     }

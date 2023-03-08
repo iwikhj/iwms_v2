@@ -23,11 +23,17 @@ public class CodeInfo {
 	@Schema(description = "코드 이름")
 	private String codeNm;
 	
+	@Schema(description = "상위 코드")
+	private String upCodeCd;
+	
 	@Schema(description = "코드 구분")
 	private String codeGbCd;
 	
+	@Schema(description = "코드 순서")
+	private int codeOrder;	
+	
 	@Schema(description = "자식 코드") 
-	private List<ChildCodeInfo> childCodeInfoList;
+	private List<CodeInfo> childCodes;
 	
 	@Schema(description = "사용 여부") 
 	private String useYn;

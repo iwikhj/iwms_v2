@@ -2,26 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iwi.iwms.api.notice.mapper.NoticeMapper">
 
-	<resultMap id="resultNoticeMap" type="com.iwi.iwms.api.notice.domain.NoticeInfo">
-		<result property="rowNum" column="rowNum"/>
-		<result property="noticeSeq" column="noticeSeq"/>
-		<result property="compSeq" column="compSeq"/>
-		<result property="compNm" column="compNm"/>
-		<result property="title" column="title"/>
-		<result property="content" column="content"/>
-		<result property="fixedTopYn" column="fixedTopYn"/>
-		<result property="mainTopYn" column="mainTopYn"/>
-		<result property="viewCnt" column="viewCnt"/>
-		<result property="delYn" column="delYn"/>
-		<result property="regDt" column="regDt"/>
-		<result property="regNm" column="regNm"/>
-		<result property="updtDt" column="updtDt"/>
-		<result property="updtNm" column="updtNm"/>
-		
-	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=noticeSeq" 
-			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>
-	</resultMap>
-		
 	<sql id="selectNotice">
 		SELECT 
 			ROW_NUMBER() OVER(ORDER BY NOTI.NOTICE_SEQ) AS rowNum
@@ -46,6 +26,26 @@
 		LEFT JOIN TB_USER UPDT_USER ON NOTI.UPDT_SEQ = UPDT_USER.USER_SEQ 
 		WHERE NOTI.DEL_YN = 'N'
 	</sql>
+	
+	<resultMap id="resultNoticeMap" type="com.iwi.iwms.api.notice.domain.NoticeInfo">
+		<result property="rowNum" column="rowNum"/>
+		<result property="noticeSeq" column="noticeSeq"/>
+		<result property="compSeq" column="compSeq"/>
+		<result property="compNm" column="compNm"/>
+		<result property="title" column="title"/>
+		<result property="content" column="content"/>
+		<result property="fixedTopYn" column="fixedTopYn"/>
+		<result property="mainTopYn" column="mainTopYn"/>
+		<result property="viewCnt" column="viewCnt"/>
+		<result property="delYn" column="delYn"/>
+		<result property="regDt" column="regDt"/>
+		<result property="regNm" column="regNm"/>
+		<result property="updtDt" column="updtDt"/>
+		<result property="updtNm" column="updtNm"/>
+		
+	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=noticeSeq" 
+			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>
+	</resultMap>
 
 	<!-- 공지사항 목록 조회 -->	
 	<select id="listNotice" parameterType="hashMap"

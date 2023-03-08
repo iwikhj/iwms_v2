@@ -2,26 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iwi.iwms.api.comp.mapper.ProjMapper">
 
-	<resultMap id="resultProjMap" type="com.iwi.iwms.api.comp.domain.ProjInfo">
-		<result property="rowNum" column="rowNum"/>
-		<result property="projSeq" column="projSeq"/>
-		<result property="compSeq" column="compSeq"/>
-		<result property="compNm" column="compNm"/>
-		<result property="projNm" column="projNm"/>
-		<result property="projSwNm" column="projSwNm"/>
-		<result property="projStdYmd" column="projStdYmd"/>
-		<result property="projEndYmd" column="projEndYmd"/>
-		<result property="useYn" column="useYn"/>
-		<result property="regDt" column="regDt"/>
-		<result property="regNm" column="regNm"/>
-		<result property="updtDt" column="updtDt"/>
-		<result property="updtNm" column="updtNm"/>
-			
-	   	<collection property="sites" column="projSeq" 
-			ofType="com.iwi.iwms.api.comp.domain.SiteInfo" select="com.iwi.iwms.api.comp.mapper.SiteMapper.listSiteByProjSeq"/>				
-		
-	</resultMap>
-	
 	<sql id="selectProj">
 		SELECT 
 			ROW_NUMBER() OVER(ORDER BY PROJ.PROJ_SEQ) AS rowNum
@@ -44,6 +24,26 @@
 		WHERE PROJ.USE_YN = 'Y'
 	</sql>
 
+	<resultMap id="resultProjMap" type="com.iwi.iwms.api.comp.domain.ProjInfo">
+		<result property="rowNum" column="rowNum"/>
+		<result property="projSeq" column="projSeq"/>
+		<result property="compSeq" column="compSeq"/>
+		<result property="compNm" column="compNm"/>
+		<result property="projNm" column="projNm"/>
+		<result property="projSwNm" column="projSwNm"/>
+		<result property="projStdYmd" column="projStdYmd"/>
+		<result property="projEndYmd" column="projEndYmd"/>
+		<result property="useYn" column="useYn"/>
+		<result property="regDt" column="regDt"/>
+		<result property="regNm" column="regNm"/>
+		<result property="updtDt" column="updtDt"/>
+		<result property="updtNm" column="updtNm"/>
+			
+	   	<collection property="sites" column="projSeq" 
+			ofType="com.iwi.iwms.api.comp.domain.SiteInfo" select="com.iwi.iwms.api.comp.mapper.SiteMapper.listSiteByProjSeq"/>				
+		
+	</resultMap>
+	
 	<!-- 프로젝트 목록 조회 -->	
 	<select id="listProj" parameterType="hashMap"
 		resultMap="resultProjMap">

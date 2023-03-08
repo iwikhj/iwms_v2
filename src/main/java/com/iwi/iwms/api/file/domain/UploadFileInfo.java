@@ -1,5 +1,9 @@
 package com.iwi.iwms.api.file.domain;
 
+import org.springframework.beans.factory.annotation.Value;
+
+import com.iwi.iwms.utils.PropertyUtil;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -52,4 +56,8 @@ public class UploadFileInfo {
 	
 	@Schema(description = "등록자") 
 	private String regNm;
+	
+	public void setFileDownloadUri(String fileDownloadUri) {
+		this.fileDownloadUri = PropertyUtil.getProperty("app.root") + "/" + PropertyUtil.getProperty("app.version") + "/files/download" + fileDownloadUri;
+	}
 }
