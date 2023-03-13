@@ -37,13 +37,6 @@
 	<select id="listNotice" parameterType="hashMap"
 		resultMap="resultNoticeMap">
 		<include refid="selectNotice"></include>
-			AND (
-				CASE 
-					WHEN (SELECT USER_ROLE FROM TB_USER WHERE USER_SEQ = #{userSeq}) = 'ROLE_IWMS_ADMIN' 
-					THEN TRUE 
-					ELSE (SELECT COMP_SEQ FROM TB_USER WHERE USER_SEQ =  #{userSeq}) = NOTI.COMP_SEQ OR NOTI.COMP_SEQ IS NULL 
-				END
-			)
 		<if test='search != null and search != ""'>
 			AND NOTI.TITLE LIKE CONCAT('%', #{search}, '%') 
 			OR NOTI.CONTENT LIKE CONCAT('%', #{search}, '%') 
@@ -63,13 +56,6 @@
 		FROM TB_NOTICE NOTI
 		LEFT JOIN TB_COMPANY COMP ON NOTI.COMP_SEQ = COMP.COMP_SEQ
 		WHERE NOTI.USE_YN = 'Y'
-			AND (
-				CASE 
-					WHEN (SELECT USER_ROLE FROM TB_USER WHERE USER_SEQ = #{userSeq}) = 'ROLE_IWMS_ADMIN' 
-					THEN TRUE 
-					ELSE (SELECT COMP_SEQ FROM TB_USER WHERE USER_SEQ =  #{userSeq}) = NOTI.COMP_SEQ OR NOTI.COMP_SEQ IS NULL 
-				END
-			)
 		<if test='search != null and search != ""'>
 			AND NOTI.TITLE LIKE CONCAT('%', #{search}, '%') 
 			OR NOTI.CONTENT LIKE CONCAT('%', #{search}, '%') 

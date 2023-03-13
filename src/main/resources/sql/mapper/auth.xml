@@ -112,12 +112,12 @@
 			, MENU.PAGE_TARGET AS pageTarget
 			, AM.READ_YN AS readYn		
 			, AM.WRITE_YN AS writeYn		
-			, AM.EXEC_YN AS execYn			
+			, AM.EXEC_YN AS execYn		
+			, AM.USE_YN AS useYn
 		FROM TB_AUTH AUTH
 		INNER JOIN TB_AUTH_MENU AM ON AUTH.AUTH_SEQ = AM.AUTH_SEQ
 		INNER JOIN TB_MENU MENU ON MENU.MENU_SEQ = AM.MENU_SEQ
-		WHERE AM.USE_YN = 'Y'
-			AND AUTH.AUTH_SEQ = #{authSeq}
+		WHERE AUTH.AUTH_SEQ = #{authSeq}
 	</sql>
 
 	<resultMap id="resultAuthMenuMap" type="com.iwi.iwms.api.auth.domain.AuthMenuInfo">

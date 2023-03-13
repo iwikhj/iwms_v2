@@ -52,4 +52,7 @@ public class AuthMenuInfo {
 	
 	@Schema(description = "하위 메뉴") 
 	private List<AuthMenuInfo> subMenus;
+	
+	@Schema(description = "사용 여부") 
+	private String useYn;
 }

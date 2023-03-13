@@ -37,11 +37,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Tag(name = "Page", description = "IWMS 페이지 정보")
+@Tag(name = "Menu page", description = "IWMS 메뉴별 페이지 정보")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("${app.root}/${app.version}/pages")
-public class PageController {
+public class MenuPageController {
 	
 	private static final int DEFAULT_PAGE = 1;
 	
@@ -62,7 +62,7 @@ public class PageController {
 	/**
 	 * 메뉴 홈
 	 */
-    @Operation(summary = "홈", description = "홈")
+    @Operation(summary = "홈 (No data)", description = "홈")
     @GetMapping(value = "/home")
     public ResponseEntity<Response<Void>> home(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
@@ -110,12 +110,12 @@ public class PageController {
 				.data(notice)
 				.loginUserInfo(loginUserInfo)
 				.build());
-    }    
+    }
     
 	/**
 	 * 메뉴 유지보수
 	 */
-    @Operation(summary = "유지보수 - 유지보수", description = "유지보수 목록")
+    @Operation(summary = "유지보수 - 유지보수 (No data)", description = "유지보수 목록")
     @GetMapping(value = "/maintain/request")
     public ResponseEntity<ListResponse<List<ReqInfo>>> maintainRequest(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
@@ -133,7 +133,7 @@ public class PageController {
 				.build());
     }
     
-    @Operation(summary = "유지보수 - 기능개발", description = "유지보수 기능개발")
+    @Operation(summary = "유지보수 - 기능개발 (No data)", description = "유지보수 기능개발")
     @GetMapping(value = "/maintain/develop")
     public ResponseEntity<Response<Void>> maintainDevelop(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
@@ -146,7 +146,7 @@ public class PageController {
 				.build());
     }
     
-    @Operation(summary = "유지보수 - 일정관리", description = "유지보수 일정관리")
+    @Operation(summary = "유지보수 - 일정관리 (No data)", description = "유지보수 일정관리")
     @GetMapping(value = "/maintain/schedule")
     public ResponseEntity<Response<Void>> maintainSchedule(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
@@ -159,7 +159,7 @@ public class PageController {
 				.build());
     }
     
-    @Operation(summary = "유지보수 - 현황", description = "유지보수 현황")
+    @Operation(summary = "유지보수 - 현황 (No data)", description = "유지보수 현황")
     @GetMapping(value = "/maintain/statistics")
     public ResponseEntity<Response<Void>> maintainDashboard(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
@@ -196,7 +196,7 @@ public class PageController {
 	/**
 	 * 메뉴 이력관리
 	 */
-    @Operation(summary = "이력관리", description = "이력관리")
+    @Operation(summary = "이력관리 (No data)", description = "이력관리")
     @GetMapping(value = "/history")
     public ResponseEntity<Response<Void>> history(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
@@ -213,7 +213,7 @@ public class PageController {
 	/**
 	 * 메뉴 배포관리
 	 */
-    @Operation(summary = "배포관리", description = "배포관리")
+    @Operation(summary = "배포관리 (No data)", description = "배포관리")
     @GetMapping(value = "/deploy")
     public ResponseEntity<Response<Void>> deploy(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
@@ -231,7 +231,7 @@ public class PageController {
 	 * 메뉴 시스템관리
 	 */
     @PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
-    @Operation(summary = "시스템관리 - 사용자 ", description = "사용자 목록")
+    @Operation(summary = "시스템관리 - 사용자", description = "사용자 목록")
     @GetMapping(value = "/system/user")
     public ResponseEntity<ListResponse<List<UserInfo>>> systemUser(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
