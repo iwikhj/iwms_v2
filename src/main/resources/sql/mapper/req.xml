@@ -15,70 +15,38 @@
 			, SITE.SITE_NM AS siteNm
 			, REQ.REQ_YMD AS reqYmd
 			, REQ.REQ_TYPE_CD AS reqTypeCd
-			, REQ_TYPE_CODE.CODE_NM AS reqType
+			, FN_GET_CODE_NM('REQ_TYPE_CD', REQ.REQ_TYPE_CD) AS reqType
 			, REQ.REQ_GB_CD AS reqGbCd
-			, REQ_GB_CODE.CODE_NM AS reqGb
+			, FN_GET_CODE_NM('REQ_GB_CD', REQ.REQ_GB_CD) AS reqGb
 			, REQ.REQ_END_YMD AS reqEndYmd
 			, REQ.REQ_CONTENTS_TXT AS reqContentsTxt
 			, REQ.AGREE_YN AS agreeYn
 			, REQ.AGREE_DT AS agreeDt
 			, REQ.AGREE_USER_SEQ AS agreeUserSeq
-			, AGREE_USER.USER_NM AS agreeUserNm
+			, FN_GET_USER_NM(REQ.AGREE_USER_SEQ) AS agreeUserNm
 			, REQ.DEL_YN AS delYn
 			, REQ.REASON_TXT AS reasonTxt
 			, DATE_FORMAT(REQ.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
-			, REG_USER.USER_NM AS regNm
+			, FN_GET_USER_NM(REQ.REG_SEQ) AS regNm
 			, DATE_FORMAT(REQ.UPDT_DT, "%Y-%m-%d %H:%i:%s") AS updtDt
-			, UPDT_USER.USER_NM AS updtNm
+			, FN_GET_USER_NM(REQ.UPDT_SEQ) AS updtNm
 			, 'TB_REQ' AS fileRefTb
 			, 'REQ_SEQ' AS fileRefCol			
 		FROM TB_REQ REQ
 		INNER JOIN TB_COMPANY COMP ON REQ.COMP_SEQ = COMP.COMP_SEQ
 		INNER JOIN TB_PROJ PROJ ON REQ.PROJ_SEQ = PROJ.PROJ_SEQ
 		INNER JOIN TB_SITE SITE ON REQ.SITE_SEQ = SITE.SITE_SEQ
-		LEFT JOIN TB_CODE REQ_TYPE_CODE ON REQ.REQ_TYPE_CD = REQ_TYPE_CODE.CODE_CD 
-			AND REQ_TYPE_CODE.UP_CODE_CD = 'REQ_TYPE_CD'  
-		LEFT JOIN TB_CODE REQ_GB_CODE ON REQ.REQ_GB_CD = REQ_GB_CODE.CODE_CD 
-			AND REQ_GB_CODE.UP_CODE_CD = 'REQ_GB_CD'      
-		LEFT JOIN TB_USER AGREE_USER ON REQ.AGREE_USER_SEQ = AGREE_USER.USER_SEQ
-		LEFT JOIN TB_USER REG_USER ON REQ.REG_SEQ = REG_USER.USER_SEQ
-		LEFT JOIN TB_USER UPDT_USER ON REQ.UPDT_SEQ = UPDT_USER.USER_SEQ 
 		WHERE REQ.DEL_YN = 'N'
 	</sql>
 
 	<resultMap id="resultReqMap" type="com.iwi.iwms.api.req.domain.ReqInfo">
-		<result property="rowNum" column="rowNum"/>
 		<result property="reqSeq" column="reqSeq"/>
-		<result property="reqNo" column="reqNo"/>
-		<result property="siteSeq" column="siteSeq"/>
-		<result property="siteNm" column="siteNm"/>
-		<result property="reqYmd" column="reqYmd"/>
-		<result property="reqTypeCd" column="reqTypeCd"/>
-		<result property="reqType" column="reqType"/>
-		<result property="reqGbCd" column="reqGbCd"/>
-		<result property="reqGb" column="reqGb"/>
-		<result property="reqEndYmd" column="reqEndYmd"/>
-		<result property="reqContentsTxt" column="reqContentsTxt"/>
-		<result property="agreeYn" column="agreeYn"/>
-		<result property="agreeDt" column="agreeDt"/>
-		<result property="agreeUserSeq" column="agreeUserSeq"/>
-		<result property="agreeUserNm" column="agreeUserNm"/>
-		<result property="delYn" column="delYn"/>
-		<result property="reasonTxt" column="reasonTxt"/>
-		<result property="regDt" column="regDt"/>
-		<result property="regNm" column="regNm"/>
-		<result property="updtDt" column="updtDt"/>
-		<result property="updtNm" column="updtNm"/>
-			
 	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=reqSeq" 
 			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>
-
 	   	<collection property="comments" column="reqSeq" 
 			ofType="com.iwi.iwms.api.req.domain.ReqCmtInfo" select="com.iwi.iwms.api.req.mapper.ReqCmtMapper.listReqCmtByReqSeq"/>			
-						
 	   	<collection property="details" column="reqSeq" 
 			ofType="com.iwi.iwms.api.req.domain.ReqDtlInfo" select="com.iwi.iwms.api.req.mapper.ReqDtlMapper.listReqDtlByReqSeq"/>			
-			
 	</resultMap>
 	
 	<!-- 요청사항 목록 조회 -->		
@@ -102,7 +70,7 @@
 	<select id="countReq" parameterType="hashMap"
 		resultType="int">
 		SELECT 
-			COUNT(REQ_SEQ)
+			COUNT(*)
 		FROM TB_REQ
 		WHERE DEL_YN = 'N'
 		<if test='search != null and search != ""'>
@@ -149,7 +117,7 @@
 		    )
 			, #{siteSeq}
 			, #{projSeq}
-			, (SELECT COMP_SEQ FROM TB_PROJ WHERE PROJ_SEQ = #{projSeq})
+			, #{compSeq}
 			, DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
 			, #{reqTypeCd}
 			, #{reqGbCd}
@@ -180,27 +148,15 @@
 		FROM TB_REQ
 		WHERE REQ_SEQ = #{reqSeq}	 
 	</delete>
-
-	<!-- 요청사항 취소 -->
-	<update id="cancelReq" parameterType="com.iwi.iwms.api.req.domain.ReqCancel">
-		UPDATE TB_REQ 
-		SET
-		   REASON_TXT = #{reasonTxt}
-			, DEL_YN = 'Y'
-			, UPDT_DT = CURRENT_TIMESTAMP
-			, UPDT_SEQ = #{updtSeq}
-		WHERE REQ_SEQ = #{reqSeq}	
-	</update>	
 	
-	<!-- 요청사항 합의 -->	
-	<update id="agreeReq" parameterType="com.iwi.iwms.api.req.domain.ReqAgree">
+	<!-- 요청사항 상태 변경. 합의/협의/반려/취소 -->	
+	<update id="updateReqStatus" parameterType="com.iwi.iwms.api.req.domain.ReqStat">
 		UPDATE TB_REQ 
 		SET
-		    AGREE_YN = #{agreeYn}
+		    AGREE_YN = #{reqStatCd}
 			, AGREE_DT = CURRENT_TIMESTAMP
 			, AGREE_USER_SEQ = #{updtSeq}
-			, UPDT_DT = CURRENT_TIMESTAMP
-			, UPDT_SEQ = #{updtSeq}
+			, REASON_TXT = #{reasonTxt}		
 		WHERE REQ_SEQ = #{reqSeq}	
 	</update>			
 		

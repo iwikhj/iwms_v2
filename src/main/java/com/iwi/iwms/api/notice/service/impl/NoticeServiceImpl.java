@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.iwi.iwms.api.file.domain.UploadFile;
@@ -54,7 +55,7 @@ public class NoticeServiceImpl implements NoticeService {
 		noticeMapper.insertNotice(notice);
 		
 		// 첨부파일 저장
-		if(notice.getFiles() != null && !notice.getFiles().isEmpty()) {
+		if(!CollectionUtils.isEmpty(notice.getFiles())) {
 			UploadFile uploadFile = notice.getFileInfo();
 			uploadFile.setFileRefSeq(notice.getNoticeSeq());
 			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + notice.getNoticeSeq());
@@ -72,12 +73,12 @@ public class NoticeServiceImpl implements NoticeService {
 
 		// 첨부파일 삭제
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(notice.getFileInfo());
-		if(attachedFiles != null && attachedFiles.size() > 0) {
+		if(!CollectionUtils.isEmpty(attachedFiles)) {
 			fileService.deleteAttachFiles(attachedFiles, notice.getAttachedFilesSeq());
 		}
 		
 		// 첨부파일 저장
-		if(notice.getFiles() != null && !notice.getFiles().isEmpty()) {
+		if(!CollectionUtils.isEmpty(notice.getFiles())) {
 			log.info("첨부파일 있음");
 			UploadFile uploadFile = notice.getFileInfo();
 			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + notice.getNoticeSeq());

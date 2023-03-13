@@ -16,32 +16,40 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Position {
+public class Dept {
 
-	@Schema(hidden = true, description = "직급 SEQ")
-	private long positionSeq;
-
-	@NotNull(message = "직급 이름은 필수 입력 사항입니다")
-	@Schema(description = "직급 이름")
-	private String positionNm;
+	@Schema(hidden = true, description = "부서 SEQ")
+	private long deptSeq;
 	
 	@NotNull(message = "소속은 필수 입력 사항입니다")
 	@Schema(hidden = true, description = "소속 SEQ") 
 	private long compSeq;
 	
-	@NotNull
-	@Schema(description = "사용 여부", defaultValue = "Y", allowableValues = {"Y", "N"}) 
+	@NotNull(message = "부서 이름은 필수 입력 사항입니다")
+	@Schema(description = "부서 이름")
+	private String deptNm;
+	
+	@Schema(description = "부서 설명") 
+	private String deptDesc;
+	
+	@Schema(description = "상위 부서 SEQ") 
+	private Long upDeptSeq;
+	
+	@Schema(description = "부서 정렬 순서") 
+	private int deptOrderNo;
+	
+	@Schema(description = "사용 여부", allowableValues = {"Y", "N"}) 
 	private String useYn;
 
 	@Schema(hidden = true, description = "등록자 SEQ") 
 	private long regSeq;
 	
 	@Schema(hidden = true, description = "수정자 SEQ") 
-	private long updtSeq;
+	private long uptSeq;
 	
-	public Position of(final LoginUserInfo loginUserInfo) {
+	public Dept of(final LoginUserInfo loginUserInfo) {
 		this.regSeq = loginUserInfo.getUserSeq();
-		this.updtSeq = loginUserInfo.getUserSeq();
+		this.uptSeq = loginUserInfo.getUserSeq();
 		return this;
 	}
 }

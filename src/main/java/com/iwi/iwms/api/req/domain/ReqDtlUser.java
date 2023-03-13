@@ -34,7 +34,7 @@ public class ReqDtlUser {
 	@Schema(hidden = true, description = "요청사항 상세 담당자 SEQ") 
 	private long userSeq;
 
-	@Schema(hidden = true, description = "사용자 업무 코드: [PL: 기획, DS: 디자인, UI: 퍼블리싱, DV: 개발, ET: 기타]", allowableValues = {"PL", "DS", "UI", "DV", "ET"}) 
+	@Schema(hidden = true, description = "업무 롤 코드: [PN: 기획, DS: 디자인, UI: 퍼블리싱, DV: 개발, DB: DB, ET: 기타]", allowableValues = {"PN", "DS", "UI", "DV", "DB", "ET"}) 
 	private String busiRollCd;
 	
     @Pattern(regexp = "^(19|20)\\d{2}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[0-1])$", message = "처리 예정일의 날짜 형식이 유효하지 않습니다(YYYYMMDD)")

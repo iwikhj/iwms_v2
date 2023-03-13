@@ -25,16 +25,19 @@ public class CompInfo {
 	@Schema(description = "소속 이름")
 	private String compNm;
 	
-	@Schema(description = "소속 구분 코드: [01: 자사, 02: 고객사, 03: 협력사, 99: 계약직]") 
+	@Schema(description = "소속 구분 코드") 
 	private String compGbCd;
+	
+	@Schema(description = "소속 구분") 
+	private String compGb;
 	
 	@Schema(description = "소속 전화번호")
 	private String compTel;
 	
-	@Schema(description = "소속 직급 목록")
-	private List<PositionInfo> positions;
+	@Schema(description = "소속 부서 목록")
+	private List<DeptInfo> depts;
 	
-	@Schema(description = "소속 회원 목록")
+	@Schema(description = "소속 사용자 목록")
 	private List<UserInfo> users;
 	
 	@Schema(description = "사용 여부")

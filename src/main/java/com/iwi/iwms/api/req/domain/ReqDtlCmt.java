@@ -65,10 +65,7 @@ public class ReqDtlCmt {
 		if(this.reqDtlCmtSeq != null && this.reqDtlCmtSeq != 0) {
 			this.fileInfo.setFileRefSeq(this.reqDtlCmtSeq);
 		}
-		this.fileInfo.setFileGbCd("01");
 		this.fileInfo.setRegSeq(loginUserInfo.getUserSeq());
-		this.fileInfo.setUpdtSeq(loginUserInfo.getUserSeq());
-		
 		return this;
 	}
 }

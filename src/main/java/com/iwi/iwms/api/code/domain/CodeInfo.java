@@ -26,28 +26,10 @@ public class CodeInfo {
 	@Schema(description = "상위 코드")
 	private String upCodeCd;
 	
-	@Schema(description = "코드 구분")
-	private String codeGbCd;
-	
-	@Schema(description = "코드 순서")
-	private int codeOrder;	
-	
-	@Schema(description = "자식 코드") 
-	private List<CodeInfo> childCodes;
-	
 	@Schema(description = "사용 여부") 
 	private String useYn;
 	
-	@Schema(description = "등록 일자") 
-	private String regDt;
-
-	@Schema(description = "등록자") 
-	private String regNm;
-	
-	@Schema(description = "수정 일자") 
-	private String updtDt;
-	
-	@Schema(description = "수정자") 
-	private String updtNm;
+	@Schema(description = "하위 코드 목록") 
+	private List<CodeInfo> subCodes;
 	
 }

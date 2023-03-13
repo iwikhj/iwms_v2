@@ -12,13 +12,13 @@
 			, DTL.REQ_DTL_SEQ AS reqDtlSeq
 			, DTL.REQ_DTL_NO AS reqDtlNo
 			, USER.USER_SEQ AS userSeq
-			, ASS_USER.USER_NM AS userNm
+			, FN_GET_USER_NM(USER.USER_SEQ) AS userNm
 			, USER.BUSI_ROLL_CD AS busiRollCd
-			, CODE1.CODE_NM AS busiRoll
+			, FN_GET_CODE_NM('BUSI_ROLL_CD', USER.BUSI_ROLL_CD) AS busiRoll
 			, USER.PROC_YMD AS procYmd
 			, USER.PROC_HH AS procHh
 			, USER.REQ_DTL_STAT_CD AS reqDtlStatCd
-			, CODE2.CODE_NM AS reqDtlStat
+			, FN_GET_CODE_NM('REQ_DTL_STAT_CD', USER.REQ_DTL_STAT_CD) AS reqDtlStat
 			, CMT.REQ_DTL_STD_YMD AS reqDtlStdYmd
 			, CMT.REQ_DTL_STD_PART AS reqDtlStdPart
 			, CMT.REQ_DTL_END_YMD AS reqDtlEndYmd
@@ -26,44 +26,16 @@
 			, CMT.CMT AS cmt
 			, CMT.MNG_MAIN_YN AS mngMainYn
 			, DATE_FORMAT(USER.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
-			, REG_USER.USER_NM AS regNm
+			, FN_GET_USER_NM(USER.REG_SEQ) AS regNm
 		FROM TB_REQ REQ
 		INNER JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ
 		INNER JOIN TB_REQ_DTL_USER USER ON DTL.REQ_DTL_SEQ = USER.REQ_DTL_SEQ
 		INNER JOIN TB_REQ_DTL_USER_CMT CMT ON USER.REQ_DTL_USER_SEQ = CMT.REQ_DTL_USER_SEQ
-		LEFT JOIN TB_CODE CODE1 ON USER.BUSI_ROLL_CD = CODE1.CODE_CD 
-			AND CODE1.UP_CODE_CD = 'BUSI_ROLL_CD'  
-		LEFT JOIN TB_CODE CODE2 ON USER.REQ_DTL_STAT_CD = CODE2.CODE_CD 
-			AND CODE2.UP_CODE_CD = 'REQ_DTL_STAT_CD'  
-		LEFT JOIN TB_USER ASS_USER ON USER.USER_SEQ = ASS_USER.USER_SEQ
-		LEFT JOIN TB_USER REG_USER ON USER.REG_SEQ = REG_USER.USER_SEQ
 		WHERE 1 = 1
 	</sql>	
 
 	<resultMap id="resultReqDtlUserMap" type="com.iwi.iwms.api.req.domain.ReqDtlUserInfo">
-		<result property="rowNum" column="rowNum"/>
-		<result property="reqDtlUserSeq" column="reqDtlUserSeq"/>
 		<result property="reqDtlUserCmtSeq" column="reqDtlUserCmtSeq"/>
-		<result property="reqSeq" column="reqSeq"/>
-		<result property="reqNo" column="reqNo"/>
-		<result property="reqDtlSeq" column="reqDtlSeq"/>
-		<result property="reqDtlNo" column="reqDtlNo"/>
-		<result property="userSeq" column="userSeq"/>
-		<result property="userNm" column="userNm"/>
-		<result property="busiRollCd" column="busiRollCd"/>
-		<result property="busiRoll" column="busiRoll"/>
-		<result property="procYmd" column="procYmd"/>
-		<result property="procHh" column="procHh"/>
-		<result property="reqDtlStdYmd" column="reqDtlStdYmd"/>
-		<result property="reqDtlStdPart" column="reqDtlStdPart"/>
-		<result property="reqDtlEndYmd" column="reqDtlEndYmd"/>
-		<result property="reqDtlEndPart" column="reqDtlEndPart"/>
-		<result property="cmt" column="cmt"/>
-		<result property="mngMainYn" column="mngMainYn"/>
-		<result property="reqDtlStatCd" column="reqDtlStatCd"/>
-		<result property="reqDtlStat" column="reqDtlStat"/>
-		<result property="regDt" column="regDt"/>
-		<result property="regNm" column="regNm"/>
 	</resultMap>
 	
 	<!-- 요청사항 상세 담당자 목록 조회 -->		

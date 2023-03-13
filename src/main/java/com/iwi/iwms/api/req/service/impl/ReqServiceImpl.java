@@ -3,19 +3,26 @@ package com.iwi.iwms.api.req.service.impl;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.iwi.iwms.api.comp.domain.SiteInfo;
+import com.iwi.iwms.api.comp.mapper.SiteMapper;
 import com.iwi.iwms.api.file.domain.UploadFile;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
 import com.iwi.iwms.api.file.service.FileService;
-import com.iwi.iwms.api.req.domain.ReqAgree;
-import com.iwi.iwms.api.req.domain.ReqCancel;
 import com.iwi.iwms.api.req.domain.Req;
+import com.iwi.iwms.api.req.domain.ReqCmt;
 import com.iwi.iwms.api.req.domain.ReqInfo;
+import com.iwi.iwms.api.req.domain.ReqStat;
+import com.iwi.iwms.api.req.enums.ReqCode;
+import com.iwi.iwms.api.req.mapper.ReqCmtMapper;
 import com.iwi.iwms.api.req.mapper.ReqMapper;
 import com.iwi.iwms.api.req.service.ReqService;
 
@@ -31,7 +38,11 @@ public class ReqServiceImpl implements ReqService {
 
 	private final ReqMapper reqMapper;
 	
+	private final SiteMapper siteMapper;
+	
 	private final FileService fileService;
+	
+	private final ReqCmtMapper reqCmtMapper;
     
 	@Override
 	public List<ReqInfo> listReq(Map<String, Object> map) {
@@ -52,15 +63,42 @@ public class ReqServiceImpl implements ReqService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public void insertReq(Req req) {
-	
-		reqMapper.insertReq(req);
+		if(CollectionUtils.isEmpty(req.getSitesSeq())) {
+			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "사이트를 선택해주세요.");
+		}
 		
-		// 첨부파일 저장
-		if(req.getFiles() != null && !req.getFiles().isEmpty()) {
-			UploadFile uploadFile = req.getFileInfo();
-			uploadFile.setFileRefSeq(req.getReqSeq());
-			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + req.getReqSeq());
-			fileService.insertAttachFiles(req.getFiles(), uploadFile);
+		AtomicInteger index = new AtomicInteger();   
+		List<SiteInfo> sites = req.getSitesSeq()
+			.stream()
+			.map(v -> {
+				int idx = index.getAndIncrement();
+				return  Optional.ofNullable(siteMapper.getSiteBySeq(v))
+							.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사이트를 찾을 수 없습니다. [" + idx + "]"));
+			})
+			.collect(Collectors.toList());
+		
+		for(SiteInfo site : sites) {
+			
+			req.setSiteSeq(site.getSiteSeq());
+			req.setProjSeq(site.getProjSeq());
+			
+			reqMapper.insertReq(req);
+			
+			ReqCmt reqCmt = ReqCmt.builder()
+					.reqSeq(req.getReqSeq())
+					.reqCmt(ReqCode.REQ.getMessage())
+					.regSeq(req.getRegSeq())
+					.build();
+			
+			reqCmtMapper.insertReqCmt(reqCmt);
+			
+			// 첨부파일 저장
+			if(!CollectionUtils.isEmpty(req.getFiles())) {
+				UploadFile uploadFile = req.getFileInfo();
+				uploadFile.setFileRefSeq(req.getReqSeq());
+				uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + req.getReqSeq());
+				fileService.insertAttachFiles(req.getFiles(), uploadFile);
+			}
 		}
 	}
 
@@ -74,12 +112,12 @@ public class ReqServiceImpl implements ReqService {
 		
 		// 첨부파일 삭제
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(req.getFileInfo());
-		if(attachedFiles != null && attachedFiles.size() > 0) {
+		if(!CollectionUtils.isEmpty(attachedFiles)) {
 			fileService.deleteAttachFiles(attachedFiles, req.getAttachedFilesSeq());
 		}
 		
 		// 첨부파일 저장
-		if(req.getFiles() != null && !req.getFiles().isEmpty()) {
+		if(!CollectionUtils.isEmpty(req.getFiles())) {
 			UploadFile uploadFile = req.getFileInfo();
 			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + req.getReqSeq());
 			fileService.insertAttachFiles(req.getFiles(), uploadFile);
@@ -97,27 +135,26 @@ public class ReqServiceImpl implements ReqService {
 		
 		// 첨부파일 삭제(디렉토리까지)
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(req.getFileInfo());
-		if(attachedFiles != null && attachedFiles.size() > 0) {
+		if(!CollectionUtils.isEmpty(attachedFiles)) {
 			fileService.deleteAttachAll(attachedFiles);
 		}
 		return result;
 	}
 	
-	@Transactional(rollbackFor = {Exception.class})
 	@Override
-	public int cancelReq(ReqCancel reqCancel) {
-		Optional.ofNullable(reqMapper.getReqBySeq(reqCancel.getReqSeq()))
+	public int updateReqStatus(ReqStat reqStat) {
+		Optional.ofNullable(reqMapper.getReqBySeq(reqStat.getReqSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항을 찾을 수 없습니다."));
 		
-		return reqMapper.cancelReq(reqCancel);
-	}
-	
-	@Override
-	public int agreeReq(ReqAgree reqAgree) {
-		Optional.ofNullable(reqMapper.getReqBySeq(reqAgree.getReqSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항을 찾을 수 없습니다."));
+		ReqCmt reqCmt = ReqCmt.builder()
+				.reqSeq(reqStat.getReqSeq())
+				.reqCmt(ReqCode.getReqCode(reqStat.getReqStatCd()).getMessage())
+				.regSeq(reqStat.getUpdtSeq())
+				.build();
 		
-		return reqMapper.agreeReq(reqAgree);
+		reqCmtMapper.insertReqCmt(reqCmt);
+		
+		return reqMapper.updateReqStatus(reqStat);
 	}
 
 }

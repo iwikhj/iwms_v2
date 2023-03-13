@@ -31,25 +31,18 @@ public class Code {
 	@Schema(description = "상위 코드")
 	private String upCodeCd;
 	
-	@Schema(description = "코드 구분")
-	private String codeGbCd;
-	
-	@Schema(description = "코드 순서", defaultValue = "0")
-	private int codeOrder;
-	
-	@NotNull
-	@Schema(description = "사용 여부", defaultValue = "Y", allowableValues = {"Y", "N"}) 
+	@Schema(description = "사용 여부", allowableValues = {"Y", "N"}) 
 	private String useYn;
 	
 	@Schema(hidden = true, description = "등록자 SEQ") 
 	private long regSeq;
 	
 	@Schema(hidden = true, description = "수정자 SEQ") 
-	private long updtSeq;
+	private long uptSeq;
 	
 	public Code of(final LoginUserInfo loginUserInfo) {
 		this.regSeq = loginUserInfo.getUserSeq();
-		this.updtSeq = loginUserInfo.getUserSeq();
+		this.uptSeq = loginUserInfo.getUserSeq();
 		return this;
 	}
 }

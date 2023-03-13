@@ -32,22 +32,22 @@ public class Site {
 	private String siteSwNm;
 	
 	@NotNull
-	@Schema(description = "사이트 구분 코드: [01: 프론트, 02: 관리자, 03: 기타]", allowableValues = {"01", "02", "03"}) 
+	@Schema(description = "사이트 구분 코드: [HP: 홈페이지 프론트, HA: 홈페이지 관리자, MS: 관리 시스템, ET: 기타 시스템]", allowableValues = {"HP", "HA", "MS", "ET"}) 
 	private String siteGbCd;
 	
 	@NotNull
-	@Schema(description = "사용 여부", defaultValue = "Y", allowableValues = {"Y", "N"}) 
+	@Schema(description = "사용 여부", allowableValues = {"Y", "N"}) 
 	private String useYn;
 	
 	@Schema(hidden = true, description = "등록자 SEQ") 
 	private long regSeq;
 	
 	@Schema(hidden = true, description = "수정자 SEQ") 
-	private long updtSeq;
+	private long uptSeq;
 	
 	public Site of(final LoginUserInfo loginUserInfo) {
 		this.regSeq = loginUserInfo.getUserSeq();
-		this.updtSeq = loginUserInfo.getUserSeq();
+		this.uptSeq = loginUserInfo.getUserSeq();
 		return this;
 	}
 }

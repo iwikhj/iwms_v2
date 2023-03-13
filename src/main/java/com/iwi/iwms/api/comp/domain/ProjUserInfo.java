@@ -35,12 +35,12 @@ public class ProjUserInfo {
 	@Schema(description = "사용자 업무") 
 	private String busiRoll;
 	
-	@Schema(description = "직급") 
-	private String positionNm;
+	@Schema(description = "소속") 
+	private String deptNm;
 	
-	@Schema(description = "프로젝트 담당자 SEQ") 
-	private Long projUserSeq;
+	@Schema(description = "직급(직책)") 
+	private String posiNm;
 	
-	@Schema(description = "대표자 여부") 
-	private String repUserYn;
+	@Schema(description = "사용자 프로젝트 담당 여부") 
+	private String assigned;
 }

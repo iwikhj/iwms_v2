@@ -1,45 +1,41 @@
-package com.iwi.iwms.api.comp.domain;
+package com.iwi.iwms.api.auth.domain;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
 
+@Setter
 @Getter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class PositionInfo {
+public class AuthInfo {
 	
-	@Schema(description = "번호")
-	private long rowNum;
 	
-	@Schema(description = "직급 SEQ")
-	private long positionSeq;
+	@Schema(description = "권한 SEQ")
+	private long authSeq;
 
-	@Schema(description = "직급 이름")
-	private String positionNm;
+	@Schema(description = "권한 코드")
+	private String authCd;
 	
-	@Schema(description = "소속 SEQ") 
-	private long compSeq;
-	
-	@Schema(description = "소속 이름") 
-	private String compNm;
+	@Schema(description = "권한 이름")
+	private String authNm;
 	
 	@Schema(description = "사용 여부") 
 	private String useYn;
 	
 	@Schema(description = "등록 일자") 
 	private String regDt;
-	
+
 	@Schema(description = "등록자") 
 	private String regNm;
 	
 	@Schema(description = "수정 일자") 
-	private String updtDt;
+	private String uptDt;
 	
 	@Schema(description = "수정자") 
-	private String updtNm;
-	
+	private String uptNm;	
 }

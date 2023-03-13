@@ -34,7 +34,7 @@ public class SiteUser {
 	private String repUserYn;
 	
 	@NotNull
-	@Schema(description = "업무 롤 코드: [PL: 기획, DS: 디자인, UI: 퍼블리싱, DV: 개발, ET: 기타]", allowableValues = {"PL", "DS", "UI", "DV", "ET"}) 
+	@Schema(hidden = true, description = "업무 롤 코드: [PN: 기획, DS: 디자인, UI: 퍼블리싱, DV: 개발, DB: DB, ET: 기타]", allowableValues = {"PN", "DS", "UI", "DV", "DB", "ET"}) 
 	private String busiRollCd; 
 	
 	@NotNull

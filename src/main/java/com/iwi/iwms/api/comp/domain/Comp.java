@@ -27,26 +27,25 @@ public class Comp {
 	private String compNm;
 	
 	@NotNull
-	@Schema(description = "소속 구분 코드: [01: 자사, 02: 고객사, 03: 협력사, 99: 계약직]", allowableValues = {"01", "02", "03", "99"}) 
+	@Schema(description = "소속 구분 코드: [01: 자사, 02: 고객사, 03: 협력사]", allowableValues = {"01", "02", "03"}) 
 	private String compGbCd;
 	
 	@Pattern(regexp = "^\\d{2,3}-\\d{3,4}-\\d{4}$", message = "유효한 전화번호가 아닙니다")
 	@Schema(description = "소속 전화번호")
 	private String compTel;
 	
-	@NotNull
-	@Schema(description = "사용 여부", defaultValue = "Y", allowableValues = {"Y", "N"}) 
+	@Schema(description = "사용 여부", allowableValues = {"Y", "N"}) 
 	private String useYn;
 	
 	@Schema(hidden = true, description = "등록자 SEQ") 
 	private long regSeq;
 	
 	@Schema(hidden = true, description = "수정자 SEQ") 
-	private long updtSeq;
+	private long uptSeq;
 	
 	public Comp of(final LoginUserInfo loginUserInfo) {
 		this.regSeq = loginUserInfo.getUserSeq();
-		this.updtSeq = loginUserInfo.getUserSeq();
+		this.uptSeq = loginUserInfo.getUserSeq();
 		return this;
 	}
 }

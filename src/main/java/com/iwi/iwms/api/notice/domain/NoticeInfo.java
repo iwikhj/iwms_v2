@@ -34,6 +34,12 @@ public class NoticeInfo {
 	@Schema(description = "내용") 
 	private String content;
 	
+	@Schema(description = "공지사항 구분 코드") 
+	private String noticeGbCd;
+	
+	@Schema(description = "공지사항 구분") 
+	private String noticeGb;
+	
 	@Schema(description = "최상단 고정 여부") 
 	private String fixedTopYn;
 	
@@ -43,11 +49,11 @@ public class NoticeInfo {
 	@Schema(description = "조회수") 
 	private int viewCnt;
 	
-	@Schema(description = "삭제 여부") 
-	private String delYn;
-	
 	@Schema(description = "첨부된 파일 정보")
 	private List<UploadFileInfo> attachedFiles;
+	
+	@Schema(description = "사용 여부") 
+	private String useYn;
 	
 	@Schema(description = "등록 일자") 
 	private String regDt;
@@ -56,8 +62,8 @@ public class NoticeInfo {
 	private String regNm;
 	
 	@Schema(description = "수정 일자") 
-	private String updtDt;
+	private String uptDt;
 	
 	@Schema(description = "수정자") 
-	private String updtNm;
+	private String uptNm;
 }

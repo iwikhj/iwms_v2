@@ -30,10 +30,10 @@ public class ProjInfo {
 	@Schema(description = "프로젝트 축약 명칭")
 	private String projSwNm;
 	
-	@Schema(description = "프로젝트 시작일: YYYYMMDD")
+	@Schema(description = "프로젝트 시작일")
 	private String projStdYmd;
 	
-	@Schema(description = "프로젝트 종료일: YYYYMMDD")
+	@Schema(description = "프로젝트 종료일")
 	private String projEndYmd;
 	
 	@Schema(description = "사용 여부")
@@ -46,8 +46,8 @@ public class ProjInfo {
 	private String regNm;
 	
 	@Schema(description = "수정 일자") 
-	private String updtDt;
+	private String uptDt;
 	
 	@Schema(description = "수정자") 
-	private String updtNm;
+	private String uptNm;
 }

@@ -2,8 +2,6 @@ package com.iwi.iwms.api.notice.domain;
 
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
-
 import org.springframework.web.multipart.MultipartFile;
 
 import com.iwi.iwms.api.file.domain.UploadFile;
@@ -35,12 +33,13 @@ public class Notice {
 	@Schema(description = "내용") 
 	private String content;
 	
-	@NotNull
-	@Schema(description = "최상단 고정 여부", defaultValue = "N", allowableValues = {"Y", "N"}) 
+	@Schema(description = "공지사항 구분 코드") 
+	private String noticeGbCd;
+	
+	@Schema(description = "최상단 고정 여부", allowableValues = {"Y", "N"}) 
 	private String fixedTopYn;
 	
-	@NotNull
-	@Schema(description = "메인상단 노출 여부", defaultValue = "N", allowableValues = {"Y", "N"}) 
+	@Schema(description = "메인상단 노출 여부", allowableValues = {"Y", "N"}) 
 	private String mainTopYn;
 	
 	@Schema(hidden = true, description = "조회수") 
@@ -59,11 +58,11 @@ public class Notice {
 	private long regSeq;
 	
 	@Schema(hidden = true, description = "수정자 SEQ") 
-	private long updtSeq;
+	private long uptSeq;
 	
 	public Notice of(final LoginUserInfo loginUserInfo) {
 		this.regSeq = loginUserInfo.getUserSeq();
-		this.updtSeq = loginUserInfo.getUserSeq();
+		this.uptSeq = loginUserInfo.getUserSeq();
 		
 		this.fileInfo = new UploadFile();
 		this.fileInfo.setFileRefTb("TB_NOTICE");
@@ -71,10 +70,7 @@ public class Notice {
 		if(this.noticeSeq != null && this.noticeSeq != 0) {
 			this.fileInfo.setFileRefSeq(this.noticeSeq);
 		}
-		this.fileInfo.setFileGbCd("01");
 		this.fileInfo.setRegSeq(loginUserInfo.getUserSeq());
-		this.fileInfo.setUpdtSeq(loginUserInfo.getUserSeq());
-		
 		return this;
 	}
 

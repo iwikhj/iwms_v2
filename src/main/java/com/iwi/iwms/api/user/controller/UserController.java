@@ -10,6 +10,8 @@ import javax.validation.Valid;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -46,6 +48,7 @@ public class UserController {
 	
 	private final UserService userService;
 	
+	@PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
 	@Operation(summary = "사용자 목록", description = "사용자 목록")
 	@GetMapping(value = "")
 	public ResponseEntity<ApiListResponse<List<UserInfo>>> listUser(HttpServletRequest request
@@ -70,6 +73,7 @@ public class UserController {
 				.build());
 	}
 	
+	@PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
     @Operation(summary = "사용자 정보", description = "사용자 정보")
     @GetMapping(value = "/{userSeq}")
     public ResponseEntity<ApiResponse<UserInfo>> getUserBySeq(HttpServletRequest request
@@ -82,7 +86,8 @@ public class UserController {
 				.data(user)
 				.build());
     }
-    
+	
+	@PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
     @Operation(summary = "사용자 등록", description = "사용자 등록<br/> - 신규 사용자등록 시 비밀번호는 아이디와 동일합니다")
 	@PostMapping(value = "", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> insertUser(HttpServletRequest request
@@ -97,6 +102,7 @@ public class UserController {
 				.build());
 	}
     
+	@PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
     @Operation(summary = "사용자 수정", description = "사용자 수정")
 	@PutMapping(value = "/{userSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> updateUser(HttpServletRequest request
@@ -112,6 +118,7 @@ public class UserController {
 				.build());
 	}
     
+	@PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
     @Operation(summary = "사용자 삭제", description = "사용자 삭제")
 	@DeleteMapping(value = "/{userSeq}")
 	public ResponseEntity<ApiResponse<Boolean>> deleteUser(HttpServletRequest request
@@ -127,6 +134,7 @@ public class UserController {
 				.build());
 	}
     
+	@PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
     @Operation(summary = "사용자 아이디 중복 확인", description = "사용자 아이디 중복 확인. true: 중복된 아이디. 사용 불가, false: 사용 가능")
     @GetMapping(value = "/exists/{userId}")
     public ResponseEntity<ApiResponse<Boolean>> checkExistsUserId(HttpServletRequest request
@@ -169,6 +177,7 @@ public class UserController {
 				.build());
 	}
     
+    @PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
     @Operation(summary = "사용자 비밀번호 초기화", description = "사용자 비밀번호 초기화")
     @PatchMapping(value = "/password-reset", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> passwordReset(HttpServletRequest request

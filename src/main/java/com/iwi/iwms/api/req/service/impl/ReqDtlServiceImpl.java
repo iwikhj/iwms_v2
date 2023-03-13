@@ -8,6 +8,7 @@ import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.iwi.iwms.api.file.service.FileService;
@@ -68,8 +69,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 		int result = reqDtlMapper.deleteReqDtl(reqDtl);
 		
 		//  요청사항 상세 디렉토리 삭제
-		List<ReqDtlCmtInfo> comments = reqDtlInfo.getComments();
-		if(comments != null && comments.size() > 0) {
+		if(!CollectionUtils.isEmpty(reqDtlInfo.getComments())) {
 			/*
 			// 코멘트 첨부파일 삭제(디렉토리까지)
 			comments.stream()

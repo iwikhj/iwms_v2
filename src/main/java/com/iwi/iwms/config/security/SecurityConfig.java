@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -35,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
 	@Value("${app.root}/${app.version}")
@@ -51,7 +53,7 @@ public class SecurityConfig {
 	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		matchUrlAndAuthority(http);
+		//matchUrlAndAuthority(http);
 		
 		http
 			.csrf().disable()
@@ -87,8 +89,10 @@ public class SecurityConfig {
         */
 		http
 		 	.authorizeRequests()
-		 	.antMatchers(HttpMethod.POST, root + "/code").hasRole("IWMS_ADMIN")
-		 	.antMatchers(HttpMethod.GET, root + "/user/me").hasAnyRole("IWMS_ADMIN", "IWMS_USER");
+		 	.antMatchers(root + "/system/**").hasRole("IWMS_ADMIN")
+		 	.antMatchers(HttpMethod.POST, root + "/notice/**").hasAnyRole("IWMS_ADMIN", "IWMS_PM")
+		 	.antMatchers(HttpMethod.PUT, root + "/notice/**").hasAnyRole("IWMS_ADMIN", "IWMS_PM")
+		 	.antMatchers(HttpMethod.DELETE, root + "/notice/**").hasAnyRole("IWMS_ADMIN", "IWMS_PM");
 		
 	}
 	

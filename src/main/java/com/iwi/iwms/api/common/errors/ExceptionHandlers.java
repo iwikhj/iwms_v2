@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -51,6 +52,12 @@ public class ExceptionHandlers {
 				    			.collect(Collectors.joining(", "));
     	
         return setErrorResponse(request, HttpStatus.BAD_REQUEST, message, e);
+    }
+    
+    
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException e, HttpServletRequest request){
+        return setErrorResponse(request, HttpStatus.FORBIDDEN, "호출 권한이 없습니다.", e);
     }
     
     @ExceptionHandler(IllegalArgumentException.class)

@@ -35,5 +35,4 @@ public interface UserMapper {
 	int updateLoginFailure(User user);
 	
 	LoginUserInfo getLoginUser(String ssoId);
-
 }

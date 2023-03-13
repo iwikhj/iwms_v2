@@ -9,6 +9,7 @@ import javax.validation.Valid;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -23,8 +24,8 @@ import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.common.response.ApiListResponse;
 import com.iwi.iwms.api.comp.domain.Comp;
 import com.iwi.iwms.api.comp.domain.CompInfo;
-import com.iwi.iwms.api.comp.domain.Position;
-import com.iwi.iwms.api.comp.domain.PositionInfo;
+import com.iwi.iwms.api.comp.domain.Dept;
+import com.iwi.iwms.api.comp.domain.DeptInfo;
 import com.iwi.iwms.api.comp.service.CompService;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.utils.Pagination;
@@ -37,6 +38,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Company", description = "IWMS 소속 관리")
 @RequiredArgsConstructor
 @RestController
+@PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
 @RequestMapping("${app.root}/${app.version}/companies")
 public class CompController {
 	
@@ -123,33 +125,27 @@ public class CompController {
 				.build());
 	}
     
-	@Operation(summary = "소속 직급 목록", description = "소속 직급 목록")
-	@GetMapping(value = "/{compSeq}/positions")
-	public ResponseEntity<ApiListResponse<List<PositionInfo>>> listPosition(HttpServletRequest request
-			, @PathVariable long compSeq
-			, @RequestParam(value = "search", required = false) String search) {
+	@Operation(summary = "소속 부서 목록", description = "소속 부서 목록")
+	@GetMapping(value = "/{compSeq}/depts")
+	public ResponseEntity<ApiListResponse<List<DeptInfo>>> listDept(HttpServletRequest request
+			, @PathVariable long compSeq) {
 		
-		Map<String, Object> map = new HashMap<>();
-		map.put("compSeq", compSeq);
-		map.put("search", search);
-		
-		List<PositionInfo> positionList = compService.listPosition(map);
+		List<DeptInfo> positionList = compService.listDeptByCompSeq(compSeq);
 
-		return ResponseEntity.ok(ApiListResponse.<List<PositionInfo>>builder()
+		return ResponseEntity.ok(ApiListResponse.<List<DeptInfo>>builder()
 				.request(request)
 				.data(positionList)
-				.query(map)
 				.build());
 	}
     
-    @Operation(summary = "소속 직급 등록", description = "소속 직급 등록")
-	@PostMapping(value = "/{compSeq}/positions", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ApiResponse<Boolean>> insertPosition(HttpServletRequest request
+    @Operation(summary = "소속 부서 등록", description = "소속 부서 등록")
+	@PostMapping(value = "/{compSeq}/depts", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<ApiResponse<Boolean>> insertDept(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
     		, @PathVariable long compSeq
-			, @ModelAttribute @Valid Position position) {
+			, @ModelAttribute @Valid Dept dept) {
     	
-    	compService.insertPosition(position.of(loginUserInfo));
+    	compService.insertDept(dept.of(loginUserInfo));
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
 				.request(request)
@@ -157,15 +153,15 @@ public class CompController {
 				.build());
 	}
     
-    @Operation(summary = "소속 직급 수정", description = "소속 직급 수정")
-	@PutMapping(value = "/{compSeq}/positions/{positionSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ApiResponse<Boolean>> updatePosition(HttpServletRequest request
+    @Operation(summary = "소속 부서 수정", description = "소속 부서 수정")
+	@PutMapping(value = "/{compSeq}/depts/{deptSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<ApiResponse<Boolean>> updateDept(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long compSeq
-			, @PathVariable long positionSeq
-			, @ModelAttribute @Valid Position position) {
+			, @PathVariable long deptSeq
+			, @ModelAttribute @Valid Dept dept) {
     	
-    	boolean result = compService.updatePosition(position.of(loginUserInfo)) > 0 ? true : false;
+    	boolean result = compService.updateDept(dept.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
 				.request(request)
@@ -173,15 +169,15 @@ public class CompController {
 				.build());
 	}
     
-    @Operation(summary = "소속 직급 삭제", description = "소속 직급 삭제")
-	@DeleteMapping(value = "/{compSeq}/positions/{positionSeq}")
-	public ResponseEntity<ApiResponse<Boolean>> deletePosition(HttpServletRequest request
+    @Operation(summary = "소속 부서 삭제", description = "소속 부서 삭제")
+	@DeleteMapping(value = "/{compSeq}/depts/{deptSeq}")
+	public ResponseEntity<ApiResponse<Boolean>> deleteDept(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long compSeq
-			, @PathVariable long positionSeq
-			, @Parameter(hidden = true) Position position) {
+			, @PathVariable long deptSeq
+			, @Parameter(hidden = true) Dept dept) {
     	
-    	boolean result = compService.deletePosition(position.of(loginUserInfo)) > 0 ? true : false;
+    	boolean result = compService.deleteDept(dept.of(loginUserInfo)) > 0 ? true : false;
     	
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
 				.request(request)

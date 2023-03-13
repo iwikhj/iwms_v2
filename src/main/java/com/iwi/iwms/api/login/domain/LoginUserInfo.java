@@ -2,7 +2,7 @@ package com.iwi.iwms.api.login.domain;
 
 import java.util.List;
 
-import com.iwi.iwms.api.user.domain.MenuInfo;
+import com.iwi.iwms.api.auth.domain.AuthMenuInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -26,21 +26,27 @@ public class LoginUserInfo {
 	
 	@Schema(description = "사용자 이름")
 	private String userNm;
-	
-	@Schema(description = "사용자 구분 코드") 
-	private String userGbCd;
-	
-	@Schema(description = "사용자 업무 코드") 
-	private String userBusiCd; 	
 
-	@Schema(description = "직급 SEQ") 
-	private long positionSeq;
+	@Schema(description = "사용자 이메일")
+	private String userEmail;
 	
-	@Schema(description = "직급") 
-	private String positionNm;
+	@Schema(description = "사용자 권한") 
+	private String authCd;
 	
-	@Schema(description = "직책 구분 코드") 
-	private String dutyGbCd;
+	@Schema(description = "사용자 권한 이름") 
+	private String authNm;
+	
+	@Schema(description = "사용자 구분") 
+	private String userGb;
+	
+	@Schema(description = "사용자 업무")
+	private String busiRoll; 	
+	
+	@Schema(description = "부서") 
+	private String deptNm;
+	
+	@Schema(description = "직급(직책)") 
+	private String posiNm;
 	
 	@Schema(description = "소속 SEQ") 
 	private long compSeq;
@@ -48,12 +54,6 @@ public class LoginUserInfo {
 	@Schema(description = "소속 이름") 
 	private String compNm;
 	
-	@Schema(description = "인증 서버 ID")
-	private String ssoId;
-	
-	@Schema(description = "사용자 권한") 
-	private String userRole;
-	
 	@Schema(description = "메뉴 목록")
-	private List<MenuInfo> menus;
+	private List<AuthMenuInfo> menus;
 }

@@ -61,13 +61,13 @@ public class AuthenticationFilter extends GenericFilterBean {
         } else if(AuthCode.EXPIRED.equals(tokenStatus)) {
 			//sendError(request, response, HttpStatus.UNAUTHORIZED, tokenStatus.name());
 			//return;
-        	passAuthentication("49a64649-08ce-47f5-95c6-dc806ddc650b", Arrays.asList("ROLE_IWMS_ADMIN"));
+        	passAuthentication("bfb1e1d6-9018-4b50-8c69-f48c939b763b", Arrays.asList("ROLE_IWMS_ADMIN"));
     		request = ignoreRequestHeader(servletRequest, request, HttpHeaders.AUTHORIZATION);
     		
         } else if(AuthCode.INVALID.equals(tokenStatus)) {
 			//sendError(request, response, HttpStatus.BAD_REQUEST, tokenStatus.name());
 			//return;
-        	passAuthentication("49a64649-08ce-47f5-95c6-dc806ddc650b", Arrays.asList("ROLE_IWMS_ADMIN"));
+        	passAuthentication("bfb1e1d6-9018-4b50-8c69-f48c939b763b", Arrays.asList("ROLE_IWMS_ADMIN"));
     		request = ignoreRequestHeader(servletRequest, request, HttpHeaders.AUTHORIZATION);
         }
 

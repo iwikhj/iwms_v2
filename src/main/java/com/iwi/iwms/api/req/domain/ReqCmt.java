@@ -2,8 +2,6 @@ package com.iwi.iwms.api.req.domain;
 
 import java.util.List;
 
-import javax.validation.constraints.NotNull;
-
 import org.springframework.web.multipart.MultipartFile;
 
 import com.iwi.iwms.api.file.domain.UploadFile;
@@ -11,6 +9,7 @@ import com.iwi.iwms.api.login.domain.LoginUserInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -19,6 +18,7 @@ import lombok.ToString;
 @ToString
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class ReqCmt {
@@ -57,9 +57,7 @@ public class ReqCmt {
 		if(this.reqCmtSeq != null && this.reqCmtSeq != 0) {
 			this.fileInfo.setFileRefSeq(this.reqCmtSeq);
 		}
-		this.fileInfo.setFileGbCd("01");
 		this.fileInfo.setRegSeq(loginUserInfo.getUserSeq());
-		this.fileInfo.setUpdtSeq(loginUserInfo.getUserSeq());
 		
 		return this;
 	}

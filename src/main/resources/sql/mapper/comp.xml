@@ -8,33 +8,22 @@
 			, COMP.COMP_SEQ AS compSeq
 			, COMP.COMP_NM AS compNm
 			, COMP.COMP_GB_CD AS compGbCd
+			, FN_GET_CODE_NM('COMP_GB_CD', COMP.COMP_GB_CD) AS compGb
 			, COMP.COMP_TEL AS compTel
 			, COMP.USE_YN AS useYn
 			, DATE_FORMAT(COMP.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
-			, REG_USER.USER_NM AS regNm
-			, DATE_FORMAT(COMP.UPDT_DT, "%Y-%m-%d %H:%i:%s") AS updtDt
-			, UPDT_USER.USER_NM AS updtNm			
+			, FN_GET_USER_NM(COMP.REG_SEQ) AS regNm
+			, DATE_FORMAT(COMP.UPT_DT, "%Y-%m-%d %H:%i:%s") AS uptDt
+			, FN_GET_USER_NM(COMP.UPT_SEQ) AS uptNm			
 		FROM TB_COMPANY COMP
-		LEFT JOIN TB_USER REG_USER ON COMP.REG_SEQ = REG_USER.USER_SEQ
-		LEFT JOIN TB_USER UPDT_USER ON COMP.UPDT_SEQ = UPDT_USER.USER_SEQ 
-		WHERE COMP.USE_YN = 'Y'
+		WHERE COMP.DEL_YN = 'N'
+			AND COMP.USE_YN = 'Y'
 	</sql>
 	
 	<resultMap id="resultCompMap" type="com.iwi.iwms.api.comp.domain.CompInfo">
-		<result property="rowNum" column="rowNum"/>
 		<result property="compSeq" column="compSeq"/>
-		<result property="compNm" column="compNm"/>
-		<result property="compGbCd" column="compGbCd"/>
-		<result property="compTel" column="compTel"/>
-		<result property="useYn" column="useYn"/>
-		<result property="regDt" column="regDt"/>
-		<result property="regNm" column="regNm"/>
-		<result property="updtDt" column="updtDt"/>
-		<result property="updtNm" column="updtNm"/>
-		
-	   	<collection property="positions" column="compSeq" 
-			ofType="com.iwi.iwms.api.comp.domain.PositionInfo" select="com.iwi.iwms.api.comp.mapper.PositionMapper.listPositionByCompSeq"/>
-					
+	   	<collection property="depts" column="compSeq" 
+			ofType="com.iwi.iwms.api.comp.domain.DeptInfo" select="com.iwi.iwms.api.comp.mapper.DeptMapper.listDeptByCompSeq"/>
 	   	<collection property="users" column="compSeq" 
 			ofType="com.iwi.iwms.api.user.domain.UserInfo" select="com.iwi.iwms.api.user.mapper.UserMapper.listUserByCompSeq"/>
 	</resultMap>
@@ -45,7 +34,6 @@
 		<include refid="selectComp"></include>
 		<if test='search != null and search != ""'>
 			AND COMP.COMP_NM LIKE CONCAT('%', #{search}, '%') 
-			OR COMP.COMP_GB_CD LIKE CONCAT('%', #{search}, '%')
 			OR COMP.COMP_TEL LIKE CONCAT('%', #{search}, '%') 
 		</if>			
 		ORDER BY COMP.COMP_SEQ DESC
@@ -58,13 +46,13 @@
 	<select id="countComp" parameterType="hashMap"
 		resultType="int">
 		SELECT 
-			COUNT(COMP_SEQ)
-		FROM TB_COMPANY
-		WHERE USE_YN = 'Y'
+			COUNT(*)
+		FROM TB_COMPANY COMP
+		WHERE COMP.DEL_YN = 'N'
+			AND COMP.USE_YN = 'Y'
 		<if test='search != null and search != ""'>
-			AND COMP_NM LIKE CONCAT('%', #{search}, '%') 
-			OR COMP_GB_CD LIKE CONCAT('%', #{search}, '%')
-			OR COMP_TEL LIKE CONCAT('%', #{search}, '%') 
+			AND COMP.COMP_NM LIKE CONCAT('%', #{search}, '%') 
+			OR COMP.COMP_TEL LIKE CONCAT('%', #{search}, '%') 
 		</if>			
 	</select>	
 		
@@ -84,14 +72,12 @@
 		    , COMP_GB_CD
 			, COMP_TEL
 			, USE_YN
-			, REG_DT
 			, REG_SEQ
 		) VALUES (
 		    #{compNm}
 			, #{compGbCd}
 			, #{compTel}
 			, #{useYn}
-			, CURRENT_TIMESTAMP
 			, #{regSeq}
 		)		
 	</insert>		
@@ -104,8 +90,8 @@
 			, COMP_GB_CD = #{compGbCd}
 			, COMP_TEL = #{compTel}
 			, USE_YN = #{useYn}
-			, UPDT_DT = CURRENT_TIMESTAMP
-			, UPDT_SEQ = #{updtSeq}
+			, UPT_DT = CURRENT_TIMESTAMP
+			, UPT_SEQ = #{uptSeq}
 		WHERE COMP_SEQ = #{compSeq}	
 	</update>	
 	

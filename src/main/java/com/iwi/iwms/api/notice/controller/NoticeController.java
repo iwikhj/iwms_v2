@@ -3,7 +3,6 @@ package com.iwi.iwms.api.notice.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -46,17 +45,15 @@ public class NoticeController {
 	@Operation(summary = "공지사항 목록", description = "공지사항 목록")
 	@GetMapping(value = "")
 	public ResponseEntity<ApiListResponse<List<NoticeInfo>>> listNotice(HttpServletRequest request
-			, @RequestParam(value = "compSeq", required = false) Optional<String> compSeq
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
 			, @RequestParam(value = "search", required = false) String search
 			, @RequestParam(value = "startDate", required = false) String startDate
-			, @RequestParam(value = "endDate", required = false) String endDate) {
+			, @RequestParam(value = "endDate", required = false) String endDate
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
 		
 		Map<String, Object> map = new HashMap<>();
-		if(compSeq.isPresent()) {
-			map.put("compSeq", compSeq.get());
-		}
+		map.put("userSeq", loginUserInfo.getUserSeq());
 		map.put("search", search);
 		map.put("startDate", startDate);
 		map.put("endDate", endDate);

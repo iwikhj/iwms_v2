@@ -10,32 +10,20 @@
 			, CMT.REQ_CMT AS reqCmt
 			, CMT.DEL_YN AS delYn
 			, DATE_FORMAT(CMT.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
-			, REG_USER.USER_NM AS regNm
+			, FN_GET_USER_NM(CMT.REG_SEQ) AS regNm
 			, DATE_FORMAT(CMT.UPDT_DT, "%Y-%m-%d %H:%i:%s") AS updtDt
-			, UPDT_USER.USER_NM AS updtNm
+			, FN_GET_USER_NM(CMT.UPDT_SEQ) AS updtNm
 			, 'TB_REQ_CMT' AS fileRefTb
 			, 'REQ_CMT_SEQ' AS fileRefCol			
 		FROM TB_REQ REQ
 		INNER JOIN TB_REQ_CMT CMT ON REQ.REQ_SEQ = CMT.REQ_SEQ
-		LEFT JOIN TB_USER REG_USER ON CMT.REG_SEQ = REG_USER.USER_SEQ
-		LEFT JOIN TB_USER UPDT_USER ON CMT.UPDT_SEQ = UPDT_USER.USER_SEQ 
 		WHERE CMT.DEL_YN = 'N'
 	</sql>
 
 	<resultMap id="resultReqCmtMap" type="com.iwi.iwms.api.req.domain.ReqCmtInfo">
-		<result property="rowNum" column="rowNum"/>
 		<result property="reqCmtSeq" column="reqCmtSeq"/>
-		<result property="reqSeq" column="reqSeq"/>
-		<result property="reqCmt" column="reqCmt"/>
-		<result property="delYn" column="delYn"/>
-		<result property="regDt" column="regDt"/>
-		<result property="regNm" column="regNm"/>
-		<result property="updtDt" column="updtDt"/>
-		<result property="updtNm" column="updtNm"/>
-			
 	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=reqCmtSeq" 
 			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>
-			
 	</resultMap>
 		
 	<!-- 요청사항별 코멘트 목록 조회 -->			

@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
-import com.iwi.iwms.api.user.domain.UserPwd;
 import com.iwi.iwms.api.user.domain.User;
 import com.iwi.iwms.api.user.domain.UserInfo;
+import com.iwi.iwms.api.user.domain.UserPwd;
 import com.iwi.iwms.api.user.domain.UserUpdate;
 
 public interface UserService {

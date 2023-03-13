@@ -10,10 +10,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.iwi.iwms.api.comp.domain.Comp;
 import com.iwi.iwms.api.comp.domain.CompInfo;
-import com.iwi.iwms.api.comp.domain.Position;
-import com.iwi.iwms.api.comp.domain.PositionInfo;
+import com.iwi.iwms.api.comp.domain.Dept;
+import com.iwi.iwms.api.comp.domain.DeptInfo;
 import com.iwi.iwms.api.comp.mapper.CompMapper;
-import com.iwi.iwms.api.comp.mapper.PositionMapper;
+import com.iwi.iwms.api.comp.mapper.DeptMapper;
 import com.iwi.iwms.api.comp.service.CompService;
 
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ public class CompServiceImpl implements CompService {
 
 	private final CompMapper compMapper;
 	
-	private final PositionMapper positionMapper;
+	private final DeptMapper deptMapper;
 	
 	@Override
 	public List<CompInfo> listComp(Map<String, Object> map) {
@@ -64,32 +64,32 @@ public class CompServiceImpl implements CompService {
 	}
 
 	@Override
-	public List<PositionInfo> listPosition(Map<String, Object> map) {
-		return positionMapper.listPosition(map);
+	public List<DeptInfo> listDeptByCompSeq(long compSeq) {
+		return deptMapper.listDeptByCompSeq(compSeq);
 	}
 
 	@Override
-	public void insertPosition(Position position) {
-		Optional.ofNullable(compMapper.getCompBySeq(position.getCompSeq()))
+	public void insertDept(Dept dept) {
+		Optional.ofNullable(compMapper.getCompBySeq(dept.getCompSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "소속을 찾을 수 없습니다."));
 		
-		positionMapper.insertPosition(position);
+		deptMapper.insertDept(dept);
 	}
 
 	@Override
-	public int updatePosition(Position position) {
-		Optional.ofNullable(positionMapper.getPositionBySeq(position))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "직급을 찾을 수 없습니다."));
+	public int updateDept(Dept dept) {
+		Optional.ofNullable(deptMapper.getDeptBySeq(dept.getDeptSeq()))
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "부서를 찾을 수 없습니다."));
 		
-		return positionMapper.updatePosition(position);
+		return deptMapper.updateDept(dept);
 	}
 
 	@Override
-	public int deletePosition(Position position) {
-		Optional.ofNullable(positionMapper.getPositionBySeq(position))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "직급을 찾을 수 없습니다."));
+	public int deleteDept(Dept dept) {
+		Optional.ofNullable(deptMapper.getDeptBySeq(dept.getDeptSeq()))
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "부서를 찾을 수 없습니다."));
 		
-		return positionMapper.deletePosition(position);
+		return deptMapper.deleteDept(dept);
 	}
 
 }

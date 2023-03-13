@@ -5,20 +5,13 @@
 	<sql id="selectFile">
 		SELECT 
 			FILE.FILE_SEQ AS fileSeq
-			, FILE.FILE_REF_TB AS fileRefTb
-			, FILE.FILE_REF_COL AS fileRefCol
-			, FILE.FILE_REF_SEQ AS fileRefSeq
-			, FILE.FILE_GB_CD AS fileGbCd
-			, FILE.FILE_ORD_ORDER AS fileOrdOrder
 			, FILE.FILE_ORG_NM AS fileOrgNm
 			, FILE.FILE_REAL_NM AS fileRealNm
 			, FILE.FILE_REAL_PATH AS fileRealPath
 			, CONCAT('/', FILE.FILE_SEQ) AS fileDownloadUri			
-			, FILE.DEL_YN AS delYn
 			, DATE_FORMAT(FILE.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
-			, REG_USER.USER_NM AS regNm
+			, FN_GET_USER_NM(FILE.REG_SEQ) AS regNm
 		FROM TB_FILE FILE
-		LEFT JOIN TB_USER REG_USER ON FILE.REG_SEQ = REG_USER.USER_SEQ
 		WHERE FILE.DEL_YN = 'N'
 	</sql>
 
@@ -29,7 +22,7 @@
 			AND FILE.FILE_REF_TB = #{fileRefTb}
 			AND FILE.FILE_REF_COL = #{fileRefCol}
 			AND FILE.FILE_REF_SEQ = #{fileRefSeq}
-		ORDER BY FILE.FILE_ORD_ORDER
+		ORDER BY FILE.FILE_ORDER_NO
 	</select>	
 
 	<!-- 참조 파일 단일 조회 -->		
@@ -47,21 +40,17 @@
 		    FILE_REF_TB
 		    , FILE_REF_COL
 			, FILE_REF_SEQ
-			, FILE_GB_CD
 			, FILE_ORG_NM
 			, FILE_REAL_NM
 			, FILE_REAL_PATH
-			, REG_DT
 			, REG_SEQ
 		) VALUES (
 		    #{fileRefTb}
 			, #{fileRefCol}
 			, #{fileRefSeq}
-			, #{fileGbCd}
 			, #{fileOrgNm}
 			, #{fileRealNm}
 			, #{fileRealPath}
-			, CURRENT_TIMESTAMP
 			, #{regSeq}
 		)		
 	</insert>		
@@ -88,12 +77,11 @@
 			AND FILE_ORD.FILE_REF_SEQ = #{fileRefSeq}
 			ORDER BY FILE_ORD.FILE_SEQ) AS R
 		SET 
-			FILE.FILE_ORD_ORDER = R.ROWNUM
+			FILE.FILE_ORDER_NO = R.ROWNUM
 		WHERE FILE.FILE_REF_TB = R.FILE_REF_TB
 		AND FILE.FILE_REF_COL = R.FILE_REF_COL
 		AND FILE.FILE_REF_SEQ = R.FILE_REF_SEQ
 		AND FILE.FILE_SEQ = R.FILE_SEQ
 	</update>		
-	
 		
 </mapper>

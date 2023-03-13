@@ -39,13 +39,13 @@ public class ReqDtl {
 	@Schema(hidden = true, description = "요청사항 사이트 업무 구분 코드") 
 	private String dtlSiteGbCd;
 	
-	@Schema(hidden = true, description = "요청사항 구분 코드: [00: 오류, 01: 개선, 02: 추가, 99: 기타]", allowableValues = {"00", "01", "02", "99"}) 
+	@Schema(description = "요청사항 구분 코드: [01: 신규개발, 02: 단순수정, 03: 기능개선, 04: 기능추가, 05: 자료요청, 06: 데이터]", allowableValues = {"01", "02", "03", "04", "05", "06"}) 
 	private String reqGbCd;
 	
 	@Schema(hidden = true, description = "사이트 구분 문자열") 
 	private String siteGbCdStr;
 	
-	@Schema(hidden = true, description = "요청사항 상세 상태 코드: [00: 접수, 01: 처리중, 02: 처리완료, 03: 검수완료, 04: 협의요청, 05: 취소]", allowableValues = {"00", "01", "02", "03", "04", "05"}) 
+	@Schema(hidden = true, description = "요청사항 상세 상태 코드: [01: 접수, 02: 처리중, 03: 처리완료, 04: 검수완료]", allowableValues = {"01", "02", "03", "04"}) 
 	private String reqDtlStatCd;
 	
     @Pattern(regexp = "^(19|20)\\d{2}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[0-1])$", message = "완료 예정일의 날짜 형식이 유효하지 않습니다(YYYYMMDD)")

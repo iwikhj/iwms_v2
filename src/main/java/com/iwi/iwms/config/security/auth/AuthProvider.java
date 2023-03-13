@@ -171,7 +171,7 @@ public class AuthProvider {
             idmUser.setFirstName(StringUtils.hasText(firstName) ? firstName : "");
             idmUser.setLastName(StringUtils.hasText(lastName) ? lastName : "");
             idmUser.setEmail(StringUtils.hasText(email) ? email : "");
-            idmUser.setEmailVerified(StringUtils.hasText(email) ? true : false);
+            idmUser.setEmailVerified(false);
 			
             Response response = usersResource.create(idmUser);
             log.info("Response: {} {}", response.getStatus(), response.getStatusInfo());
@@ -199,9 +199,9 @@ public class AuthProvider {
             log.info("Create password-type credentials.");
             
             // Create new Role
-    		RoleRepresentation newRoleRep = realmResource.roles().get(role.substring(5).toLowerCase()).toRepresentation();
+    		RoleRepresentation newRoleRep = realmResource.roles().get(role).toRepresentation();
             userResource.roles().realmLevel().add(Arrays.asList(newRoleRep));
-            log.info("Assign roles: {}", role.substring(5).toLowerCase());
+            log.info("Assign roles: {}", role);
             
             // Remove Default Role 
             RoleRepresentation defaultRoleRep = realmResource.roles().get("default-roles-master").toRepresentation();
@@ -223,7 +223,7 @@ public class AuthProvider {
 	 * @param String lastName
 	 * @param String email
 	 */
-	public void updateUser(String ssoId, String firstName, String lastName) {
+	public void updateUser(String ssoId, String firstName, String lastName, String email) {
 		log.info("by userId: {}", ssoId);
 		
         Keycloak keycloak = connectKeycloak();
@@ -236,6 +236,8 @@ public class AuthProvider {
         UserRepresentation idmUser = new UserRepresentation();
         idmUser.setFirstName(StringUtils.hasText(firstName) ? firstName : "");
         idmUser.setLastName(StringUtils.hasText(lastName) ? lastName : "");
+        idmUser.setEmail(StringUtils.hasText(email) ? email : "");
+        idmUser.setEmailVerified(false);        
         
         // update user
         userResource.update(idmUser);
@@ -259,12 +261,12 @@ public class AuthProvider {
         UserResource userResource = usersResource.get(ssoId);
 
         // Remove old Role
-        RoleRepresentation oldRoleRep = realmResource.roles().get(oldRole.substring(5).toLowerCase()).toRepresentation();
+        RoleRepresentation oldRoleRep = realmResource.roles().get(oldRole).toRepresentation();
 		userResource.roles().realmLevel().remove(Arrays.asList(oldRoleRep));
 		log.info("Unassign roles: {}", oldRoleRep); 
 
         // Create new Role
-		RoleRepresentation newRoleRep = realmResource.roles().get(newRole.substring(5).toLowerCase()).toRepresentation();
+		RoleRepresentation newRoleRep = realmResource.roles().get(newRole).toRepresentation();
         userResource.roles().realmLevel().add(Arrays.asList(newRoleRep));
         log.info("Assign roles: {}", newRoleRep);
         

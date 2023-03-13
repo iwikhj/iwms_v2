@@ -27,7 +27,7 @@ public class ProjUser {
 	@Schema(hidden = true, description = "대표자 여부", defaultValue = "N", allowableValues = {"Y", "N"}) 
 	private String repUserYn;
 	
-	@Schema(hidden = true, description = "사용자 업무 코드: [PN: 기획, DS: 디자인, UI: 퍼블리싱, DV: 개발, ET: 기타]", allowableValues = {"PN", "DS", "UI", "DV", "ET"}) 
+	@Schema(hidden = true, description = "사용자 업무 코드: [PN: 기획, DS: 디자인, UI: 퍼블리싱, DV: 개발, DB: DB, ET: 기타]", allowableValues = {"PN", "DS", "UI", "DV", "DB", "ET"}) 
 	private String busiRollCd;
 	
 	@Schema(hidden = true, description = "사용 여부", defaultValue = "Y", allowableValues = {"Y", "N"}) 

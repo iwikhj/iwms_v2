@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.iwi.iwms.api.file.domain.UploadFile;
@@ -41,7 +42,7 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 		reqCmtMapper.insertReqCmt(reqCmt);
 		
 		// 첨부파일 저장
-		if(reqCmt.getFiles() != null && !reqCmt.getFiles().isEmpty()) {
+		if(!CollectionUtils.isEmpty(reqCmt.getFiles())) {
 			UploadFile uploadFile = reqCmt.getFileInfo();
 			uploadFile.setFileRefSeq(reqCmt.getReqCmtSeq());
 			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + reqCmt.getReqSeq());
@@ -59,12 +60,12 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 		
 		// 첨부파일 삭제
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(reqCmt.getFileInfo());
-		if(attachedFiles != null && attachedFiles.size() > 0) {
+		if(!CollectionUtils.isEmpty(attachedFiles)) {
 			fileService.deleteAttachFiles(attachedFiles, reqCmt.getAttachedFilesSeq());
 		}
 		
 		// 첨부파일 저장
-		if(reqCmt.getFiles() != null && !reqCmt.getFiles().isEmpty()) {
+		if(!CollectionUtils.isEmpty(reqCmt.getFiles())) {
 			UploadFile uploadFile = reqCmt.getFileInfo();
 			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + reqCmt.getReqSeq());
 			fileService.insertAttachFiles(reqCmt.getFiles(), uploadFile);
@@ -81,7 +82,7 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 		int result = reqCmtMapper.deleteReqCmt(reqCmt);
 		
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(reqCmt.getFileInfo());
-		if(attachedFiles != null && attachedFiles.size() > 0) {
+		if(!CollectionUtils.isEmpty(attachedFiles)) {
 			fileService.deleteAttachFiles(attachedFiles, null);
 		}
 		

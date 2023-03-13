@@ -1,7 +1,5 @@
 package com.iwi.iwms.api.file.domain;
 
-import org.springframework.beans.factory.annotation.Value;
-
 import com.iwi.iwms.utils.PropertyUtil;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -21,18 +19,6 @@ public class UploadFileInfo {
 	@Schema(description = "파일 SEQ")
 	private long fileSeq;
 	
-	@Schema(description = "첨부 파일 테이블명")
-	private String fileRefTb;
-	
-	@Schema(description = "첨부 파일 컬럼명")
-	private String fileRefCol;
-	
-	@Schema(description = "첨부 파일 키값")
-	private String fileRefSeq;
-	
-	@Schema(description = "첨부 파일 구분")
-	private String fileGbCd;
-	
 	@Schema(description = "첨부 파일 정렬 순서")
 	private int fileOrdOrder;
 	
@@ -47,9 +33,6 @@ public class UploadFileInfo {
 	
 	@Schema(description = "첨부 파일 다운로드 URI")
 	private String fileDownloadUri;
-	
-	@Schema(description = "삭제 여부") 
-	private String delYn;
 	
 	@Schema(description = "등록 일자") 
 	private String regDt;

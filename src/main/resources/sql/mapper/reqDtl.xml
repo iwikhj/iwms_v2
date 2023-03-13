@@ -12,12 +12,12 @@
 			, DTL.REQ_DTL_NM AS reqDtlNm
 			, DTL.REQ_DTL_CONTENT_TXT AS reqDtlContentTxt
 			, DTL.DTL_SITE_GB_CD AS dtlSiteGbCd
-			, CODE1.CODE_NM AS dtlSiteGb
+			, FN_GET_CODE_NM('DTL_SITE_GB_CD', DTL.DTL_SITE_GB_CD) AS dtlSiteGb
 			, DTL.REQ_GB_CD AS reqGbCd
-			, CODE2.CODE_NM AS reqGb
+			, FN_GET_CODE_NM('REQ_DTL_STAT_CD', DTL.REQ_DTL_STAT_CD) AS reqGb
 			, DTL.SITE_GB_CD_STR AS siteGbCdStr
 			, DTL.REQ_DTL_STAT_CD AS reqDtlStatCd
-			, CODE3.CODE_NM AS reqDtlStat
+			, FN_GET_CODE_NM('REQ_GB_CD', DTL.REQ_GB_CD) AS reqDtlStat
 			, DTL.REQ_DTL_STAT_CMT AS reqDtlStatCmt
 			, DTL.TGT_YMD AS tgtYmd
 			, DTL.TGT_MM AS tgtMm
@@ -32,58 +32,18 @@
 			, DATE_FORMAT(DTL.DEL_DT, "%Y-%m-%d %H:%i:%s") AS delDt
 			, DTL.DEL_YN AS delYn
 			, DATE_FORMAT(DTL.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
-			, REG_USER.USER_NM AS regNm
+			, FN_GET_USER_NM(DTL.REG_SEQ) AS regNm
 			, DATE_FORMAT(DTL.UPDT_DT, "%Y-%m-%d %H:%i:%s") AS updtDt
-			, UPDT_USER.USER_NM AS updtNm			
+			, FN_GET_USER_NM(DTL.UPDT_SEQ) AS updtNm			
 		FROM TB_REQ_DTL DTL
-		INNER JOIN TB_REQ REQ ON DTL.REQ_SEQ = REQ.REQ_SEQ
-		LEFT JOIN TB_CODE CODE1 ON DTL.DTL_SITE_GB_CD = CODE1.CODE_CD 
-			AND CODE1.UP_CODE_CD = 'DTL_SITE_GB_CD' 
-		LEFT JOIN TB_CODE CODE2 ON DTL.REQ_DTL_STAT_CD = CODE2.CODE_CD 
-			AND CODE2.UP_CODE_CD = 'REQ_DTL_STAT_CD'  
-		LEFT JOIN TB_CODE CODE3 ON DTL.REQ_GB_CD = CODE3.CODE_CD 
-			AND CODE3.UP_CODE_CD = 'REQ_GB_CD'   
-		LEFT JOIN TB_USER REG_USER ON DTL.REG_SEQ = REG_USER.USER_SEQ
-		LEFT JOIN TB_USER UPDT_USER ON DTL.UPDT_SEQ = UPDT_USER.USER_SEQ 
+		INNER JOIN TB_REQ REQ ON DTL.REQ_SEQ = REQ.REQ_SEQ 
 		WHERE DTL.DEL_YN = 'N'
 	</sql>
 
 	<resultMap id="resultReqDtlMap" type="com.iwi.iwms.api.req.domain.ReqDtlInfo">
-		<result property="rowNum" column="rowNum"/>
-		<result property="reqSeq" column="reqSeq"/>
-		<result property="reqNo" column="reqNo"/>
 		<result property="reqDtlSeq" column="reqDtlSeq"/>
-		<result property="reqDtlNo" column="reqDtlNo"/>
-		<result property="reqDtlNm" column="reqDtlNm"/>
-		<result property="reqDtlContentTxt" column="reqDtlContentTxt"/>
-		<result property="dtlSiteGbCd" column="dtlSiteGbCd"/>
-		<result property="dtlSiteGb" column="dtlSiteGb"/>
-		<result property="reqGbCd" column="reqGbCd"/>
-		<result property="reqGb" column="reqGb"/>
-		<result property="siteGbCdStr" column="siteGbCdStr"/>
-		<result property="reqDtlStatCd" column="reqDtlStatCd"/>
-		<result property="reqDtlStat" column="reqDtlStat"/>
-		<result property="reqDtlStatCmt" column="reqDtlStatCmt"/>
-		<result property="tgtYmd" column="tgtYmd"/>
-		<result property="tgtMm" column="tgtMm"/>
-		<result property="mngOkYmd" column="mngOkYmd"/>
-		<result property="mngOkSeq" column="mngOkSeq"/>
-		<result property="cusOkYmd" column="cusOkYmd"/>
-		<result property="cusOkSeq" column="cusOkSeq"/>				
-		<result property="returnYmd" column="returnYmd"/>
-		<result property="returnSeq" column="returnSeq"/>			
-		<result property="reqDtlScore" column="reqDtlScore"/>
-		<result property="reqDtlEvalCotentCmt" column="reqDtlEvalCotentCmt"/>	
-		<result property="delDt" column="delDt"/>
-		<result property="delYn" column="delYn"/>
-		<result property="regDt" column="regDt"/>
-		<result property="regNm" column="regNm"/>
-		<result property="updtDt" column="updtDt"/>
-		<result property="updtNm" column="updtNm"/>
-		
 	   	<collection property="comments" column="reqDtlSeq" 
 			ofType="com.iwi.iwms.api.req.domain.ReqDtlCmtInfo" select="com.iwi.iwms.api.req.mapper.ReqDtlCmtMapper.listReqDtlCmtByReqDtlSeq"/>
-			
 		<collection property="users" column="reqDtlSeq" 
 			ofType="com.iwi.iwms.api.req.domain.ReqDtlUserInfo" select="com.iwi.iwms.api.req.mapper.ReqDtlUserMapper.listReqDtlUserByReqDtlSeq"/>
 	</resultMap>

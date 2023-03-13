@@ -7,11 +7,14 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.iwi.iwms.api.auth.domain.AuthInfo;
+import com.iwi.iwms.api.auth.service.AuthService;
 import com.iwi.iwms.api.common.response.ListResponse;
 import com.iwi.iwms.api.common.response.Response;
 import com.iwi.iwms.api.comp.domain.CompInfo;
@@ -53,6 +56,8 @@ public class PageController {
 	private final UserService userService;
 	
 	private final CompService compService;
+	
+	private final AuthService authService;
     
 	/**
 	 * 메뉴 홈
@@ -79,6 +84,7 @@ public class PageController {
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
 		Map<String, Object> map = new HashMap<>();
+		map.put("userSeq", loginUserInfo.getUserSeq());
 		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, noticeService.countNotice(map)));
     	
     	List<NoticeInfo> listNotice = noticeService.listNotice(map);
@@ -109,19 +115,6 @@ public class PageController {
 	/**
 	 * 메뉴 유지보수
 	 */
-    @Operation(summary = "유지보수 - 현황", description = "유지보수 현황")
-    @GetMapping(value = "/maintain/dashboard")
-    public ResponseEntity<Response<Void>> maintainDashboard(HttpServletRequest request
-    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
-    	
-		// TODO 유지보수 현황 비지니스 로직 없음
-    	
-		return ResponseEntity.ok(Response.<Void>builder()
-				.request(request)
-				.loginUserInfo(loginUserInfo)
-				.build());
-    }
-    
     @Operation(summary = "유지보수 - 유지보수", description = "유지보수 목록")
     @GetMapping(value = "/maintain/request")
     public ResponseEntity<ListResponse<List<ReqInfo>>> maintainRequest(HttpServletRequest request
@@ -159,6 +152,19 @@ public class PageController {
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
     	// TODO 유지보수 일정관리 비지니스 로직 없음
+    	
+		return ResponseEntity.ok(Response.<Void>builder()
+				.request(request)
+				.loginUserInfo(loginUserInfo)
+				.build());
+    }
+    
+    @Operation(summary = "유지보수 - 현황", description = "유지보수 현황")
+    @GetMapping(value = "/maintain/statistics")
+    public ResponseEntity<Response<Void>> maintainDashboard(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+    	
+		// TODO 유지보수 현황 비지니스 로직 없음
     	
 		return ResponseEntity.ok(Response.<Void>builder()
 				.request(request)
@@ -224,6 +230,7 @@ public class PageController {
 	/**
 	 * 메뉴 시스템관리
 	 */
+    @PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
     @Operation(summary = "시스템관리 - 사용자 ", description = "사용자 목록")
     @GetMapping(value = "/system/user")
     public ResponseEntity<ListResponse<List<UserInfo>>> systemUser(HttpServletRequest request
@@ -242,6 +249,7 @@ public class PageController {
 				.build());
     }
     
+    @PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
     @Operation(summary = "시스템관리 - 소속 ", description = "소속 목록")
     @GetMapping(value = "/system/company")
     public ResponseEntity<ListResponse<List<CompInfo>>> systemCompany(HttpServletRequest request
@@ -260,6 +268,7 @@ public class PageController {
 				.build());
     }
     
+    @PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
     @Operation(summary = "시스템관리 - 프로젝트 ", description = "프로젝트 목록")
     @GetMapping(value = "/system/project")
     public ResponseEntity<ListResponse<List<ProjInfo>>> systemProject(HttpServletRequest request
@@ -278,18 +287,20 @@ public class PageController {
 				.build());
     }
     
+    @PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
     @Operation(summary = "시스템관리 - 권한 ", description = "권한 목록")
-    @GetMapping(value = "/system/role")
-    public ResponseEntity<ListResponse<Void>> systemRole(HttpServletRequest request
+    @GetMapping(value = "/system/auth")
+    public ResponseEntity<ListResponse<List<AuthInfo>>> systemRole(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
 		Map<String, Object> map = new HashMap<>();
-		//map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, projService.countProj(map)));
+		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, authService.countAuth(map)));
 		
-    	// TODO 시스템관리 권한 비지니스 로직 없음
-    	
-		return ResponseEntity.ok(ListResponse.<Void>builder()
+		List<AuthInfo> listAuth = authService.listAuth(map);
+
+		return ResponseEntity.ok(ListResponse.<List<AuthInfo>>builder()
 				.request(request)
+				.data(listAuth)
 				.query(map)
 				.loginUserInfo(loginUserInfo)
 				.build());

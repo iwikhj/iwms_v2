@@ -28,7 +28,7 @@ public class AuthorizationAccessDeniedHandler implements AccessDeniedHandler {
         response.getWriter().write(ErrorResponse.builder()
         		.request(request)
         		.status(HttpServletResponse.SC_FORBIDDEN)
-        		.message("API 호출 권한이 없습니다.")
+        		.message("호출 권한이 없습니다.")
         		.build()
         		.toJson());
     }

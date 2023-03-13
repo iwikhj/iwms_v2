@@ -5,8 +5,8 @@ import java.util.Map;
 
 import com.iwi.iwms.api.comp.domain.Comp;
 import com.iwi.iwms.api.comp.domain.CompInfo;
-import com.iwi.iwms.api.comp.domain.Position;
-import com.iwi.iwms.api.comp.domain.PositionInfo;
+import com.iwi.iwms.api.comp.domain.Dept;
+import com.iwi.iwms.api.comp.domain.DeptInfo;
 
 public interface CompService {
 
@@ -22,11 +22,11 @@ public interface CompService {
 	
 	int deleteComp(Comp comp);
 	
-	List<PositionInfo> listPosition(Map<String, Object> map);
+	List<DeptInfo> listDeptByCompSeq(long compSeq);
 
-	void insertPosition(Position position);
+	void insertDept(Dept dept);
 	
-	int updatePosition(Position position);
+	int updateDept(Dept dept);
 	
-	int deletePosition(Position position);
+	int deleteDept(Dept dept);
 }

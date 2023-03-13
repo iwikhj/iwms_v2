@@ -1,10 +1,6 @@
 package com.iwi.iwms.api.user.domain;
 
-import java.util.List;
-
 import org.springframework.beans.BeanUtils;
-
-import com.iwi.iwms.api.comp.domain.Proj;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -32,6 +28,36 @@ public class UserInfo {
 	@Schema(description = "사용자 이름")
 	private String userNm;
 	
+	@Schema(description = "사용자 이메일")
+	private String userEmail;
+	
+	@Schema(description = "인증 서버 키") 
+	private String ssoKey;	
+	
+	@Schema(description = "사용자 권한 SEQ") 
+	private long authSeq;
+	
+	@Schema(description = "사용자 권한") 
+	private String authCd;
+	
+	@Schema(description = "사용자 권한 이름") 
+	private String authNm;
+	
+	@Schema(description = "소속 SEQ") 
+	private long compSeq;
+	
+	@Schema(description = "소속 이름") 
+	private String compNm;	
+	
+	@Schema(description = "부서 SEQ") 
+	private long deptSeq;
+	
+	@Schema(description = "부서 이름") 
+	private String deptNm;	
+	
+	@Schema(description = "직급(직책)") 
+	private String posiNm;	
+	
 	@Schema(description = "사용자 구분 코드") 
 	private String userGbCd;
 	
@@ -39,25 +65,10 @@ public class UserInfo {
 	private String userGb;
 	
 	@Schema(description = "사용자 업무 코드") 
-	private String userBusiCd;
+	private String busiRollCd;
 	
 	@Schema(description = "사용자 업무")
-	private String userBusi;
-
-	@Schema(description = "직급 SEQ") 
-	private long positionSeq;
-	
-	@Schema(description = "직급") 
-	private String positionNm;
-	
-	@Schema(description = "직책 구분 코드") 
-	private String dutyGbCd;
-	
-	@Schema(description = "소속 SEQ") 
-	private long compSeq;
-	
-	@Schema(description = "소속 이름") 
-	private String compNm;
+	private String busiRoll;
 	
 	@Schema(description = "전화번호") 
 	private String userTel;
@@ -74,11 +85,8 @@ public class UserInfo {
 	@Schema(description = "상세 주소") 
 	private String userDtlAddr;
 	
-	@Schema(description = "사용자 CI") 
-	private String userCiKey;
-	
-	@Schema(description = "사용자 DI") 
-	private String userDiKey;
+	@Schema(description = "검증 여부") 
+	private String verifyYn;
 	
 	@Schema(description = "비밀번호 초기화 여부") 
 	private String pwdResetYn;
@@ -86,32 +94,14 @@ public class UserInfo {
 	@Schema(description = "로그인 실패 횟수") 
 	private int loginErrCnt;
 	
-	@Schema(description = "검증 여부") 
-	private String verifyYn;
-	
 	@Schema(description = "마지막 로그인 IP") 
 	private String lastLoginIp;
 	
 	@Schema(description = "마지막 로그인 시간") 
 	private String lastLoginDt;
 	
-	@Schema(description = "인증 서버 ID")
-	private String ssoId;
-	
-	@Schema(description = "사용자 권한") 
-	private String userRole;
-	
-	@Schema(description = "담당 프로젝트") 
-	private List<Proj> projects;
-	
 	@Schema(description = "사용 여부") 
 	private String useYn;
-	
-	@Schema(description = "계정 휴면 일자") 
-	private String userDorYmd;
-	
-	@Schema(description = "계정 삭제 일자") 
-	private String userDelYmd;
 	
 	@Schema(description = "등록 일자") 
 	private String regDt;
@@ -120,10 +110,10 @@ public class UserInfo {
 	private String regNm;
 	
 	@Schema(description = "수정 일자") 
-	private String updtDt;
+	private String uptDt;
 	
 	@Schema(description = "수정자") 
-	private String updtNm;	
+	private String uptNm;	
 	
 	public User asUser() {
 		User user = new User();

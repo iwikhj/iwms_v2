@@ -12,42 +12,24 @@
 			, CMT.REQ_DTL_NO AS reqDtlNo
 			, CMT.REQ_DTL_CMT AS reqDtlCmt
 			, CMT.USER_SEQ AS userSeq
-			, ASS_USER.USER_NM AS userNm
+			, FN_GET_USER_NM(CMT.USER_SEQ) AS userNm
 			, CMT.DEL_YN AS delYn
 			, DATE_FORMAT(CMT.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
-			, REG_USER.USER_NM AS regNm
+			, FN_GET_USER_NM(CMT.REG_SEQ) AS regNm
 			, DATE_FORMAT(CMT.UPDT_DT, "%Y-%m-%d %H:%i:%s") AS updtDt
-			, UPDT_USER.USER_NM AS updtNm
+			, FN_GET_USER_NM(CMT.UPDT_SEQ) AS updtNm
 			, 'TB_REQ_DTL_CMT' AS fileRefTb
 			, 'REQ_DTL_CMT_SEQ' AS fileRefCol			
 		FROM TB_REQ REQ
 		INNER JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ
 		INNER JOIN TB_REQ_DTL_CMT CMT ON DTL.REQ_DTL_SEQ = CMT.REQ_DTL_SEQ
-		LEFT JOIN TB_USER ASS_USER ON CMT.USER_SEQ = ASS_USER.USER_SEQ
-		LEFT JOIN TB_USER REG_USER ON CMT.REG_SEQ = REG_USER.USER_SEQ
-		LEFT JOIN TB_USER UPDT_USER ON CMT.UPDT_SEQ = UPDT_USER.USER_SEQ 
 		WHERE CMT.DEL_YN = 'N'
 	</sql>
 
 	<resultMap id="resultReqDtlCmtMap" type="com.iwi.iwms.api.req.domain.ReqDtlCmtInfo">
-		<result property="rowNum" column="rowNum"/>
 		<result property="reqDtlCmtSeq" column="reqDtlCmtSeq"/>
-		<result property="reqSeq" column="reqSeq"/>
-		<result property="reqNo" column="reqNo"/>
-		<result property="reqDtlSeq" column="reqDtlSeq"/>
-		<result property="reqDtlNo" column="reqDtlNo"/>
-		<result property="reqDtlCmt" column="reqDtlCmt"/>
-		<result property="userSeq" column="userSeq"/>
-		<result property="userNm" column="userNm"/>
-		<result property="delYn" column="delYn"/>
-		<result property="regDt" column="regDt"/>
-		<result property="regNm" column="regNm"/>
-		<result property="updtDt" column="updtDt"/>
-		<result property="updtNm" column="updtNm"/>
-			
 	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=reqDtlCmtSeq" 
 			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>
-			
 	</resultMap>
 		
 	<!-- 요청사항 상세별 코멘트 목록 조회 -->			

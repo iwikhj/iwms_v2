@@ -30,10 +30,10 @@ public class UserPwd {
 	private String pwdResetYn;
 	
 	@Schema(hidden = true, description = "수정자 SEQ") 
-	private long updtSeq;
+	private long uptSeq;
 	
 	public UserPwd of(final LoginUserInfo loginUserInfo) {
-		this.updtSeq = loginUserInfo.getUserSeq();
+		this.uptSeq = loginUserInfo.getUserSeq();
 		return this;
 	}
 }

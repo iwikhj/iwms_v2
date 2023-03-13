@@ -36,7 +36,7 @@ public class SiteServiceImpl implements SiteService {
 
 	@Override
 	public SiteInfo getSiteBySeq(Site site) {
-		return Optional.ofNullable(siteMapper.getSiteBySeq(site))
+		return Optional.ofNullable(siteMapper.getSiteBySeq(site.getSiteSeq()))
 					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사이트를 찾을 수 없습니다."));
 	}
 
@@ -50,7 +50,7 @@ public class SiteServiceImpl implements SiteService {
 
 	@Override
 	public int updateSite(Site site) {
-		Optional.ofNullable(siteMapper.getSiteBySeq(site))
+		Optional.ofNullable(siteMapper.getSiteBySeq(site.getSiteSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사이트를 찾을 수 없습니다."));
 		
 		return siteMapper.updateSite(site);
@@ -58,7 +58,7 @@ public class SiteServiceImpl implements SiteService {
 
 	@Override
 	public int deleteSite(Site site) {
-		Optional.ofNullable(siteMapper.getSiteBySeq(site))
+		Optional.ofNullable(siteMapper.getSiteBySeq(site.getSiteSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사이트를 찾을 수 없습니다."));
 		
 		return siteMapper.deleteSite(site);

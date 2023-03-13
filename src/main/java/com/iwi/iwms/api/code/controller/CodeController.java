@@ -9,6 +9,7 @@ import javax.validation.Valid;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -33,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 @Tag(name = "Common Code", description = "IWMS 공통 코드 관리")
 @RequiredArgsConstructor
 @RestController
+@PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
 @RequestMapping("${app.root}/${app.version}/codes")
 public class CodeController {
 

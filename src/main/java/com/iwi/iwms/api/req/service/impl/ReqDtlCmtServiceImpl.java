@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.iwi.iwms.api.file.domain.UploadFile;
@@ -42,7 +43,7 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 		reqDtlCmtMapper.insertReqDtlCmt(reqDtlCmt);
 		
 		// 첨부파일 저장
-		if(reqDtlCmt.getFiles() != null && !reqDtlCmt.getFiles().isEmpty()) {
+		if(!CollectionUtils.isEmpty(reqDtlCmt.getFiles())) {
 			UploadFile uploadFile = reqDtlCmt.getFileInfo();
 			uploadFile.setFileRefSeq(reqDtlCmt.getReqDtlCmtSeq());
 			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + reqDtlCmt.getReqSeq() + "/" + reqDtlCmt.getReqDtlSeq() + "/" + reqDtlCmt.getReqDtlCmtSeq());
@@ -60,12 +61,12 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 		
 		// 첨부파일 삭제
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(reqDtlCmt.getFileInfo());
-		if(attachedFiles != null && attachedFiles.size() > 0) {
+		if(!CollectionUtils.isEmpty(attachedFiles)) {
 			fileService.deleteAttachFiles(attachedFiles, reqDtlCmt.getAttachedFilesSeq());
 		}
 		
 		// 첨부파일 저장
-		if(reqDtlCmt.getFiles() != null && !reqDtlCmt.getFiles().isEmpty()) {
+		if(!CollectionUtils.isEmpty(reqDtlCmt.getFiles())) {
 			UploadFile uploadFile = reqDtlCmt.getFileInfo();
 			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + reqDtlCmt.getReqSeq() + "/" + reqDtlCmt.getReqDtlSeq() + "/" + reqDtlCmt.getReqDtlCmtSeq());
 			fileService.insertAttachFiles(reqDtlCmt.getFiles(), uploadFile);
@@ -83,7 +84,7 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 		
 		// 첨부파일 삭제(디렉토리까지)
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(reqDtlCmt.getFileInfo());
-		if(attachedFiles != null && attachedFiles.size() > 0) {
+		if(!CollectionUtils.isEmpty(attachedFiles)) {
 			fileService.deleteAttachAll(attachedFiles);
 		}
 		return result;

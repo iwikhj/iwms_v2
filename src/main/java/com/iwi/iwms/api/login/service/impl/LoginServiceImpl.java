@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwi.iwms.api.login.domain.Login;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.login.domain.Reissue;
@@ -31,13 +30,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class LoginServiceImpl implements LoginService{
 
-	private final AuthProvider authProvider;
-	
 	private final UserMapper userMapper;
 	
+	private final AuthProvider authProvider;
+	
     private final RedisProvider redis;
-    
-    private final ObjectMapper objectMapper;
 	
 	@Override
 	public AccessTokenResponse login(Login login) {
@@ -55,19 +52,18 @@ public class LoginServiceImpl implements LoginService{
 			// 인증 서버 인증 요청 
 			AccessTokenResponse accessTokenResponse = authProvider.grantToken(login.getUsername(), login.getPassword());
 			log.info("USERNAME: [{}]", accessTokenResponse);
-			String ssoId = userInfo.getSsoId();
+			String key = userInfo.getSsoKey();
 			
 			// 로그인한 사용자의 정보를 Redis 서버에 저장한다. 이후 요청에 대한 사용자 정보는 Redis 서버에서 불러온다.
 			// 사용자 정보의 만료 시간은 리플레시 토큰의 만료 시간과 동일하게 설정한다. 리플레시 토큰 만료시에는 다시 로그인해야 한다.
-			LoginUserInfo loginUserInfo = userMapper.getLoginUser(ssoId);
-			
-			if(redis.hasKey(ssoId)) {
-				redis.delete(ssoId);
+			LoginUserInfo loginUserInfo = userMapper.getLoginUser(key);
+			if(redis.hasKey(key)) {
+				redis.delete(key);
 			}
 			
 			long timeout = Duration.ofSeconds(accessTokenResponse.getRefreshExpiresIn()).toMillis();
-			redis.setHash(ssoId, "user", loginUserInfo, timeout);
-			redis.setHash(ssoId, "refreshToken", accessTokenResponse.getRefreshToken(), timeout);
+			redis.setHash(key, "user", loginUserInfo, timeout);
+			redis.setHash(key, "refreshToken", accessTokenResponse.getRefreshToken(), timeout);
 			
 			// 로그인한 사용자의 접속IP를 저장 및 LOGIN_ERR_CNT 초기화. 
 			userInfo.setLastLoginIp(login.getLoginIp());
