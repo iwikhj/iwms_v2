@@ -3,126 +3,167 @@
 <mapper namespace="com.iwi.iwms.api.req.mapper.ReqDtlMapper">
 
 	<sql id="selectReqDtl">
-		SELECT
-			ROW_NUMBER() OVER(ORDER BY DTL.REQ_DTL_SEQ) AS rowNum
-			, DTL.REQ_SEQ AS reqSeq
-			, DTL.REQ_NO AS reqNo
+		SELECT 
+			REQ.REQ_SEQ AS reqSeq
+			, REQ.REQ_NO AS reqNo
 			, DTL.REQ_DTL_SEQ AS reqDtlSeq
 			, DTL.REQ_DTL_NO AS reqDtlNo
-			, DTL.REQ_DTL_NM AS reqDtlNm
-			, DTL.REQ_DTL_CONTENT_TXT AS reqDtlContentTxt
-			, DTL.DTL_SITE_GB_CD AS dtlSiteGbCd
-			, FN_GET_CODE_NM('DTL_SITE_GB_CD', DTL.DTL_SITE_GB_CD) AS dtlSiteGb
-			, DTL.REQ_GB_CD AS reqGbCd
-			, FN_GET_CODE_NM('REQ_DTL_STAT_CD', DTL.REQ_DTL_STAT_CD) AS reqGb
-			, DTL.SITE_GB_CD_STR AS siteGbCdStr
-			, DTL.REQ_DTL_STAT_CD AS reqDtlStatCd
-			, FN_GET_CODE_NM('REQ_GB_CD', DTL.REQ_GB_CD) AS reqDtlStat
-			, DTL.REQ_DTL_STAT_CMT AS reqDtlStatCmt
-			, DTL.TGT_YMD AS tgtYmd
-			, DTL.TGT_MM AS tgtMm
-			, DTL.MNG_OK_YMD AS mngOkYmd
-			, DTL.MNG_OK_SEQ AS mngOkSeq
-			, DTL.CUS_OK_YMD AS cusOkYmd
-			, DTL.CUS_OK_SEQ AS cusOkSeq
-			, DTL.RETURN_YMD AS returnYmd
-			, DTL.RETURN_SEQ AS returnSeq
-			, DTL.REQ_DTL_SCORE AS reqDtlScore
-			, DTL.REQ_DTL_EVAL_COTENT_CMT AS reqDtlEvalCotentCmt
-			, DATE_FORMAT(DTL.DEL_DT, "%Y-%m-%d %H:%i:%s") AS delDt
-			, DTL.DEL_YN AS delYn
+            , SITE.SITE_NM AS siteNm	
+			, REQ.REQ_TITLE AS reqTitle
+            , REQ.REQ_CONTENT AS reqContent
+			, REQ.REQ_YMD AS reqYmd
+			, REQ.REQ_END_YMD AS reqEndYmd
+			, REQ.REQ_TYPE_CD AS reqTypeCd
+			, FN_GET_CODE_NM('REQ_TYPE_CD', REQ.REQ_TYPE_CD) AS reqType
+			, REQ.REQ_GB_CD AS reqGbCd
+			, FN_GET_CODE_NM('REQ_GB_CD', REQ.REQ_GB_CD) AS reqGb
+			, RHIS.REQ_HIS_SEQ AS reqHisSeq
+            , RHIS.REQ_STAT_CD AS reqStatCd
+			, FN_GET_CODE_NM('REQ_STAT_CD', RHIS.REQ_STAT_CD) AS reqStat 
+			, FN_GET_USER_NM(DTL.REQ_DTL_USER_SEQ) AS reqDtlUser
+			, DTL.BUSI_ROLL_CD AS busiRollCd
+			, FN_GET_CODE_NM('BUSI_ROLL_CD', DTL.BUSI_ROLL_CD) AS busiRoll 
+			, DHIS.REQ_DTL_HIS_SEQ AS reqDtlHisSeq
+            , DHIS.REQ_DTL_STAT_CD AS reqDtlStatCd
+			, FN_GET_CODE_NM('REQ_DTL_STAT_CD', DHIS.REQ_DTL_STAT_CD) AS reqDtlStat 
+			, DTL.USE_YN AS useYn
 			, DATE_FORMAT(DTL.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
-			, FN_GET_USER_NM(DTL.REG_SEQ) AS regNm
-			, DATE_FORMAT(DTL.UPDT_DT, "%Y-%m-%d %H:%i:%s") AS updtDt
-			, FN_GET_USER_NM(DTL.UPDT_SEQ) AS updtNm			
-		FROM TB_REQ_DTL DTL
-		INNER JOIN TB_REQ REQ ON DTL.REQ_SEQ = REQ.REQ_SEQ 
-		WHERE DTL.DEL_YN = 'N'
+			, FN_GET_USER_NM(DTL.REG_SEQ) AS regNm	
+		FROM TB_REQ REQ
+		INNER JOIN TB_SITE SITE ON REQ.SITE_SEQ = SITE.SITE_SEQ
+		INNER JOIN TB_REQ_HIS RHIS ON REQ.REQ_SEQ = RHIS.REQ_SEQ
+			AND RHIS.REQ_HIS_SEQ = (SELECT MAX(REQ_HIS_SEQ) FROM TB_REQ_HIS WHERE REQ_SEQ = REQ.REQ_SEQ)	
+		LEFT JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ		
+			AND DTL.USE_YN = 'Y'	
+		LEFT JOIN TB_REQ_DTL_HIS DHIS ON DTL.REQ_DTL_SEQ = DHIS.REQ_DTL_SEQ
+			AND DHIS.REQ_DTL_HIS_SEQ = (SELECT MAX(REQ_DTL_HIS_SEQ) FROM TB_REQ_DTL_HIS WHERE REQ_DTL_SEQ = DTL.REQ_DTL_SEQ)				
+		WHERE REQ.DEL_YN = 'N'
+			AND REQ.USE_YN = 'Y'
 	</sql>
 
 	<resultMap id="resultReqDtlMap" type="com.iwi.iwms.api.req.domain.ReqDtlInfo">
+		<result property="reqSeq" column="reqSeq"/>
 		<result property="reqDtlSeq" column="reqDtlSeq"/>
-	   	<collection property="comments" column="reqDtlSeq" 
-			ofType="com.iwi.iwms.api.req.domain.ReqDtlCmtInfo" select="com.iwi.iwms.api.req.mapper.ReqDtlCmtMapper.listReqDtlCmtByReqDtlSeq"/>
-		<collection property="users" column="reqDtlSeq" 
-			ofType="com.iwi.iwms.api.req.domain.ReqDtlUserInfo" select="com.iwi.iwms.api.req.mapper.ReqDtlUserMapper.listReqDtlUserByReqDtlSeq"/>
+	   	<collection property="histories" column="reqSeq=reqSeq,reqDtlSeq=reqDtlSeq" 
+			ofType="com.iwi.iwms.api.req.domain.ReqDtlHisInfo" select="listHisByReqAndDtlSeq"/>
+	   	<collection property="comments" column="reqSeq=reqSeq,reqDtlSeq=reqDtlSeq" 
+			ofType="com.iwi.iwms.api.req.domain.ReqDtlCmtInfo" select="listCmtByReqAndDtlSeq"/>			
 	</resultMap>
-	
-	<!-- 요청사항 상세 목록 조회 -->		
-	<select id="listReqDtlByReqSeq" parameterType="long"
+
+	<!-- 요청사항 상세 단일 조회 -->		
+	<select id="getReqDtlByReqAndDtlSeq" parameterType="hashMap"
 		resultMap="resultReqDtlMap">
 		<include refid="selectReqDtl"></include>
-			AND DTL.REQ_SEQ = #{reqSeq}
-		ORDER BY DTL.REQ_DTL_SEQ DESC	
+			AND REQ.REQ_SEQ = #{reqSeq}
+		<if test='reqDtlSeq != null and reqDtlSeq != ""'>
+			AND DTL.REQ_DTL_SEQ = #{reqDtlSeq}
+		</if>			
+		LIMIT 1
 	</select>	
-
+	
 	<!-- 요청사항 상세 단일 조회 -->		
 	<select id="getReqDtlBySeq" parameterType="long"
 		resultMap="resultReqDtlMap">
 		<include refid="selectReqDtl"></include>
+		<if test='reqDtlSeq != null and reqDtlSeq != ""'>
 			AND DTL.REQ_DTL_SEQ = #{reqDtlSeq}
+		</if>			
 	</select>	
 
+	<!-- 접수: 담당자 배정 -->	
 	<!-- 요청사항 상세 등록 -->	
-	<insert id="insertReqDtl" parameterType="com.iwi.iwms.api.req.domain.ReqDtl">
+	<insert id="insertReqDtl" parameterType="com.iwi.iwms.api.req.domain.ReqDtl"
+		useGeneratedKeys="true" keyProperty="reqDtlSeq">
 		INSERT INTO TB_REQ_DTL
 		(
 		    REQ_DTL_NO
 		    , REQ_SEQ
-			, REQ_NO
-			, REQ_DTL_NM
-			, REQ_DTL_CONTENT_TXT
-			, DTL_SITE_GB_CD
-			, REQ_GB_CD
-			, SITE_GB_CD_STR
+			, REQ_DTL_USER_SEQ
+			, BUSI_ROLL_CD
 			, REQ_DTL_STAT_CD
-			, TGT_YMD
 			, TGT_MM
-			, DEL_YN
-			, REG_DT
+			, USE_YN
 			, REG_SEQ
 		) VALUES (
 		    (
 				SELECT
-					CONCAT(#{reqNo}, '-', LPAD(COALESCE(MAX(SUBSTR(S_REQ_DTL.REQ_DTL_NO, 12)), 0) + 1, 2, 0))
-				FROM TB_REQ_DTL AS S_REQ_DTL
-                WHERE S_REQ_DTL.REQ_NO = #{reqNo}
-				LIMIT 1	    
+					CONCAT(REQ.REQ_NO, '-', LPAD(COALESCE(MAX(SUBSTR(DTL.REQ_DTL_NO, 12)), 0) + 1, 2, 0))
+				FROM TB_REQ REQ
+				INNER JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ
+				WHERE REQ.REQ_SEQ = #{reqSeq}
+				LIMIT 1					
+				 
 		    )
 			, #{reqSeq}
-			, #{reqNo}
-			, #{reqDtlNm}
-			, #{reqDtlContentTxt}
-			, #{dtlSiteGbCd}
-			, #{reqGbCd}
-			, #{siteGbCdStr}
-			, '00'
-			, #{tgtYmd}
+			, #{reqDtlUserSeq}
+			, (SELECT BUSI_ROLL_CD FROM TB_USER WHERE USER_SEQ = #{reqDtlUserSeq})
+			, #{reqDtlStatCd}
 			, #{tgtMm}
-			, 'N'
-			, CURRENT_TIMESTAMP
+			, #{useYn}
 			, #{regSeq}
 		)		
-		<selectKey keyColumn="REQ_DTL_SEQ,REQ_DTL_NO,REQ_DTL_STAT_CD" keyProperty="reqDtlSeq,reqDtlNo,reqDtlStatCd" resultType="map" order="AFTER">
-        	SELECT 
-        		REQ_DTL_SEQ
-        		, REQ_DTL_NO
-        		, REQ_DTL_STAT_CD
-        	FROM TB_REQ_DTL
-        	WHERE REQ_DTL_SEQ = LAST_INSERT_ID()
-    	</selectKey>
 	</insert>	
+	
+	<!-- 처리중: 담당자 확인 -->	
+	<update id="updateReqDtlStatByInProgress" parameterType="com.iwi.iwms.api.req.domain.ReqDtl">
+		UPDATE TB_REQ_DTL 
+		SET
+			REQ_DTL_STAT_CD = #{reqDtlStatCd}
+			, REQ_DTL_STD_YMD = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
+			, MNG_OK_YMD = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
+			, MNG_OK_USER_SEQ = #{uptSeq}
+			, UPT_DT = CURRENT_TIMESTAMP
+			, UPT_SEQ = #{uptSeq}
+		WHERE REQ_DTL_SEQ = #{reqDtlSeq}	
+	</update>		
+
+	<!-- 처리완료: 처리 일시 업데이트 -->	
+	<update id="updateReqDtlStatByProcessed" parameterType="com.iwi.iwms.api.req.domain.ReqDtl">
+		UPDATE TB_REQ_DTL 
+		SET
+			REQ_DTL_STAT_CD = #{reqDtlStatCd}
+			, PROC_YMD = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
+			, PROC_HH = #{procHh}
+			, UPT_DT = CURRENT_TIMESTAMP
+			, UPT_SEQ = #{uptSeq}
+		WHERE REQ_DTL_SEQ = #{reqDtlSeq}	
+	</update>	
+
+	<!-- 검수완료: 고객사 확인 + 고객사 평가 업데이트 -->	
+	<update id="updateReqDtlStatByInspectionCompleted" parameterType="com.iwi.iwms.api.req.domain.ReqDtl">
+		UPDATE TB_REQ_DTL 
+		SET
+			REQ_DTL_STAT_CD = #{reqDtlStatCd}
+			, REQ_DTL_END_YMD = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
+			, CUS_OK_YMD = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
+			, CUS_OK_USER_SEQ = #{uptSeq}
+			, REQ_DTL_EVAL_SCORE = #{reqDtlEvalScore}
+			, REQ_DTL_EVAL_CMT = #{reqDtlEvalCmt}
+			, UPT_DT = CURRENT_TIMESTAMP
+			, UPT_SEQ = #{uptSeq}
+		WHERE REQ_DTL_SEQ = #{reqDtlSeq}	
+	</update>	
+	
+	<!-- 취소: 취소 -->	
+	<update id="updateReqDtlStatByCancel" parameterType="com.iwi.iwms.api.req.domain.ReqDtl">
+		UPDATE TB_REQ_DTL 
+		SET
+			REQ_DTL_STAT_CD = #{reqDtlStatCd}
+			, CANCEL_YMD = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
+			, CANCEL_USER_SEQ = #{uptSeq}
+			, UPT_DT = CURRENT_TIMESTAMP
+			, UPT_SEQ = #{uptSeq}
+		WHERE REQ_DTL_SEQ = #{reqDtlSeq}	
+	</update>	
 	
 	<!-- 요청사항 상세 수정 -->	
 	<update id="updateReqDtl" parameterType="com.iwi.iwms.api.req.domain.ReqDtl">
 		UPDATE TB_REQ_DTL 
 		SET
-			REQ_DTL_NM = #{reqDtlNm}
-			, REQ_DTL_CONTENT_TXT = #{reqDtlContentTxt}
-			, TGT_YMD = #{tgtYmd}
-			, TGT_MM = #{tgtMm}
-			, UPDT_DT = CURRENT_TIMESTAMP
-			, UPDT_SEQ = #{updtSeq}
+			TGT_MM = #{tgtMm}
+			, USE_YN = #{useYn}
+			, UPT_DT = CURRENT_TIMESTAMP
+			, UPT_SEQ = #{uptSeq}
 		WHERE REQ_DTL_SEQ = #{reqDtlSeq}	
 	</update>
 	
@@ -133,37 +174,118 @@
 		WHERE REQ_DTL_SEQ = #{reqDtlSeq}	 
 	</delete>
 	
-	<insert id="insertReqDtlHis" parameterType="com.iwi.iwms.api.req.domain.ReqDtl">
+	<!-- 요청사항 상세 이력 등록 -->	
+	<insert id="insertReqDtlHis" parameterType="com.iwi.iwms.api.req.domain.ReqDtlHis">
 		INSERT INTO TB_REQ_DTL_HIS
 		(
 		    REQ_DTL_SEQ
-		    , REQ_DTL_NO
-			, REQ_DTL_STAT_CD
-			, REG_YMD
-			, REG_DT
+		    , REQ_DTL_STAT_CD
+			, REQ_DTL_STAT_CMT
 			, REG_SEQ
 		) VALUES (
 			#{reqDtlSeq}
-			, #{reqDtlNo}
 			, #{reqDtlStatCd}
-			, DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
-			, CURRENT_TIMESTAMP
+			, #{reqDtlStatCmt}
 			, #{regSeq}
 		)		
-	</insert>	
+	</insert>
+	
+
+	<!-- 요청사항 상세 이력 조회 -->	
+	<select id="listHisByReqAndDtlSeq" parameterType="hashMap"
+		resultType="com.iwi.iwms.api.req.domain.ReqDtlHisInfo">
+		SELECT
+			*
+		FROM (
+			SELECT
+				REQ.REQ_SEQ AS reqSeq
+				, null AS reqDtlSeq
+				, HIS.REQ_STAT_CD AS reqDtlStatCd
+				, FN_GET_CODE_NM('REQ_STAT_CD', HIS.REQ_STAT_CD) AS reqDtlStat			
+				, HIS.REQ_STAT_CMT AS reqDtlStatCmt
+				, DATE_FORMAT(HIS.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+				, FN_GET_USER_NM(HIS.REG_SEQ) AS regNm
+			FROM TB_REQ REQ
+			INNER JOIN TB_REQ_HIS HIS ON REQ.REQ_SEQ = HIS.REQ_SEQ
+			WHERE REQ.DEL_YN = 'N'
+				AND REQ.USE_YN = 'Y'
+				AND REQ.REQ_SEQ = #{reqSeq}
+			UNION ALL    
+			SELECT
+				REQ.REQ_SEQ AS reqSeq
+				, DTL.REQ_DTL_SEQ AS reqDtlSeq
+				, HIS.REQ_DTL_STAT_CD AS reqDtlStatCd
+				, FN_GET_CODE_NM('REQ_DTL_STAT_CD', HIS.REQ_DTL_STAT_CD) AS reqDtlStat
+				, HIS.REQ_DTL_STAT_CMT AS reqDtlStatCmt
+				, DATE_FORMAT(HIS.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+				, FN_GET_USER_NM(HIS.REG_SEQ) AS regNm
+			FROM TB_REQ REQ
+			INNER JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ
+			INNER JOIN TB_REQ_DTL_HIS HIS ON DTL.REQ_DTL_SEQ = HIS.REQ_DTL_SEQ
+			WHERE REQ.DEL_YN = 'N'
+				AND REQ.USE_YN = 'Y'
+				AND DTL.USE_YN = 'Y'
+				AND DTL.REQ_DTL_SEQ = #{reqDtlSeq}
+		) STAT
+        ORDER BY regDt
+	</select>		
+
+	<resultMap id="resultReqAndDtlCmtMap" type="com.iwi.iwms.api.req.domain.ReqDtlCmtInfo">
+		<result property="reqDtlCmtSeq" column="reqDtlCmtSeq"/>
+	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=reqDtlCmtSeq" 
+			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>
+	</resultMap>
 		
-	<!-- 유지보수상세 처리상태 업데이트 
-	<update id="updateStat" parameterType="com.iwi.iwms.api.req.domain.ReqDtl">
-		UPDATE  TB_REQ_DTL
-		SET     REQ_DTL_STAT_CD    = #{reqDtlStatCd}
-		        , REQ_DTL_STAT_CMT = #{reqDtlStatCmt}
-		        , MNG_OK_DT        = SYSDATE
-		        , MNG_OK_SEQ       = #{mngOkSeq}
-		        , MNG_OK_IP        = #{mngOkIp}
-		        , UPD_DT           = SYSDATE
-		        , UPD_SEQ          = #{updSeq}
-		        , UPD_IP           = #{updIp}
-		WHERE   REQ_DTL_NO = #{reqDtlNo}
-	</update>	
-	-->	
+	<!-- 요청사항 상세 코멘트 조회 -->	
+	<select id="listCmtByReqAndDtlSeq" parameterType="hashMap"
+		resultMap="resultReqAndDtlCmtMap">
+		SELECT
+			*
+		FROM (
+			SELECT
+				REQ.REQ_SEQ AS reqSeq
+				, null AS reqDtlSeq
+				, CMT.REQ_CMT_SEQ AS reqDtlCmtSeq
+				, CMT.REQ_CMT AS reqDtlCmt
+				, HIS.REQ_STAT_CD AS reqDtlStatCd
+				, FN_GET_CODE_NM('REQ_STAT_CD', HIS.REQ_STAT_CD) AS reqDtlStat
+				, CMT.USE_YN AS useYn
+				, DATE_FORMAT(CMT.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+				, FN_GET_USER_NM(CMT.REG_SEQ) AS regNm
+				, 'TB_REQ_CMT' AS fileRefTb
+				, 'REQ_CMT_SEQ' AS fileRefCol			
+			FROM TB_REQ REQ
+			INNER JOIN TB_REQ_CMT CMT ON REQ.REQ_SEQ = CMT.REQ_SEQ
+			INNER JOIN TB_REQ_HIS HIS ON CMT.REQ_SEQ = HIS.REQ_SEQ
+				AND CMT.REQ_HIS_SEQ = HIS.REQ_HIS_SEQ
+			WHERE REQ.DEL_YN = 'N'
+				AND REQ.USE_YN = 'Y'
+				AND CMT.USE_YN = 'Y'
+				AND REQ.REQ_SEQ = #{reqSeq}
+			UNION ALL    
+			SELECT
+				REQ.REQ_SEQ AS reqSeq
+				, DTL.REQ_DTL_SEQ AS reqDtlSeq
+				, CMT.REQ_DTL_CMT_SEQ AS reqDtlCmtSeq
+				, CMT.REQ_DTL_CMT AS reqDtlCmt
+				, HIS.REQ_DTL_STAT_CD AS reqDtlStatCd
+				, FN_GET_CODE_NM('REQ_DTL_STAT_CD', HIS.REQ_DTL_STAT_CD) AS reqDtlStat
+				, CMT.USE_YN AS useYn
+				, DATE_FORMAT(CMT.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+				, FN_GET_USER_NM(CMT.REG_SEQ) AS regNm
+				, 'TB_REQ_DTL_CMT' AS fileRefTb
+				, 'REQ_DTL_CMT_SEQ' AS fileRefCol			
+			FROM TB_REQ REQ
+			INNER JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ
+			INNER JOIN TB_REQ_DTL_CMT CMT ON DTL.REQ_DTL_SEQ = CMT.REQ_DTL_SEQ
+			INNER JOIN TB_REQ_DTL_HIS HIS ON CMT.REQ_DTL_SEQ = HIS.REQ_DTL_SEQ
+				AND CMT.REQ_DTL_HIS_SEQ = HIS.REQ_DTL_HIS_SEQ
+			WHERE REQ.DEL_YN = 'N'
+				AND REQ.USE_YN = 'Y'
+				AND DTL.USE_YN = 'Y'
+				AND CMT.USE_YN = 'Y'
+				AND DTL.REQ_DTL_SEQ = #{reqDtlSeq}
+		) STAT
+        ORDER BY regDt
+	</select>		
 </mapper>

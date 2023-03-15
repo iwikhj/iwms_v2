@@ -68,6 +68,7 @@ public class AuthenticationFilter extends GenericFilterBean {
 			//sendError(request, response, HttpStatus.BAD_REQUEST, tokenStatus.name());
 			//return;
         	passAuthentication("bfb1e1d6-9018-4b50-8c69-f48c939b763b", Arrays.asList("ROLE_IWMS_ADMIN"));
+        	//passAuthentication("f983803e-4d8e-45ec-a0c9-8fbef7c8263f", Arrays.asList("ROLE_IWMS_ENG"));
     		request = ignoreRequestHeader(servletRequest, request, HttpHeaders.AUTHORIZATION);
         }
 

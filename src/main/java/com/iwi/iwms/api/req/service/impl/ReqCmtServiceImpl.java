@@ -13,6 +13,7 @@ import com.iwi.iwms.api.file.domain.UploadFile;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
 import com.iwi.iwms.api.file.service.FileService;
 import com.iwi.iwms.api.req.domain.ReqCmt;
+import com.iwi.iwms.api.req.domain.ReqCmtInfo;
 import com.iwi.iwms.api.req.mapper.ReqCmtMapper;
 import com.iwi.iwms.api.req.mapper.ReqMapper;
 import com.iwi.iwms.api.req.service.ReqCmtService;
@@ -32,6 +33,12 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 	private final ReqCmtMapper reqCmtMapper;
 	
 	private final FileService fileService;
+
+	@Override
+	public ReqCmtInfo getReqCmtBySeq(long reqCmtSeq) {
+		return Optional.ofNullable(reqCmtMapper.getReqCmtBySeq(reqCmtSeq))
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항 코멘트를 찾을 수 없습니다."));
+	}
 	
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
@@ -53,8 +60,7 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateReqCmt(ReqCmt reqCmt) {
-		Optional.ofNullable(reqCmtMapper.getReqCmtBySeq(reqCmt.getReqCmtSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항 코멘트를 찾을 수 없습니다."));
+		this.getReqCmtBySeq(reqCmt.getReqCmtSeq());
 		
 		int result = reqCmtMapper.updateReqCmt(reqCmt);
 		
@@ -76,8 +82,7 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int deleteReqCmt(ReqCmt reqCmt) {
-		Optional.ofNullable(reqCmtMapper.getReqCmtBySeq(reqCmt.getReqCmtSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항 코멘트를 찾을 수 없습니다."));
+		this.getReqCmtBySeq(reqCmt.getReqCmtSeq());
 	
 		int result = reqCmtMapper.deleteReqCmt(reqCmt);
 		

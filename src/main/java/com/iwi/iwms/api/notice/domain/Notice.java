@@ -54,11 +54,20 @@ public class Notice {
 	@Schema(description = "첨부된 파일 SEQ")
 	private List<Long> attachedFilesSeq;
 	
+	@Schema(description = "사용 여부", allowableValues = {"Y", "N"}) 
+	private String useYn;
+	
 	@Schema(hidden = true, description = "등록자 SEQ") 
 	private long regSeq;
 	
 	@Schema(hidden = true, description = "수정자 SEQ") 
 	private long uptSeq;
+	
+	@Schema(hidden = true, description = "수정자 SEQ") 
+	private String userAuthCd;
+	
+	@Schema(hidden = true, description = "수정자 SEQ") 
+	private long userCompSeq;
 	
 	public Notice of(final LoginUserInfo loginUserInfo) {
 		this.regSeq = loginUserInfo.getUserSeq();

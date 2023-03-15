@@ -35,32 +35,27 @@ public class SiteServiceImpl implements SiteService {
 	}
 
 	@Override
-	public SiteInfo getSiteBySeq(Site site) {
-		return Optional.ofNullable(siteMapper.getSiteBySeq(site.getSiteSeq()))
+	public SiteInfo getSiteBySeq(long siteSeq) {
+		return Optional.ofNullable(siteMapper.getSiteBySeq(siteSeq))
 					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사이트를 찾을 수 없습니다."));
 	}
 
 	@Override
-	public void insertSite(Site Site) {
-		Optional.ofNullable(projMapper.getProjBySeq(Site.getProjSeq()))
+	public void insertSite(Site site) {
+		Optional.ofNullable(projMapper.getProjBySeq(site.getProjSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "프로젝트를 찾을 수 없습니다."));	
-		
-		siteMapper.insertSite(Site);
+		siteMapper.insertSite(site);
 	}
 
 	@Override
 	public int updateSite(Site site) {
-		Optional.ofNullable(siteMapper.getSiteBySeq(site.getSiteSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사이트를 찾을 수 없습니다."));
-		
+		this.getSiteBySeq(site.getSiteSeq());
 		return siteMapper.updateSite(site);
 	}
 
 	@Override
 	public int deleteSite(Site site) {
-		Optional.ofNullable(siteMapper.getSiteBySeq(site.getSiteSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사이트를 찾을 수 없습니다."));
-		
+		this.getSiteBySeq(site.getSiteSeq());		
 		return siteMapper.deleteSite(site);
 	}
 

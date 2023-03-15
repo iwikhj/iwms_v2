@@ -203,10 +203,9 @@ public class ProjController {
     @GetMapping(value = "/{projSeq}/sites/{siteSeq}")
     public ResponseEntity<ApiResponse<SiteInfo>> getSiteBySeq(HttpServletRequest request
     		, @PathVariable long projSeq
-    		, @PathVariable long siteSeq
-			, @Parameter(hidden = true) Site site) {
+    		, @PathVariable long siteSeq) {
     	
-    	SiteInfo Siteect = siteService.getSiteBySeq(site);
+    	SiteInfo Siteect = siteService.getSiteBySeq(siteSeq);
     	
 		return ResponseEntity.ok(ApiResponse.<SiteInfo>builder()
 				.request(request)

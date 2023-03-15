@@ -12,7 +12,7 @@ public interface SiteService {
 	
 	int countSite(Map<String, Object> map);
 
-	SiteInfo getSiteBySeq(Site site);
+	SiteInfo getSiteBySeq(long siteSeq);
 	
 	void insertSite(Site site);
 	

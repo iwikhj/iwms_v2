@@ -6,7 +6,7 @@ import java.util.Map;
 import org.apache.ibatis.annotations.Mapper;
 
 import com.iwi.iwms.api.req.domain.Req;
-import com.iwi.iwms.api.req.domain.ReqStat;
+import com.iwi.iwms.api.req.domain.ReqHis;
 import com.iwi.iwms.api.req.domain.ReqInfo;
 
 @Mapper
@@ -24,5 +24,5 @@ public interface ReqMapper {
 	
 	int deleteReq(Req req);
 	
-	int updateReqStatus(ReqStat reqStat);
+	void insertReqHis(ReqHis reqHis);
 }

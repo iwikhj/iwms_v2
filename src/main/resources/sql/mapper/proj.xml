@@ -146,7 +146,7 @@
 		resultType="com.iwi.iwms.api.comp.domain.ProjUserInfo">
 		SELECT 
 			ROW_NUMBER() OVER(ORDER BY USER.USER_SEQ) AS rowNum
-            , COMP.COMP_SEQ AS compSeq
+            , PU.PROJ_SEQ AS projSeq
             , COMP.COMP_NM AS compNm			
 			, USER.USER_SEQ AS userSeq
 			, USER.USER_NM AS userNm
@@ -172,7 +172,7 @@
 		resultType="com.iwi.iwms.api.comp.domain.ProjUserInfo">
 		SELECT 
 			ROW_NUMBER() OVER(ORDER BY USER.USER_SEQ) AS rowNum
-            , COMP.COMP_SEQ AS compSeq
+            , PU.PROJ_SEQ AS projSeq
             , COMP.COMP_NM AS compNm			
 			, USER.USER_SEQ AS userSeq
 			, USER.USER_NM AS userNm

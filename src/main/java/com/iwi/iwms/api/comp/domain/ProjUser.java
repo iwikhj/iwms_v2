@@ -37,13 +37,13 @@ public class ProjUser {
 	private long regSeq;
 	
 	@Schema(hidden = true, description = "수정자 SEQ") 
-	private long updtSeq;
+	private long uptSeq;
 	
 	public ProjUser of(final LoginUserInfo loginUserInfo) {
 		this.repUserYn = StringUtils.hasText(this.repUserYn) ? this.repUserYn : "N";
 		this.useYn = StringUtils.hasText(this.useYn) ? this.useYn : "Y";
 		this.regSeq = loginUserInfo.getUserSeq();
-		this.updtSeq = loginUserInfo.getUserSeq();
+		this.uptSeq = loginUserInfo.getUserSeq();
 		return this;
 	}
 }

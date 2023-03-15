@@ -45,12 +45,12 @@ public class NoticeController {
 	@Operation(summary = "공지사항 목록", description = "공지사항 목록")
 	@GetMapping(value = "")
 	public ResponseEntity<ApiListResponse<List<NoticeInfo>>> listNotice(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
 			, @RequestParam(value = "search", required = false) String search
 			, @RequestParam(value = "startDate", required = false) String startDate
-			, @RequestParam(value = "endDate", required = false) String endDate
-			, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+			, @RequestParam(value = "endDate", required = false) String endDate) {
 		
 		Map<String, Object> map = new HashMap<>();
 		map.put("userSeq", loginUserInfo.getUserSeq());
@@ -71,14 +71,15 @@ public class NoticeController {
     @Operation(summary = "공지사항 상세", description = "공지사항 상세")
     @GetMapping(value = "/{noticeSeq}")
     public ResponseEntity<ApiResponse<NoticeInfo>> getNoticeBySeq(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
     		, @PathVariable long noticeSeq) {
     	
-    	NoticeInfo notice = noticeService.getNoticeBySeq(noticeSeq);
+    	NoticeInfo noticeInfo = noticeService.getNoticeBySeq(noticeSeq, loginUserInfo.getUserSeq());
     	noticeService.updateViewCnt(noticeSeq);
     	
 		return ResponseEntity.ok(ApiResponse.<NoticeInfo>builder()
 				.request(request)
-				.data(notice)
+				.data(noticeInfo)
 				.build());
     }
     

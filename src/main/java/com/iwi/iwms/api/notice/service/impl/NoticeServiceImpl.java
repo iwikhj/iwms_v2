@@ -1,5 +1,6 @@
 package com.iwi.iwms.api.notice.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -43,8 +44,12 @@ public class NoticeServiceImpl implements NoticeService {
 	}
 
 	@Override
-	public NoticeInfo getNoticeBySeq(long noticeSeq) {
-		return Optional.ofNullable(noticeMapper.getNoticeBySeq(noticeSeq))
+	public NoticeInfo getNoticeBySeq(long noticeSeq, long userSeq) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("noticeSeq", noticeSeq);
+		map.put("userSeq", userSeq);
+		
+		return Optional.ofNullable(noticeMapper.getNoticeBySeq(map))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "공지사항을 찾을 수 없습니다."));
 	}
 
@@ -66,8 +71,8 @@ public class NoticeServiceImpl implements NoticeService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateNotice(Notice notice) {
-		Optional.ofNullable(noticeMapper.getNoticeBySeq(notice.getNoticeSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "공지사항을 찾을 수 없습니다."));
+		
+		this.getNoticeBySeq(notice.getNoticeSeq(), notice.getUptSeq());
 		
 		int result = noticeMapper.updateNotice(notice);
 
@@ -90,8 +95,8 @@ public class NoticeServiceImpl implements NoticeService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int deleteNotice(Notice notice) {
-		Optional.ofNullable(noticeMapper.getNoticeBySeq(notice.getNoticeSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "공지사항을 찾을 수 없습니다."));
+		
+		this.getNoticeBySeq(notice.getNoticeSeq(), notice.getUptSeq());
 		
 		int result = noticeMapper.deleteNotice(notice);
 		

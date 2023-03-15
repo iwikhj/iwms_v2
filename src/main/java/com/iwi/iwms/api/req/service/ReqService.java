@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import com.iwi.iwms.api.req.domain.Req;
+import com.iwi.iwms.api.req.domain.ReqHis;
 import com.iwi.iwms.api.req.domain.ReqInfo;
-import com.iwi.iwms.api.req.domain.ReqStat;
 
 public interface ReqService {
 
@@ -21,5 +21,5 @@ public interface ReqService {
 	
 	int deleteReq(Req req);
 	
-	int updateReqStatus(ReqStat reqStat);
+	void insertReqHis(ReqHis reqHis);
 }

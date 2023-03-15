@@ -11,6 +11,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iwi.iwms.api.auth.domain.AuthInfo;
@@ -24,7 +25,9 @@ import com.iwi.iwms.api.comp.service.ProjService;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.notice.domain.NoticeInfo;
 import com.iwi.iwms.api.notice.service.NoticeService;
+import com.iwi.iwms.api.req.domain.ReqDtlInfo;
 import com.iwi.iwms.api.req.domain.ReqInfo;
+import com.iwi.iwms.api.req.service.ReqDtlService;
 import com.iwi.iwms.api.req.service.ReqService;
 import com.iwi.iwms.api.user.domain.UserInfo;
 import com.iwi.iwms.api.user.service.UserService;
@@ -50,6 +53,8 @@ public class MenuPageController {
 	private final NoticeService noticeService;
 	
 	private final ReqService reqService;
+	
+	private final ReqDtlService reqDtlService;
 	
 	private final ProjService projService;
 	
@@ -86,7 +91,6 @@ public class MenuPageController {
 		Map<String, Object> map = new HashMap<>();
 		map.put("userSeq", loginUserInfo.getUserSeq());
 		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, noticeService.countNotice(map)));
-    	
     	List<NoticeInfo> listNotice = noticeService.listNotice(map);
     	
 		return ResponseEntity.ok(ListResponse.<List<NoticeInfo>>builder()
@@ -97,13 +101,13 @@ public class MenuPageController {
 				.build());
     }
     
-    @Operation(summary = "공지사항 상세", description = "공지사항 상세")
-    @GetMapping(value = "/notice/{noticeSeq}")
+    @Operation(summary = "공지사항 - 상세", description = "공지사항 상세")
+    @GetMapping(value = "/notice/detail")
     public ResponseEntity<Response<NoticeInfo>> noticeDetail(HttpServletRequest request
-    		, @PathVariable long noticeSeq
+    		, @RequestParam(value = "seq", required = true) Long noticeSeq
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
-    	NoticeInfo notice = noticeService.getNoticeBySeq(noticeSeq);
+    	NoticeInfo notice = noticeService.getNoticeBySeq(noticeSeq, loginUserInfo.getUserSeq());
     	
 		return ResponseEntity.ok(Response.<NoticeInfo>builder()
 				.request(request)
@@ -115,7 +119,7 @@ public class MenuPageController {
 	/**
 	 * 메뉴 유지보수
 	 */
-    @Operation(summary = "유지보수 - 유지보수 (No data)", description = "유지보수 목록")
+    @Operation(summary = "유지보수 - 유지보수 ", description = "유지보수 목록")
     @GetMapping(value = "/maintain/request")
     public ResponseEntity<ListResponse<List<ReqInfo>>> maintainRequest(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
@@ -129,6 +133,28 @@ public class MenuPageController {
 				.request(request)
 				.data(listReq)
 				.query(map)
+				.loginUserInfo(loginUserInfo)
+				.build());
+    }
+    
+    @Operation(summary = "유지보수 - 유지보수 - 상세 ", description = "유지보수 상세")
+    @GetMapping(value = "/maintain/request/detail")
+    public ResponseEntity<Response<ReqDtlInfo>> maintainRequestDetail(HttpServletRequest request
+    		, @RequestParam(value = "rSeq", required = true) Long reqSeq
+    		, @RequestParam(value = "dSeq", required = false) Long reqDtlSeq
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+    	
+    	Map<String, Object> map = new HashMap<>();
+		map.put("reqSeq", reqSeq);
+		if(reqDtlSeq != null && reqDtlSeq != 0) {
+			map.put("reqDtlSeq", reqDtlSeq);
+		}
+		
+    	ReqDtlInfo reqDtl = reqDtlService.getReqDtlByReqAndDtlSeq(map);
+    	
+		return ResponseEntity.ok(Response.<ReqDtlInfo>builder()
+				.request(request)
+				.data(reqDtl)
 				.loginUserInfo(loginUserInfo)
 				.build());
     }
@@ -290,7 +316,7 @@ public class MenuPageController {
     @PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
     @Operation(summary = "시스템관리 - 권한 ", description = "권한 목록")
     @GetMapping(value = "/system/auth")
-    public ResponseEntity<ListResponse<List<AuthInfo>>> systemRole(HttpServletRequest request
+    public ResponseEntity<ListResponse<List<AuthInfo>>> systemAuth(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
 		Map<String, Object> map = new HashMap<>();

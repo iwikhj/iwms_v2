@@ -50,8 +50,8 @@ public class CompInfo {
 	private String regNm;
 	
 	@Schema(description = "수정 일자") 
-	private String updtDt;
+	private String uptDt;
 	
 	@Schema(description = "수정자") 
-	private String updtNm;	
+	private String uptNm;	
 }

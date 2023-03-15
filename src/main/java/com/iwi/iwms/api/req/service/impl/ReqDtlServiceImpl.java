@@ -2,7 +2,7 @@ package com.iwi.iwms.api.req.service.impl;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -13,9 +13,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.iwi.iwms.api.file.service.FileService;
 import com.iwi.iwms.api.req.domain.ReqDtl;
-import com.iwi.iwms.api.req.domain.ReqDtlCmtInfo;
+import com.iwi.iwms.api.req.domain.ReqDtlHis;
 import com.iwi.iwms.api.req.domain.ReqDtlInfo;
-import com.iwi.iwms.api.req.domain.ReqInfo;
+import com.iwi.iwms.api.req.enums.ReqDtlStatCode;
 import com.iwi.iwms.api.req.mapper.ReqDtlMapper;
 import com.iwi.iwms.api.req.mapper.ReqMapper;
 import com.iwi.iwms.api.req.service.ReqDtlService;
@@ -36,24 +36,54 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 
 	private final FileService fileService;
 	
+	@Override
+	public ReqDtlInfo getReqDtlByReqAndDtlSeq(Map<String, Object> map) {
+		return reqDtlMapper.getReqDtlByReqAndDtlSeq(map);
+	}
+	
+
+	@Override
+	public ReqDtlInfo getReqDtlBySeq(long reqSeq) {
+		return Optional.ofNullable(reqDtlMapper.getReqDtlBySeq(reqSeq))
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요구사항 상세를 찾을 수 없습니다."));
+	}
+	
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public void insertReqDtl(ReqDtl reqDtl) {
-		ReqInfo reqInfo = Optional.ofNullable(reqMapper.getReqBySeq(reqDtl.getReqSeq()))
+		Optional.ofNullable(reqMapper.getReqBySeq(reqDtl.getReqSeq()))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요구사항을 찾을 수 없습니다."));
 		
-		reqDtl.setReqNo(reqInfo.getReqNo());
-		reqDtl.setReqGbCd(reqInfo.getReqGbCd());
+		if(CollectionUtils.isEmpty(reqDtl.getReqDtlUserSeqs())) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "담당자는 필수 입력 사항입니다");
+		}
 		
-		reqDtlMapper.insertReqDtl(reqDtl);
-		reqDtlMapper.insertReqDtlHis(reqDtl);
+		ReqDtlStatCode status = ReqDtlStatCode.RECEIPT;	//RECEIPT
+		
+		for(int i = 0; i < reqDtl.getReqDtlUserSeqs().size(); i++) {
+			long reqDtlUserSeq = reqDtl.getReqDtlUserSeqs().get(i);
+			int tgtMm = reqDtl.getTgtMms().get(i);
+					
+			reqDtl.setReqDtlUserSeq(reqDtlUserSeq);
+			reqDtl.setTgtMm(tgtMm);
+			reqDtl.setReqDtlStatCd(status.getCode());
+			reqDtlMapper.insertReqDtl(reqDtl);
+			
+			ReqDtlHis reqDtlHis = ReqDtlHis.builder()
+					.reqDtlSeq(reqDtl.getReqDtlSeq())
+					.reqDtlStatCd(status.getCode())
+					.reqDtlStatCmt(status.getMessage())
+					.regSeq(reqDtl.getUptSeq())
+					.build();
+			
+			reqDtlMapper.insertReqDtlHis(reqDtlHis);
+		}
 	}
 
+	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateReqDtl(ReqDtl reqDtl) {
-		Optional.ofNullable(reqDtlMapper.getReqDtlBySeq(reqDtl.getReqDtlSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요구사항 상세를 찾을 수 없습니다."));
-		
+		this.getReqDtlBySeq(reqDtl.getReqDtlSeq());
 		int result = reqDtlMapper.updateReqDtl(reqDtl);
 		
 		return result;		
@@ -63,30 +93,106 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int deleteReqDtl(ReqDtl reqDtl) {
-		ReqDtlInfo reqDtlInfo = Optional.ofNullable(reqDtlMapper.getReqDtlBySeq(reqDtl.getReqDtlSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요구사항 상세를 찾을 수 없습니다."));
+		ReqDtlInfo reqDtlInfo = this.getReqDtlBySeq(reqDtl.getReqDtlSeq());
 		
 		int result = reqDtlMapper.deleteReqDtl(reqDtl);
 		
 		//  요청사항 상세 디렉토리 삭제
 		if(!CollectionUtils.isEmpty(reqDtlInfo.getComments())) {
-			/*
-			// 코멘트 첨부파일 삭제(디렉토리까지)
-			comments.stream()
-				.forEach(v -> {
-					List<UploadFileInfo> attachedFiles = v.getAttachedFiles();
-					if(attachedFiles != null && attachedFiles.size() > 0) {
-						fileService.deleteAttachAll(attachedFiles);
-					}
-				});
-			*/
-			
 			Path path = Paths.get(UPLOAD_PATH_PREFIX)
 					.resolve(String.valueOf(reqDtlInfo.getReqSeq()))
 					.resolve(String.valueOf(reqDtlInfo.getReqDtlSeq()));
 			fileService.deletePath(path);
 		}
 		return result;
+	}
+
+	@Transactional(rollbackFor = {Exception.class})
+	@Override
+	public int updateReqDtlStatByInProgress(ReqDtl reqDtl) {
+		this.getReqDtlBySeq(reqDtl.getReqDtlSeq());
+		
+		ReqDtlStatCode status = ReqDtlStatCode.IN_PROGRESS;	//IN_PROGRESS
+		
+		reqDtl.setReqDtlStatCd(status.getCode());
+		reqDtlMapper.updateReqDtlStatByInProgress(reqDtl);
+		
+		ReqDtlHis reqDtlHis = ReqDtlHis.builder()
+				.reqDtlSeq(reqDtl.getReqDtlSeq())
+				.reqDtlStatCd(status.getCode())
+				.reqDtlStatCmt(status.getMessage())
+				.regSeq(reqDtl.getUptSeq())
+				.build();
+		
+		reqDtlMapper.insertReqDtlHis(reqDtlHis);
+		
+		return 1;
+	}
+
+	@Transactional(rollbackFor = {Exception.class})
+	@Override
+	public int updateReqDtlStatByProcessed(ReqDtl reqDtl) {
+		this.getReqDtlBySeq(reqDtl.getReqDtlSeq());
+
+		ReqDtlStatCode status = ReqDtlStatCode.PROCESSED;	//PROCESSED
+		
+		reqDtl.setReqDtlStatCd(status.getCode());
+		reqDtlMapper.updateReqDtlStatByProcessed(reqDtl);
+		
+		ReqDtlHis reqDtlHis = ReqDtlHis.builder()
+				.reqDtlSeq(reqDtl.getReqDtlSeq())
+				.reqDtlStatCd(status.getCode())
+				.reqDtlStatCmt(status.getMessage())
+				.regSeq(reqDtl.getUptSeq())
+				.build();
+		
+		reqDtlMapper.insertReqDtlHis(reqDtlHis);
+		
+		return 1;
+	}
+	
+	@Transactional(rollbackFor = {Exception.class})
+	@Override
+	public int updateReqDtlStatByInspectionCompleted(ReqDtl reqDtl) {
+		this.getReqDtlBySeq(reqDtl.getReqDtlSeq());
+
+		ReqDtlStatCode status = ReqDtlStatCode.INSPECTION_COMPLETED;	//INSPECTION_COMPLETED
+		
+		reqDtl.setReqDtlStatCd(status.getCode());
+		reqDtlMapper.updateReqDtlStatByInspectionCompleted(reqDtl);
+		
+		ReqDtlHis reqDtlHis = ReqDtlHis.builder()
+				.reqDtlSeq(reqDtl.getReqDtlSeq())
+				.reqDtlStatCd(status.getCode())
+				.reqDtlStatCmt(status.getMessage())
+				.regSeq(reqDtl.getUptSeq())
+				.build();
+		
+		reqDtlMapper.insertReqDtlHis(reqDtlHis);
+		
+		return 1;
+	}
+
+	@Transactional(rollbackFor = {Exception.class})
+	@Override
+	public int updateReqDtlStatByCancel(ReqDtl reqDtl) {
+		this.getReqDtlBySeq(reqDtl.getReqDtlSeq());
+	
+		ReqDtlStatCode status = ReqDtlStatCode.CANCEL;	//CANCEL
+		
+		reqDtl.setReqDtlStatCd(status.getCode());
+		reqDtlMapper.updateReqDtlStatByCancel(reqDtl);
+		
+		ReqDtlHis reqDtlHis = ReqDtlHis.builder()
+				.reqDtlSeq(reqDtl.getReqDtlSeq())
+				.reqDtlStatCd(status.getCode())
+				.reqDtlStatCmt(status.getMessage())
+				.regSeq(reqDtl.getUptSeq())
+				.build();
+		
+		reqDtlMapper.insertReqDtlHis(reqDtlHis);
+		
+		return 1;
 	}
 
 }

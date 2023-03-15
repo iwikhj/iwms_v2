@@ -36,12 +36,6 @@ public class Req {
 	@Schema(hidden = true, description = "사이트 SEQ") 
 	private long siteSeq;
 	
-	@Schema(hidden = true, description = "프로젝트 SEQ")
-	private long projSeq;
-	
-	@Schema(hidden = true, description = "소속 SEQ")
-	private long compSeq;
-	
 	@NotNull(message = "요청사항 타입은 필수 입력 사항입니다")
 	@Schema(description = "요청사항 타입 코드: [00: 일반, 99: 긴급]", allowableValues = {"00", "99"}) 
 	private String reqTypeCd;
@@ -53,9 +47,12 @@ public class Req {
     @Pattern(regexp = "^(19|20)\\d{2}(0[1-9]|1[012])(0[1-9]|[12][0-9]|3[0-1])$", message = "유지보수 완료 예정일의 날짜 형식이 유효하지 않습니다(YYYYMMDD)")
 	@Schema(description = "요청사항 완료 예정일: YYYYMMDD")
 	private String reqEndYmd;
-	
+    
+	@Schema(description = "요청사항 제목") 
+	private String reqTitle;
+    
 	@Schema(description = "요청사항 내용") 
-	private String reqContentsTxt;
+	private String reqContent;
 	
 	@Schema(description = "첨부할 파일")
 	private List<MultipartFile> files;
@@ -66,15 +63,18 @@ public class Req {
 	@Schema(description = "첨부된 파일 SEQ")
 	private List<Long> attachedFilesSeq;
 	
+	@Schema(description = "사용 여부", allowableValues = {"Y", "N"}) 
+	private String useYn;
+	
 	@Schema(hidden = true, description = "등록자 SEQ") 
 	private long regSeq;
 	
 	@Schema(hidden = true, description = "수정자 SEQ") 
-	private long updtSeq;
+	private long uptSeq;
 	
 	public Req of(final LoginUserInfo loginUserInfo) {
 		this.regSeq = loginUserInfo.getUserSeq();
-		this.updtSeq = loginUserInfo.getUserSeq();
+		this.uptSeq = loginUserInfo.getUserSeq();
 		
 		this.fileInfo = new UploadFile();
 		this.fileInfo.setFileRefTb("TB_REQ");

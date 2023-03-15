@@ -52,6 +52,9 @@ public class NoticeInfo {
 	@Schema(description = "첨부된 파일 정보")
 	private List<UploadFileInfo> attachedFiles;
 	
+	@Schema(description = "등록자 여부") 
+	private String writerYn;
+	
 	@Schema(description = "사용 여부") 
 	private String useYn;
 	

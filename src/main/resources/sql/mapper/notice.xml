@@ -2,44 +2,34 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iwi.iwms.api.notice.mapper.NoticeMapper">
 
-	<sql id="selectNotice">
+	<!-- 공지사항 목록 조회 -->	
+	<select id="listNotice" parameterType="hashMap"
+		resultType="com.iwi.iwms.api.notice.domain.NoticeInfo">
 		SELECT 
 			ROW_NUMBER() OVER(ORDER BY NOTI.NOTICE_SEQ) AS rowNum
 			, NOTI.NOTICE_SEQ AS noticeSeq
 			, NOTI.COMP_SEQ AS compSeq
 			, COMP.COMP_NM AS compNm	
 			, NOTI.TITLE AS title
-			, NOTI.CONTENT AS content
 			, NOTI.NOTICE_GB_CD AS noticeGbCd
 			, FN_GET_CODE_NM('NOTICE_GB_CD', NOTI.NOTICE_GB_CD) AS noticeGb
 			, NOTI.FIXED_TOP_YN AS fixedTopYn
 			, NOTI.MAIN_TOP_YN AS mainTopYn
 			, NOTI.VIEW_CNT AS viewCnt
+			, CASE WHEN AUTH.AUTH_CD = 'ROLE_IWMS_ADMIN' OR NOTI.REG_SEQ = USER.USER_SEQ THEN 'Y' ELSE 'N' END AS writerYn
 			, NOTI.USE_YN AS useYn
 			, DATE_FORMAT(NOTI.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 			, FN_GET_USER_NM(NOTI.REG_SEQ) AS regNm
 			, DATE_FORMAT(NOTI.UPT_DT, "%Y-%m-%d %H:%i:%s") AS uptDt
 			, FN_GET_USER_NM(NOTI.UPT_SEQ) AS uptNm
-			, 'TB_NOTICE' AS fileRefTb
-			, 'NOTICE_SEQ' AS fileRefCol
 		FROM TB_NOTICE NOTI
-		LEFT JOIN TB_COMPANY COMP ON NOTI.COMP_SEQ = COMP.COMP_SEQ
+		LEFT JOIN TB_COMPANY COMP ON NOTI.COMP_SEQ = COMP.COMP_SEQ 
+		LEFT JOIN TB_USER USER ON USER.USER_SEQ = #{userSeq}
+		LEFT JOIN TB_AUTH AUTH ON USER.AUTH_SEQ = AUTH.AUTH_SEQ
 		WHERE NOTI.USE_YN = 'Y'
-	</sql>
-	
-	<resultMap id="resultNoticeMap" type="com.iwi.iwms.api.notice.domain.NoticeInfo">
-		<result property="noticeSeq" column="noticeSeq"/>
-	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=noticeSeq" 
-			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>
-	</resultMap>
-
-	<!-- 공지사항 목록 조회 -->	
-	<select id="listNotice" parameterType="hashMap"
-		resultMap="resultNoticeMap">
-		<include refid="selectNotice"></include>
+			AND (CASE WHEN AUTH.AUTH_CD = 'ROLE_IWMS_ADMIN' THEN TRUE ELSE (USER.COMP_SEQ = NOTI.COMP_SEQ OR NOTI.COMP_SEQ IS NULL) END)			
 		<if test='search != null and search != ""'>
 			AND NOTI.TITLE LIKE CONCAT('%', #{search}, '%') 
-			OR NOTI.CONTENT LIKE CONCAT('%', #{search}, '%') 
 			OR COMP.COMP_NM LIKE CONCAT('%', #{search}, '%') 
 		</if>			
 		ORDER BY NOTI.NOTICE_SEQ DESC
@@ -54,19 +44,51 @@
 		SELECT 
 			COUNT(*)
 		FROM TB_NOTICE NOTI
-		LEFT JOIN TB_COMPANY COMP ON NOTI.COMP_SEQ = COMP.COMP_SEQ
+		LEFT JOIN TB_COMPANY COMP ON NOTI.COMP_SEQ = COMP.COMP_SEQ 
+		LEFT JOIN TB_USER USER ON USER.USER_SEQ = #{userSeq}
+		LEFT JOIN TB_AUTH AUTH ON USER.AUTH_SEQ = AUTH.AUTH_SEQ
 		WHERE NOTI.USE_YN = 'Y'
+			AND (CASE WHEN AUTH.AUTH_CD = 'ROLE_IWMS_ADMIN' THEN TRUE ELSE (USER.COMP_SEQ = NOTI.COMP_SEQ OR NOTI.COMP_SEQ IS NULL) END)	
 		<if test='search != null and search != ""'>
 			AND NOTI.TITLE LIKE CONCAT('%', #{search}, '%') 
-			OR NOTI.CONTENT LIKE CONCAT('%', #{search}, '%') 
 			OR COMP.COMP_NM LIKE CONCAT('%', #{search}, '%') 
 		</if>				
 	</select>		
+	
+	<resultMap id="resultNoticeMap" type="com.iwi.iwms.api.notice.domain.NoticeInfo">
+		<result property="noticeSeq" column="noticeSeq"/>
+	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=noticeSeq" 
+			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>
+	</resultMap>
 
 	<!-- 공지사항 단일 조회 -->	
-	<select id="getNoticeBySeq" parameterType="long"
+	<select id="getNoticeBySeq" parameterType="hashMap"
 		resultMap="resultNoticeMap">
-		<include refid="selectNotice"></include>
+		SELECT 
+			NOTI.NOTICE_SEQ AS noticeSeq
+			, NOTI.COMP_SEQ AS compSeq
+			, COMP.COMP_NM AS compNm	
+			, NOTI.TITLE AS title
+			, NOTI.CONTENT AS content
+			, NOTI.NOTICE_GB_CD AS noticeGbCd
+			, FN_GET_CODE_NM('NOTICE_GB_CD', NOTI.NOTICE_GB_CD) AS noticeGb
+			, NOTI.FIXED_TOP_YN AS fixedTopYn
+			, NOTI.MAIN_TOP_YN AS mainTopYn
+			, NOTI.VIEW_CNT AS viewCnt
+			, CASE WHEN AUTH.AUTH_CD = 'ROLE_IWMS_ADMIN' OR NOTI.REG_SEQ = USER.USER_SEQ THEN 'Y' ELSE 'N' END AS writerYn
+			, NOTI.USE_YN AS useYn
+			, DATE_FORMAT(NOTI.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+			, FN_GET_USER_NM(NOTI.REG_SEQ) AS regNm
+			, DATE_FORMAT(NOTI.UPT_DT, "%Y-%m-%d %H:%i:%s") AS uptDt
+			, FN_GET_USER_NM(NOTI.UPT_SEQ) AS uptNm
+			, 'TB_NOTICE' AS fileRefTb
+			, 'NOTICE_SEQ' AS fileRefCol
+		FROM TB_NOTICE NOTI
+		LEFT JOIN TB_COMPANY COMP ON NOTI.COMP_SEQ = COMP.COMP_SEQ 
+		LEFT JOIN TB_USER USER ON USER.USER_SEQ = #{userSeq}
+		LEFT JOIN TB_AUTH AUTH ON USER.AUTH_SEQ = AUTH.AUTH_SEQ
+		WHERE NOTI.USE_YN = 'Y'
+			AND (CASE WHEN AUTH.AUTH_CD = 'ROLE_IWMS_ADMIN' THEN TRUE ELSE (USER.COMP_SEQ = NOTI.COMP_SEQ OR NOTI.COMP_SEQ IS NULL) END)	
 			AND NOTI.NOTICE_SEQ = #{noticeSeq}
 	</select>	
 
@@ -82,7 +104,6 @@
 			, FIXED_TOP_YN
 		    , MAIN_TOP_YN
 			, USE_YN
-			, REG_DT
 			, REG_SEQ
 		) VALUES (
 			 #{compSeq}
@@ -92,7 +113,6 @@
 			, #{fixedTopYn}
 			, #{mainTopYn}
 			, #{useYn}
-			, CURRENT_TIMESTAMP
 			, #{regSeq}
 		)		
 	</insert>		

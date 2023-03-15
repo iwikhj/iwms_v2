@@ -15,7 +15,7 @@ public interface NoticeMapper {
 	
 	int countNotice(Map<String, Object> map);
 	
-	NoticeInfo getNoticeBySeq(long noticeSeq);
+	NoticeInfo getNoticeBySeq(Map<String, Object> map);
 	
 	void insertNotice(Notice notice);
 	

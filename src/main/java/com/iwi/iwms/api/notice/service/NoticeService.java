@@ -12,7 +12,7 @@ public interface NoticeService {
 	
 	int countNotice(Map<String, Object> map);
 
-	NoticeInfo getNoticeBySeq(long noticeSeq);
+	NoticeInfo getNoticeBySeq(long noticeSeq, long userSeq);
 	
 	void insertNotice(Notice notice);
 	

@@ -47,42 +47,32 @@ public class ProjServiceImpl implements ProjService {
 
 	@Override
 	public int updateProj(Proj proj) {
-		Optional.ofNullable(projMapper.getProjBySeq(proj.getProjSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "프로젝트를 찾을 수 없습니다."));
-		
+		this.getProjBySeq(proj.getProjSeq());
 		return projMapper.updateProj(proj);
 	}
 
 	@Override
 	public int deleteProj(Proj proj) {
-		Optional.ofNullable(projMapper.getProjBySeq(proj.getProjSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "프로젝트를 찾을 수 없습니다."));
-		
+		this.getProjBySeq(proj.getProjSeq());
 		return projMapper.deleteProj(proj);
 	}
 
 	@Override
 	public List<ProjUserInfo> listCustProjUser(long projSeq) {
-		Optional.ofNullable(projMapper.getProjBySeq(projSeq))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "프로젝트를 찾을 수 없습니다."));
-		
+		this.getProjBySeq(projSeq);
 		return projMapper.listCustProjUser(projSeq);
 	}
 
 	@Override
 	public List<ProjUserInfo> listPerfProjUser(long projSeq) {
-		Optional.ofNullable(projMapper.getProjBySeq(projSeq))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "프로젝트를 찾을 수 없습니다."));
-		
+		this.getProjBySeq(projSeq);
 		return projMapper.listPerfProjUser(projSeq);
 	}
 	
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateProjUser(ProjUserList projUserList) {
-		Optional.ofNullable(projMapper.getProjBySeq(projUserList.getProjSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "프로젝트를 찾을 수 없습니다."));
-		
+		this.getProjBySeq(projUserList.getProjSeq());
 		projMapper.deleteProjUser(projUserList.getProjSeq());
 		return projMapper.updateProjUser(projUserList.getUsers());
 	}

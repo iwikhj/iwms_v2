@@ -54,25 +54,19 @@ public class AuthServiceImpl implements AuthService {
 
 	@Override
 	public int updateAuth(Auth auth) {
-		Optional.ofNullable(authMapper.getAuthBySeq(auth.getAuthSeq()))
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "권한을 찾을 수 없습니다"));
-		
+		this.getAuthBySeq(auth.getAuthSeq());
 		return authMapper.updateAuth(auth);
 	}
 
 	@Override
 	public int deleteAuth(Auth auth) {
-		Optional.ofNullable(authMapper.getAuthBySeq(auth.getAuthSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "권한을 찾을 수 없습니다"));
-		
+		this.getAuthBySeq(auth.getAuthSeq());
 		return authMapper.deleteAuth(auth);
 	}
 
 	@Override
 	public List<AuthMenuInfo> getAuthMenuByAuthSeq(long authSeq) {
-		Optional.ofNullable(authMapper.getAuthBySeq(authSeq))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "권한을 찾을 수 없습니다"));
-		
+		this.getAuthBySeq(authSeq);
 		return authMapper.getAuthMenuByAuthSeq(authSeq);
 	}
 	

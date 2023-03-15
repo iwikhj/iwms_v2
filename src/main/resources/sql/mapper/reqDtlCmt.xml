@@ -4,26 +4,22 @@
 
 	<sql id="selectReqDtlCmt">
 		SELECT
-			ROW_NUMBER() OVER(ORDER BY CMT.REQ_DTL_CMT_SEQ) AS rowNum
-			, CMT.REQ_DTL_CMT_SEQ AS reqDtlCmtSeq
-			, REQ.REQ_SEQ AS reqSeq
-			, REQ.REQ_NO AS reqNo
+			DTL.REQ_SEQ AS reqSeq
 			, CMT.REQ_DTL_SEQ AS reqDtlSeq
-			, CMT.REQ_DTL_NO AS reqDtlNo
+			, CMT.REQ_DTL_CMT_SEQ AS reqDtlCmtSeq
 			, CMT.REQ_DTL_CMT AS reqDtlCmt
-			, CMT.USER_SEQ AS userSeq
-			, FN_GET_USER_NM(CMT.USER_SEQ) AS userNm
-			, CMT.DEL_YN AS delYn
+			, HIS.REQ_DTL_STAT_CD AS reqDtlStatCd
+			, FN_GET_CODE_NM('REQ_DTL_STAT_CD', HIS.REQ_DTL_STAT_CD) AS reqDtlStat
+			, CMT.USE_YN AS useYn
 			, DATE_FORMAT(CMT.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 			, FN_GET_USER_NM(CMT.REG_SEQ) AS regNm
-			, DATE_FORMAT(CMT.UPDT_DT, "%Y-%m-%d %H:%i:%s") AS updtDt
-			, FN_GET_USER_NM(CMT.UPDT_SEQ) AS updtNm
 			, 'TB_REQ_DTL_CMT' AS fileRefTb
 			, 'REQ_DTL_CMT_SEQ' AS fileRefCol			
-		FROM TB_REQ REQ
-		INNER JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ
+		FROM TB_REQ_DTL DTL
 		INNER JOIN TB_REQ_DTL_CMT CMT ON DTL.REQ_DTL_SEQ = CMT.REQ_DTL_SEQ
-		WHERE CMT.DEL_YN = 'N'
+		INNER JOIN TB_REQ_DTL_HIS HIS ON CMT.REQ_DTL_SEQ = HIS.REQ_DTL_SEQ
+			AND CMT.REQ_DTL_HIS_SEQ = HIS.REQ_DTL_HIS_SEQ
+		WHERE CMT.USE_YN = 'Y'
 	</sql>
 
 	<resultMap id="resultReqDtlCmtMap" type="com.iwi.iwms.api.req.domain.ReqDtlCmtInfo">
@@ -53,19 +49,15 @@
 		INSERT INTO TB_REQ_DTL_CMT
 		(
 		    REQ_DTL_SEQ
-		    , REQ_DTL_NO
+		    , REQ_DTL_HIS_SEQ
 			, REQ_DTL_CMT
-			, USER_SEQ
-			, DEL_YN
-			, REG_DT
+			, USE_YN
 			, REG_SEQ
 		) VALUES (
 			#{reqDtlSeq}
-			, #{reqDtlNo}
+			, #{reqDtlHisSeq}
 			, #{reqDtlCmt}
-			, #{userSeq}
-			, 'N'
-			, CURRENT_TIMESTAMP
+			, #{useYn}
 			, #{regSeq}
 		)		
 	</insert>		
@@ -74,9 +66,10 @@
 	<update id="updateReqDtlCmt" parameterType="com.iwi.iwms.api.req.domain.ReqDtlCmt">
 		UPDATE TB_REQ_DTL_CMT 
 		SET
-		   REQ_DTL_CMT = #{reqDtlCmt}
-			, UPDT_DT = CURRENT_TIMESTAMP
-			, UPDT_SEQ = #{updtSeq}
+			REQ_DTL_CMT = #{reqDtlCmt}
+			, useYn = #{useYn}
+			, UPT_DT = CURRENT_TIMESTAMP
+			, UPT_SEQ = #{uptSeq}
 		WHERE REQ_DTL_CMT_SEQ = #{reqDtlCmtSeq}	
 	</update>
 

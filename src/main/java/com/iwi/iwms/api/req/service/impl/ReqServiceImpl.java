@@ -3,26 +3,21 @@ package com.iwi.iwms.api.req.service.impl;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.server.ResponseStatusException;
 
-import com.iwi.iwms.api.comp.domain.SiteInfo;
-import com.iwi.iwms.api.comp.mapper.SiteMapper;
 import com.iwi.iwms.api.file.domain.UploadFile;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
 import com.iwi.iwms.api.file.service.FileService;
 import com.iwi.iwms.api.req.domain.Req;
-import com.iwi.iwms.api.req.domain.ReqCmt;
+import com.iwi.iwms.api.req.domain.ReqHis;
 import com.iwi.iwms.api.req.domain.ReqInfo;
-import com.iwi.iwms.api.req.domain.ReqStat;
-import com.iwi.iwms.api.req.enums.ReqCode;
-import com.iwi.iwms.api.req.mapper.ReqCmtMapper;
+import com.iwi.iwms.api.req.enums.ReqStatCode;
 import com.iwi.iwms.api.req.mapper.ReqMapper;
 import com.iwi.iwms.api.req.service.ReqService;
 
@@ -38,11 +33,7 @@ public class ReqServiceImpl implements ReqService {
 
 	private final ReqMapper reqMapper;
 	
-	private final SiteMapper siteMapper;
-	
 	private final FileService fileService;
-	
-	private final ReqCmtMapper reqCmtMapper;
     
 	@Override
 	public List<ReqInfo> listReq(Map<String, Object> map) {
@@ -67,30 +58,20 @@ public class ReqServiceImpl implements ReqService {
 			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "사이트를 선택해주세요.");
 		}
 		
-		AtomicInteger index = new AtomicInteger();   
-		List<SiteInfo> sites = req.getSitesSeq()
-			.stream()
-			.map(v -> {
-				int idx = index.getAndIncrement();
-				return  Optional.ofNullable(siteMapper.getSiteBySeq(v))
-							.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사이트를 찾을 수 없습니다. [" + idx + "]"));
-			})
-			.collect(Collectors.toList());
+		ReqStatCode status = ReqStatCode.REQUEST;	//REQUEST
 		
-		for(SiteInfo site : sites) {
-			
-			req.setSiteSeq(site.getSiteSeq());
-			req.setProjSeq(site.getProjSeq());
-			
+		for(long siteSeq : req.getSitesSeq()) {
+			req.setSiteSeq(siteSeq);
 			reqMapper.insertReq(req);
 			
-			ReqCmt reqCmt = ReqCmt.builder()
+			ReqHis reqHis = ReqHis.builder()
 					.reqSeq(req.getReqSeq())
-					.reqCmt(ReqCode.REQ.getMessage())
+					.reqStatCd(status.getCode())
+					.reqStatCmt(status.getMessage())
 					.regSeq(req.getRegSeq())
 					.build();
 			
-			reqCmtMapper.insertReqCmt(reqCmt);
+			reqMapper.insertReqHis(reqHis);
 			
 			// 첨부파일 저장
 			if(!CollectionUtils.isEmpty(req.getFiles())) {
@@ -105,8 +86,7 @@ public class ReqServiceImpl implements ReqService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateReq(Req req) {
-		Optional.ofNullable(reqMapper.getReqBySeq(req.getReqSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항을 찾을 수 없습니다."));
+		this.getReqBySeq(req.getReqSeq());
 		
 		int result = reqMapper.updateReq(req);
 		
@@ -128,8 +108,7 @@ public class ReqServiceImpl implements ReqService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int deleteReq(Req req) {
-		Optional.ofNullable(reqMapper.getReqBySeq(req.getReqSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항을 찾을 수 없습니다."));
+		this.getReqBySeq(req.getReqSeq());
 		
 		int result = reqMapper.deleteReq(req);
 		
@@ -140,21 +119,17 @@ public class ReqServiceImpl implements ReqService {
 		}
 		return result;
 	}
-	
+
+	@Transactional(rollbackFor = {Exception.class})
 	@Override
-	public int updateReqStatus(ReqStat reqStat) {
-		Optional.ofNullable(reqMapper.getReqBySeq(reqStat.getReqSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항을 찾을 수 없습니다."));
+	public void insertReqHis(ReqHis reqHis) {
+		this.getReqBySeq(reqHis.getReqSeq());
 		
-		ReqCmt reqCmt = ReqCmt.builder()
-				.reqSeq(reqStat.getReqSeq())
-				.reqCmt(ReqCode.getReqCode(reqStat.getReqStatCd()).getMessage())
-				.regSeq(reqStat.getUpdtSeq())
-				.build();
+		if(!StringUtils.hasText(reqHis.getReqStatCmt())) {
+			reqHis.setReqStatCmt(ReqStatCode.toMessage(reqHis.getReqStatCd()));
+		}
 		
-		reqCmtMapper.insertReqCmt(reqCmt);
-		
-		return reqMapper.updateReqStatus(reqStat);
+		reqMapper.insertReqHis(reqHis);
 	}
 
 }

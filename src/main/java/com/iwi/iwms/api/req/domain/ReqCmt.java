@@ -28,6 +28,9 @@ public class ReqCmt {
 	
 	@Schema(hidden = true, description = "요청사항 SEQ")
 	private long reqSeq;
+	
+	@Schema(description = "요청사항 마지막 상태 SEQ")
+	private long reqHisSeq;
 
 	@Schema(description = "요청사항 코멘트") 
 	private String reqCmt;
@@ -41,15 +44,18 @@ public class ReqCmt {
 	@Schema(description = "첨부된 파일 SEQ")
 	private List<Long> attachedFilesSeq;
 	
+	@Schema(description = "사용 여부", allowableValues = {"Y", "N"}) 
+	private String useYn;
+	
 	@Schema(hidden = true, description = "등록자 SEQ") 
 	private long regSeq;
 	
 	@Schema(hidden = true, description = "수정자 SEQ") 
-	private long updtSeq;
+	private long uptSeq;
 	
 	public ReqCmt of(final LoginUserInfo loginUserInfo) {
 		this.regSeq = loginUserInfo.getUserSeq();
-		this.updtSeq = loginUserInfo.getUserSeq();
+		this.uptSeq = loginUserInfo.getUserSeq();
 		
 		this.fileInfo = new UploadFile();
 		this.fileInfo.setFileRefTb("TB_REQ_CMT");

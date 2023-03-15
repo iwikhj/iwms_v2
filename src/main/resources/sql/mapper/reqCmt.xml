@@ -4,20 +4,20 @@
 
 	<sql id="selectReqCmt">
 		SELECT
-			ROW_NUMBER() OVER(ORDER BY CMT.REQ_CMT_SEQ) AS rowNum
+			CMT.REQ_SEQ AS reqSeq
 			, CMT.REQ_CMT_SEQ AS reqCmtSeq
-			, REQ.REQ_SEQ AS reqSeq
 			, CMT.REQ_CMT AS reqCmt
-			, CMT.DEL_YN AS delYn
+			, HIS.REQ_STAT_CD AS reqStatCd
+			, FN_GET_CODE_NM('REQ_STAT_CD', HIS.REQ_STAT_CD) AS reqStat
+			, CMT.USE_YN AS useYn
 			, DATE_FORMAT(CMT.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 			, FN_GET_USER_NM(CMT.REG_SEQ) AS regNm
-			, DATE_FORMAT(CMT.UPDT_DT, "%Y-%m-%d %H:%i:%s") AS updtDt
-			, FN_GET_USER_NM(CMT.UPDT_SEQ) AS updtNm
 			, 'TB_REQ_CMT' AS fileRefTb
 			, 'REQ_CMT_SEQ' AS fileRefCol			
-		FROM TB_REQ REQ
-		INNER JOIN TB_REQ_CMT CMT ON REQ.REQ_SEQ = CMT.REQ_SEQ
-		WHERE CMT.DEL_YN = 'N'
+		FROM TB_REQ_CMT CMT
+		INNER JOIN TB_REQ_HIS HIS ON CMT.REQ_SEQ = HIS.REQ_SEQ
+			AND CMT.REQ_HIS_SEQ = HIS.REQ_HIS_SEQ
+		WHERE CMT.USE_YN = 'Y'
 	</sql>
 
 	<resultMap id="resultReqCmtMap" type="com.iwi.iwms.api.req.domain.ReqCmtInfo">
@@ -47,15 +47,15 @@
 		INSERT INTO TB_REQ_CMT
 		(
 		    REQ_SEQ
+		    , REQ_HIS_SEQ
 			, REQ_CMT
-			, DEL_YN
-			, REG_DT
+			, USE_YN
 			, REG_SEQ
 		) VALUES (
 			#{reqSeq}
+			, #{reqHisSeq}
 			, #{reqCmt}
-			, 'N'
-			, CURRENT_TIMESTAMP
+			, #{useYn}
 			, #{regSeq}
 		)		
 	</insert>		
@@ -64,9 +64,10 @@
 	<update id="updateReqCmt" parameterType="com.iwi.iwms.api.req.domain.ReqCmt">
 		UPDATE TB_REQ_CMT 
 		SET
-		   REQ_CMT = #{reqCmt}
-			, UPDT_DT = CURRENT_TIMESTAMP
-			, UPDT_SEQ = #{updtSeq}
+			REQ_CMT = #{reqCmt}
+			, useYn = #{useYn}
+			, UPT_DT = CURRENT_TIMESTAMP
+			, UPT_SEQ = #{uptSeq}
 		WHERE REQ_CMT_SEQ = #{reqCmtSeq}	
 	</update>
 

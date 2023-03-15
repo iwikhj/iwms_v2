@@ -17,8 +17,8 @@ public class ProjUserInfo {
 	@Schema(description = "번호")
 	private long rowNum;
 	
-	@Schema(description = "소속 SEQ")
-	private long compSeq;
+	@Schema(description = "프로젝트 SEQ")
+	private long projSeq;
 	
 	@Schema(description = "소속 이름")
 	private String compNm;

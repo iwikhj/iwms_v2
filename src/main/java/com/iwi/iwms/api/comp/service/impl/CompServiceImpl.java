@@ -49,17 +49,13 @@ public class CompServiceImpl implements CompService {
 
 	@Override
 	public int updateComp(Comp comp) {
-		Optional.ofNullable(compMapper.getCompBySeq(comp.getCompSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "소속을 찾을 수 없습니다."));
-		
+		this.getCompBySeq(comp.getCompSeq());
 		return compMapper.updateComp(comp);
 	}
 
 	@Override
 	public int deleteComp(Comp comp) {
-		Optional.ofNullable(compMapper.getCompBySeq(comp.getCompSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "소속을 찾을 수 없습니다."));
-		
+		this.getCompBySeq(comp.getCompSeq());		
 		return compMapper.deleteComp(comp);
 	}
 
@@ -70,25 +66,19 @@ public class CompServiceImpl implements CompService {
 
 	@Override
 	public void insertDept(Dept dept) {
-		Optional.ofNullable(compMapper.getCompBySeq(dept.getCompSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "소속을 찾을 수 없습니다."));
-		
+		this.getCompBySeq(dept.getCompSeq());		
 		deptMapper.insertDept(dept);
 	}
 
 	@Override
 	public int updateDept(Dept dept) {
-		Optional.ofNullable(deptMapper.getDeptBySeq(dept.getDeptSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "부서를 찾을 수 없습니다."));
-		
+		this.getCompBySeq(dept.getCompSeq());		
 		return deptMapper.updateDept(dept);
 	}
 
 	@Override
 	public int deleteDept(Dept dept) {
-		Optional.ofNullable(deptMapper.getDeptBySeq(dept.getDeptSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "부서를 찾을 수 없습니다."));
-		
+		this.getCompBySeq(dept.getCompSeq());		
 		return deptMapper.deleteDept(dept);
 	}
 

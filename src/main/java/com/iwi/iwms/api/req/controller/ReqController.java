@@ -27,13 +27,12 @@ import com.iwi.iwms.api.req.domain.Req;
 import com.iwi.iwms.api.req.domain.ReqCmt;
 import com.iwi.iwms.api.req.domain.ReqDtl;
 import com.iwi.iwms.api.req.domain.ReqDtlCmt;
-import com.iwi.iwms.api.req.domain.ReqDtlUser;
+import com.iwi.iwms.api.req.domain.ReqDtlInfo;
+import com.iwi.iwms.api.req.domain.ReqHis;
 import com.iwi.iwms.api.req.domain.ReqInfo;
-import com.iwi.iwms.api.req.domain.ReqStat;
 import com.iwi.iwms.api.req.service.ReqCmtService;
 import com.iwi.iwms.api.req.service.ReqDtlCmtService;
 import com.iwi.iwms.api.req.service.ReqDtlService;
-import com.iwi.iwms.api.req.service.ReqDtlUserService;
 import com.iwi.iwms.api.req.service.ReqService;
 import com.iwi.iwms.utils.Pagination;
 
@@ -55,8 +54,6 @@ public class ReqController {
 	private final ReqDtlService reqDtlService;
 	
 	private final ReqDtlCmtService reqDtlCmtService;
-	
-	private final ReqDtlUserService reqDtlUserCmtService;
 	
 	@Operation(summary = "요청사항 목록", description = "요청사항 목록")
 	@GetMapping(value = "")
@@ -81,19 +78,6 @@ public class ReqController {
 				.query(map)
 				.build());
 	}
-	
-    @Operation(summary = "요청사항 상세", description = "요청사항 상세")
-    @GetMapping(value = "/{reqSeq}")
-    public ResponseEntity<ApiResponse<ReqInfo>> getReqBySeq(HttpServletRequest request
-    		, @PathVariable long reqSeq) {
-    	
-    	ReqInfo requ = reqService.getReqBySeq(reqSeq);
-    	
-		return ResponseEntity.ok(ApiResponse.<ReqInfo>builder()
-				.request(request)
-				.data(requ)
-				.build());
-    }
     
     @Operation(summary = "요청사항 등록", description = "요청사항 등록")
 	@PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -138,19 +122,18 @@ public class ReqController {
 				.data(result)
 				.build());
 	}
-    
-    @Operation(summary = "요청사항 상태 변경", description = "요청사항 합의/협의/반려/취소")
-	@PatchMapping(value = "/{reqSeq}/agree", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+
+    @Operation(summary = "요청사항 상태 변경", description = "요청사항 합의/협의요청/반려/취소")
+	@PatchMapping(value = "/{reqSeq}/status", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> agreeReq(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long reqSeq
-			, @ModelAttribute @Valid ReqStat reqStatus) {
+			, @ModelAttribute @Valid ReqHis reqHis) {
 
-    	boolean result = reqService.updateReqStatus(reqStatus.of(loginUserInfo)) > 0 ? true : false;
+    	reqService.insertReqHis(reqHis.of(loginUserInfo));
     	
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
 				.request(request)
-				.data(result)
 				.build());
 	}
 
@@ -200,8 +183,28 @@ public class ReqController {
 				.data(result)
 				.build());
 	}    
+    
+    @Operation(summary = "요청사항 상세", description = "요청사항 상세")
+    @GetMapping(value = "/{reqSeq}/details")
+    public ResponseEntity<ApiResponse<ReqDtlInfo>> getReqDtlByReqAndDtlSeq(HttpServletRequest request
+    		, @PathVariable long reqSeq
+			, @RequestParam(value = "reqDtlSeq", required = false) Long reqDtlSeq) {
+		
+    	Map<String, Object> map = new HashMap<>();
+		map.put("reqSeq", reqSeq);
+		if(reqDtlSeq != null && reqDtlSeq != 0) {
+			map.put("reqDtlSeq", reqDtlSeq);
+		}
+		
+    	ReqDtlInfo reqDtl = reqDtlService.getReqDtlByReqAndDtlSeq(map);
+    	
+		return ResponseEntity.ok(ApiResponse.<ReqDtlInfo>builder()
+				.request(request)
+				.data(reqDtl)
+				.build());
+    }
 
-    @Operation(summary = "요청사항 상세 등록", description = "요청사항 상세 등록")
+    @Operation(summary = "요청사항 상세 등록", description = "요청사항 담당자 배정")
 	@PostMapping(value = "/{reqSeq}/details", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> insertReqDtl(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
@@ -241,6 +244,70 @@ public class ReqController {
 			, @Parameter(hidden = true) ReqDtl reqDtl) {
     	
     	boolean result = reqDtlService.deleteReqDtl(reqDtl.of(loginUserInfo)) > 0 ? true : false;
+
+    	return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+				.request(request)
+				.data(result)
+				.build());
+	}
+    
+    @Operation(summary = "요청사항 상세 - 담당자 확인", description = "담당자 확인 상태 업데이트")
+	@PatchMapping(value = "/{reqSeq}/details/{reqDtlSeq}/inprogress")
+	public ResponseEntity<ApiResponse<Boolean>> updateReqDtlStatByInProgress(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
+			, @PathVariable long reqSeq
+			, @PathVariable long reqDtlSeq
+			, @Parameter(hidden = true) ReqDtl reqDtl) {
+    	
+    	boolean result = reqDtlService.updateReqDtlStatByInProgress(reqDtl.of(loginUserInfo)) > 0 ? true : false;
+
+    	return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+				.request(request)
+				.data(result)
+				.build());
+	}
+    
+    @Operation(summary = "요청사항 상세 - 처리 완료", description = "처리 완료 상태 업데이트")
+    @PatchMapping(value = "/{reqSeq}/details/{reqDtlSeq}/processed", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<ApiResponse<Boolean>> updateReqDtlStatByProcessed(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
+			, @PathVariable long reqSeq
+			, @PathVariable long reqDtlSeq
+			, @ModelAttribute @Valid ReqDtl reqDtl) {
+    	
+    	boolean result = reqDtlService.updateReqDtlStatByProcessed(reqDtl.of(loginUserInfo)) > 0 ? true : false;
+
+    	return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+				.request(request)
+				.data(result)
+				.build());
+	}
+    
+    @Operation(summary = "요청사항 상세 - 검수 완료", description = "검수 완료 상태 업데이트")
+    @PatchMapping(value = "/{reqSeq}/details/{reqDtlSeq}/completed", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	public ResponseEntity<ApiResponse<Boolean>> updateReqDtlStatByInspectionCompleted(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
+			, @PathVariable long reqSeq
+			, @PathVariable long reqDtlSeq
+			, @ModelAttribute @Valid ReqDtl reqDtl) {
+    	
+    	boolean result = reqDtlService.updateReqDtlStatByInspectionCompleted(reqDtl.of(loginUserInfo)) > 0 ? true : false;
+
+    	return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+				.request(request)
+				.data(result)
+				.build());
+	}
+    
+    @Operation(summary = "요청사항 상세 - 취소", description = "취소 상태 업데이트")
+    @PatchMapping(value = "/{reqSeq}/details/{reqDtlSeq}/cancel")
+	public ResponseEntity<ApiResponse<Boolean>> updateReqDtlStatByCancel(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
+			, @PathVariable long reqSeq
+			, @PathVariable long reqDtlSeq
+			, @Parameter(hidden = true) ReqDtl reqDtl) {
+    	
+    	boolean result = reqDtlService.updateReqDtlStatByCancel(reqDtl.of(loginUserInfo)) > 0 ? true : false;
 
     	return ResponseEntity.ok(ApiResponse.<Boolean>builder()
 				.request(request)
@@ -298,55 +365,4 @@ public class ReqController {
 				.build());
 	}
     
-    
-    @Operation(summary = "요청사항 상세 담당자 처리 등록", description = "요청사항 상세 담당자 처리 등록")
-	@PostMapping(value = "/{reqSeq}/details/{reqDtlSeq}/users", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ApiResponse<Boolean>> insertReqDtlUser(HttpServletRequest request
-			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
-			, @PathVariable long reqSeq
-			, @PathVariable long reqDtlSeq
-			, @ModelAttribute @Valid ReqDtlUser reqDtlUser) {
-    	
-    	reqDtlUserCmtService.insertReqDtlUser(reqDtlUser.of(loginUserInfo));
-
-		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
-				.data(true)
-				.build());
-	}
-    
-    
-    @Operation(summary = "요청사항 상세 담당자 처리 수정", description = "요청사항 상세 담당자 처리 수정")
-	@PutMapping(value = "/{reqSeq}/details/{reqDtlSeq}/users/{reqDtlUserSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ApiResponse<Boolean>> updateReqDtlUser(HttpServletRequest request
-			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
-			, @PathVariable long reqSeq
-			, @PathVariable long reqDtlSeq
-			, @PathVariable long reqDtlUserSeq
-			, @ModelAttribute @Valid ReqDtlUser reqDtlUser) {
-    	
-    	boolean result = reqDtlUserCmtService.updateReqDtlUser(reqDtlUser.of(loginUserInfo)) > 0 ? true : false;
-
-		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
-				.data(result)
-				.build());
-	}
-    
-    @Operation(summary = "요청사항 상세 담당자 처리 삭제", description = "요청사항 상세 담당자 처리 삭제")
-	@DeleteMapping(value = "/{reqSeq}/details/{reqDtlSeq}/users/{reqDtlUserSeq}")
-	public ResponseEntity<ApiResponse<Boolean>> deleteReqDtlUser(HttpServletRequest request
-			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
-			, @PathVariable long reqSeq
-			, @PathVariable long reqDtlSeq
-			, @PathVariable long reqDtlUserSeq
-			, @Parameter(hidden = true) ReqDtlUser reqDtlUser) {
-    	
-    	boolean result = reqDtlUserCmtService.deleteReqDtlUser(reqDtlUser.of(loginUserInfo)) > 0 ? true : false;
-
-		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
-				.data(result)
-				.build());
-	}
 }

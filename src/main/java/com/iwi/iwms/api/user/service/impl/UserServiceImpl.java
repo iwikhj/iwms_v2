@@ -88,8 +88,7 @@ public class UserServiceImpl implements UserService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateUser(UserUpdate userUpdate) {
-		UserInfo userInfo = Optional.ofNullable(userMapper.getUserBySeq(userUpdate.getUserSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+		UserInfo userInfo = this.getUserBySeq(userUpdate.getUserSeq());
 		
 		AuthInfo authInfo = Optional.ofNullable(authMapper.getAuthByAuthCd(userUpdate.getAuthCd()))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 권한을 찾을 수 없습니다."));
@@ -121,9 +120,8 @@ public class UserServiceImpl implements UserService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int deleteUser(User user) {
-		UserInfo userInfo = Optional.ofNullable(userMapper.getUserBySeq(user.getUserSeq()))
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
-		
+		UserInfo userInfo = this.getUserBySeq(user.getUserSeq());
+
 		int result = userMapper.deleteUser(user);
 		
 		if(result > 0) {
@@ -137,8 +135,7 @@ public class UserServiceImpl implements UserService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int passwordChange(UserPwd userPwd) {
-		UserInfo userInfo = Optional.ofNullable(userMapper.getUserBySeq(userPwd.getUserSeq()))
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다"));
+		UserInfo userInfo = this.getUserBySeq(userPwd.getUserSeq());
 		
 		int result = userMapper.updatePassword(userPwd);
 		
@@ -152,8 +149,7 @@ public class UserServiceImpl implements UserService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int passwordReset(UserPwd userPwd) {
-		UserInfo userInfo = Optional.ofNullable(userMapper.getUserBySeq(userPwd.getUserSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다"));
+		UserInfo userInfo = this.getUserBySeq(userPwd.getUserSeq());
 		
 		int result = userMapper.updatePassword(userPwd);
 		
