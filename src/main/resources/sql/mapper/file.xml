@@ -51,7 +51,7 @@
 			, #{fileOrgNm}
 			, #{fileRealNm}
 			, #{fileRealPath}
-			, #{regSeq}
+			, #{loginUserSeq}
 		)		
 	</insert>		
 

@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,12 +24,11 @@ import com.iwi.iwms.api.common.response.ApiListResponse;
 import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.comp.domain.Proj;
 import com.iwi.iwms.api.comp.domain.ProjInfo;
+import com.iwi.iwms.api.comp.domain.ProjUser;
 import com.iwi.iwms.api.comp.domain.ProjUserInfo;
-import com.iwi.iwms.api.comp.domain.ProjUserList;
 import com.iwi.iwms.api.comp.domain.Site;
 import com.iwi.iwms.api.comp.domain.SiteInfo;
 import com.iwi.iwms.api.comp.service.ProjService;
-import com.iwi.iwms.api.comp.service.SiteService;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.utils.Pagination;
 
@@ -48,12 +46,11 @@ import lombok.extern.slf4j.Slf4j;
 public class ProjController {
 	
 	private final ProjService projService; 
-	
-	private final SiteService siteService; 
 
 	@Operation(summary = "프로젝트 목록", description = "프로젝트 목록")
 	@GetMapping(value = "")
 	public ResponseEntity<ApiListResponse<List<ProjInfo>>> listProj(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
 			, @RequestParam(value = "compSeq", required = false) Optional<String> compSeq
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
@@ -62,6 +59,7 @@ public class ProjController {
 			, @RequestParam(value = "endDate", required = false) String endDate) {
 		
 		Map<String, Object> map = new HashMap<>();
+		map.put("userSeq", loginUserInfo.getUserSeq());
 		if(compSeq.isPresent()) {
 			map.put("compSeq", compSeq.get());
 		}
@@ -82,9 +80,10 @@ public class ProjController {
     @Operation(summary = "프로젝트 정보", description = "프로젝트 정보")
     @GetMapping(value = "/{projSeq}")
     public ResponseEntity<ApiResponse<ProjInfo>> getProjBySeq(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
     		, @PathVariable long projSeq) {
     	
-    	ProjInfo project = projService.getProjBySeq(projSeq);
+    	ProjInfo project = projService.getProjBySeq(projSeq, loginUserInfo.getUserSeq());
     	
 		return ResponseEntity.ok(ApiResponse.<ProjInfo>builder()
 				.request(request)
@@ -141,14 +140,14 @@ public class ProjController {
 	public ResponseEntity<ApiResponse<List<ProjUserInfo>>> listProjUser(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long projSeq
-			, @Parameter(description = "구분: [1: 고객사, 2: 수행사]") @RequestParam(value = "projUserGb", required = true) int projUserGb) {
+			, @Parameter(description = "담당자 구분: [1:수행사, 2:고객사]") @RequestParam(value = "projUserGb", required = true) int projUserGb) {
     	
     	List<ProjUserInfo> projUserList = null;
     			
 		if(projUserGb == 1) {
-			projUserList = projService.listCustProjUser(projSeq);
-		} else if(projUserGb == 2) {
 			projUserList = projService.listPerfProjUser(projSeq);
+		} else if(projUserGb == 2) {
+			projUserList = projService.listCustProjUser(projSeq);
 		}
     	
 		return ResponseEntity.ok(ApiResponse.<List<ProjUserInfo>>builder()
@@ -158,14 +157,13 @@ public class ProjController {
 	}
     
     @Operation(summary = "프로젝트 담당자 등록", description = "프로젝트 담당자 등록")
-	@PostMapping(value = "/{projSeq}/users", consumes = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/{projSeq}/users", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> updateProjUser(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long projSeq
-			, @RequestBody @Valid ProjUserList projUserList) {
+			, @ModelAttribute @Valid ProjUser projUser) {
     	
-    	projUserList.setProjSeq(projSeq);
-    	boolean result = projService.updateProjUser(projUserList.of(loginUserInfo)) > 0 ? true : false;
+    	boolean result = projService.updateProjUser(projUser.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
 				.request(request)
@@ -188,9 +186,9 @@ public class ProjController {
 		map.put("search", search);
 		map.put("startDate", startDate);
 		map.put("endDate", endDate);
-		map.put("pagination", new Pagination(page, limit, siteService.countSite(map)));
+		map.put("pagination", new Pagination(page, limit, projService.countSite(map)));
 		
-		List<SiteInfo> SiteList = siteService.listSite(map);
+		List<SiteInfo> SiteList = projService.listSite(map);
 		
 		return ResponseEntity.ok(ApiListResponse.<List<SiteInfo>>builder()
 				.request(request)
@@ -202,10 +200,11 @@ public class ProjController {
     @Operation(summary = "사이트 정보", description = "사이트 정보")
     @GetMapping(value = "/{projSeq}/sites/{siteSeq}")
     public ResponseEntity<ApiResponse<SiteInfo>> getSiteBySeq(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
     		, @PathVariable long projSeq
     		, @PathVariable long siteSeq) {
     	
-    	SiteInfo Siteect = siteService.getSiteBySeq(siteSeq);
+    	SiteInfo Siteect = projService.getSiteBySeq(siteSeq, loginUserInfo.getUserSeq());
     	
 		return ResponseEntity.ok(ApiResponse.<SiteInfo>builder()
 				.request(request)
@@ -220,7 +219,7 @@ public class ProjController {
 			, @PathVariable long projSeq
 			, @ModelAttribute @Valid Site site) {
     	
-    	siteService.insertSite(site.of(loginUserInfo));
+    	projService.insertSite(site.of(loginUserInfo));
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
 				.request(request)
@@ -236,7 +235,7 @@ public class ProjController {
 			, @PathVariable long siteSeq
 			, @ModelAttribute @Valid Site site) {
     	
-    	boolean result = siteService.updateSite(site.of(loginUserInfo)) > 0 ? true : false;
+    	boolean result = projService.updateSite(site.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
 				.request(request)
@@ -252,7 +251,7 @@ public class ProjController {
 			, @PathVariable long siteSeq
 			, @Parameter(hidden = true) Site site) {
     	
-    	boolean result = siteService.deleteSite(site.of(loginUserInfo)) > 0 ? true : false;
+    	boolean result = projService.deleteSite(site.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
 				.request(request)

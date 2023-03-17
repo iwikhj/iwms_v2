@@ -13,7 +13,7 @@ public interface ReqDtlMapper {
 
 	ReqDtlInfo getReqDtlByReqAndDtlSeq(Map<String, Object> map);
 	
-	ReqDtlInfo getReqDtlBySeq(long reqSeq);
+	ReqDtlInfo getReqDtlBySeq(Map<String, Object> map);
 	
 	void insertReqDtl(ReqDtl reqDtl);
 	

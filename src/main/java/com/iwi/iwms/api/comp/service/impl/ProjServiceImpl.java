@@ -1,5 +1,6 @@
 package com.iwi.iwms.api.comp.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -11,10 +12,13 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.iwi.iwms.api.comp.domain.Proj;
 import com.iwi.iwms.api.comp.domain.ProjInfo;
+import com.iwi.iwms.api.comp.domain.ProjUser;
 import com.iwi.iwms.api.comp.domain.ProjUserInfo;
-import com.iwi.iwms.api.comp.domain.ProjUserList;
+import com.iwi.iwms.api.comp.domain.Site;
+import com.iwi.iwms.api.comp.domain.SiteInfo;
 import com.iwi.iwms.api.comp.mapper.ProjMapper;
 import com.iwi.iwms.api.comp.service.ProjService;
+import com.iwi.iwms.api.user.domain.UserSiteInfo;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,8 +39,12 @@ public class ProjServiceImpl implements ProjService {
 	}
 
 	@Override
-	public ProjInfo getProjBySeq(long projSeq) {
-		return Optional.ofNullable(projMapper.getProjBySeq(projSeq))
+	public ProjInfo getProjBySeq(long projSeq, long loginUserSeq) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("projSeq", projSeq);
+		map.put("loginUserSeq", loginUserSeq);
+		
+		return Optional.ofNullable(projMapper.getProjBySeq(map))
 					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "프로젝트를 찾을 수 없습니다."));
 	}
 
@@ -47,34 +55,69 @@ public class ProjServiceImpl implements ProjService {
 
 	@Override
 	public int updateProj(Proj proj) {
-		this.getProjBySeq(proj.getProjSeq());
+		this.getProjBySeq(proj.getProjSeq(), proj.getLoginUserSeq());
 		return projMapper.updateProj(proj);
 	}
 
 	@Override
 	public int deleteProj(Proj proj) {
-		this.getProjBySeq(proj.getProjSeq());
+		this.getProjBySeq(proj.getProjSeq(), proj.getLoginUserSeq());
 		return projMapper.deleteProj(proj);
 	}
 
 	@Override
 	public List<ProjUserInfo> listCustProjUser(long projSeq) {
-		this.getProjBySeq(projSeq);
 		return projMapper.listCustProjUser(projSeq);
 	}
 
 	@Override
 	public List<ProjUserInfo> listPerfProjUser(long projSeq) {
-		this.getProjBySeq(projSeq);
 		return projMapper.listPerfProjUser(projSeq);
 	}
 	
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
-	public int updateProjUser(ProjUserList projUserList) {
-		this.getProjBySeq(projUserList.getProjSeq());
-		projMapper.deleteProjUser(projUserList.getProjSeq());
-		return projMapper.updateProjUser(projUserList.getUsers());
+	public int updateProjUser(ProjUser projUser) {
+		this.getProjBySeq(projUser.getProjSeq(), projUser.getLoginUserSeq());
+		projMapper.deleteProjUser(projUser);
+		return projMapper.updateProjUser(projUser);
+	}
+	
+	@Override
+	public List<SiteInfo> listSite(Map<String, Object> map) {
+		return projMapper.listSite(map);
 	}
 
+	@Override
+	public int countSite(Map<String, Object> map) {
+		return projMapper.countSite(map);
+	}
+
+	@Override
+	public SiteInfo getSiteBySeq(long siteSeq, long loginUserSeq) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("siteSeq", siteSeq);
+		map.put("loginUserSeq", loginUserSeq);
+		
+		return Optional.ofNullable(projMapper.getSiteBySeq(map))
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사이트를 찾을 수 없습니다."));
+	}
+
+	@Override
+	public void insertSite(Site site) {
+		this.getProjBySeq(site.getProjSeq(), site.getLoginUserSeq());
+		projMapper.insertSite(site);
+	}
+
+	@Override
+	public int updateSite(Site site) {
+		this.getSiteBySeq(site.getSiteSeq(), site.getLoginUserSeq());
+		return projMapper.updateSite(site);
+	}
+
+	@Override
+	public int deleteSite(Site site) {
+		this.getSiteBySeq(site.getSiteSeq(), site.getLoginUserSeq());		
+		return projMapper.deleteSite(site);
+	}
 }

@@ -1,6 +1,8 @@
 package com.iwi.iwms.api.req.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -35,15 +37,23 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 	private final FileService fileService;
 
 	@Override
-	public ReqCmtInfo getReqCmtBySeq(long reqCmtSeq) {
-		return Optional.ofNullable(reqCmtMapper.getReqCmtBySeq(reqCmtSeq))
+	public ReqCmtInfo getReqCmtBySeq(long reqCmtSeq, long loginUserSeq) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("reqCmtSeq", reqCmtSeq);
+		map.put("loginUserSeq", loginUserSeq);
+		
+		return Optional.ofNullable(reqCmtMapper.getReqCmtBySeq(map))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항 코멘트를 찾을 수 없습니다."));
 	}
 	
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public void insertReqCmt(ReqCmt reqCmt) {
-		Optional.ofNullable(reqMapper.getReqBySeq(reqCmt.getReqSeq()))
+		Map<String, Object> map = new HashMap<>();
+		map.put("reqSeq", reqCmt.getReqSeq());
+		map.put("loginUserSeq", reqCmt.getLoginUserSeq());
+		
+		Optional.ofNullable(reqMapper.getReqBySeq(map))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항을 찾을 수 없습니다."));
 	
 		reqCmtMapper.insertReqCmt(reqCmt);
@@ -60,7 +70,7 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateReqCmt(ReqCmt reqCmt) {
-		this.getReqCmtBySeq(reqCmt.getReqCmtSeq());
+		this.getReqCmtBySeq(reqCmt.getReqCmtSeq(), reqCmt.getLoginUserSeq());
 		
 		int result = reqCmtMapper.updateReqCmt(reqCmt);
 		
@@ -82,7 +92,7 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int deleteReqCmt(ReqCmt reqCmt) {
-		this.getReqCmtBySeq(reqCmt.getReqCmtSeq());
+		this.getReqCmtBySeq(reqCmt.getReqCmtSeq(), reqCmt.getLoginUserSeq());
 	
 		int result = reqCmtMapper.deleteReqCmt(reqCmt);
 		

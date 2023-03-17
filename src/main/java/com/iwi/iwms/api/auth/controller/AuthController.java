@@ -10,11 +10,9 @@ import javax.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -22,7 +20,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.iwi.iwms.api.auth.domain.Auth;
 import com.iwi.iwms.api.auth.domain.AuthInfo;
-import com.iwi.iwms.api.auth.domain.AuthMenuInfo;
 import com.iwi.iwms.api.auth.service.AuthService;
 import com.iwi.iwms.api.common.response.ApiListResponse;
 import com.iwi.iwms.api.common.response.ApiResponse;
@@ -48,6 +45,7 @@ public class AuthController {
 	@Operation(summary = "권한 목록", description = "권한 목록")
 	@GetMapping(value = "")
 	public ResponseEntity<ApiListResponse<List<AuthInfo>>> listAuth(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
 			, @RequestParam(value = "search", required = false) String search
@@ -55,6 +53,7 @@ public class AuthController {
 			, @RequestParam(value = "endDate", required = false) String endDate) {
 		
 		Map<String, Object> map = new HashMap<>();
+		map.put("loginUserSeq", loginUserInfo.getUserSeq());
 		map.put("search", search);
 		map.put("startDate", startDate);
 		map.put("endDate", endDate);
@@ -72,29 +71,16 @@ public class AuthController {
     @Operation(summary = "권한 정보", description = "권한 정보")
     @GetMapping(value = "/{authSeq}")
     public ResponseEntity<ApiResponse<AuthInfo>> getAuthBySeq(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
     		, @PathVariable long authSeq) {
     	
-    	AuthInfo auth = authService.getAuthBySeq(authSeq);
+    	AuthInfo auth = authService.getAuthBySeq(authSeq, loginUserInfo.getUserSeq());
     	
 		return ResponseEntity.ok(ApiResponse.<AuthInfo>builder()
 				.request(request)
 				.data(auth)
 				.build());
     }
-    
-    @Operation(summary = "권한 등록", description = "권한 등록")
-	@PostMapping(value = "", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ApiResponse<Boolean>> insertAuth(HttpServletRequest request
-    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
-			, @ModelAttribute @Valid Auth auth) {
-    	
-    	authService.insertAuth(auth.of(loginUserInfo));
-
-		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
-				.data(true)
-				.build());
-	}
     
     @Operation(summary = "권한 수정", description = "권한 수정")
 	@PutMapping(value = "/{authSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
@@ -108,49 +94,6 @@ public class AuthController {
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
 				.request(request)
 				.data(result)
-				.build());
-	}
-    
-    @Operation(summary = "권한 삭제", description = "권한 삭제")
-	@DeleteMapping(value = "/{authSeq}")
-	public ResponseEntity<ApiResponse<Boolean>> deleteAuth(HttpServletRequest request
-			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
-			, @PathVariable long authSeq
-			, @Parameter(hidden = true) Auth auth) {
-    	
-    	boolean result = authService.deleteAuth(auth.of(loginUserInfo)) > 0 ? true : false;
-
-		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
-				.data(result)
-				.build());
-	}
-    
-    @Operation(summary = "권한별 메뉴 조회", description = "권한별 메뉴 조회")
-	@GetMapping(value = "/{authSeq}/menu")
-	public ResponseEntity<ApiResponse<List<AuthMenuInfo>>> getAuthMenuByAuthSeq(HttpServletRequest request
-    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
-    		, @PathVariable long authSeq) {
-    	
-    	List<AuthMenuInfo> authMenu = authService.getAuthMenuByAuthSeq(authSeq);
-
-		return ResponseEntity.ok(ApiResponse.<List<AuthMenuInfo>>builder()
-				.request(request)
-				.data(authMenu)
-				.build());
-	}
-    
-    @Operation(summary = "권한별 메뉴 수정", description = "권한별 메뉴 수정")
-	@PutMapping(value = "/{authSeq}/menu", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ApiResponse<Boolean>> insertAuthMenu(HttpServletRequest request
-    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
-			, @ModelAttribute @Valid Auth auth) {
-    	
-    	authService.insertAuth(auth.of(loginUserInfo));
-
-		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
-				.data(true)
 				.build());
 	}
 }

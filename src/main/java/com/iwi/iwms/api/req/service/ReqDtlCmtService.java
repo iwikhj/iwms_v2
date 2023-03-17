@@ -5,7 +5,7 @@ import com.iwi.iwms.api.req.domain.ReqDtlCmtInfo;
 
 public interface ReqDtlCmtService {
 
-	ReqDtlCmtInfo getReqDtlCmtBySeq(long reqDtlCmtSeq);
+	ReqDtlCmtInfo getReqDtlCmtBySeq(long reqDtlCmtSeq, long loginUserSeq);
 	
 	void insertReqDtlCmt(ReqDtlCmt reqDtlCmt);
 	

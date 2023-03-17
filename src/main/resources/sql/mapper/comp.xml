@@ -10,22 +10,25 @@
 			, COMP.COMP_GB_CD AS compGbCd
 			, FN_GET_CODE_NM('COMP_GB_CD', COMP.COMP_GB_CD) AS compGb
 			, COMP.COMP_TEL AS compTel
+			, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = COMP.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn				
 			, COMP.USE_YN AS useYn
+			, COMP.DEL_YN AS delYn
 			, DATE_FORMAT(COMP.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 			, FN_GET_USER_NM(COMP.REG_SEQ) AS regNm
 			, DATE_FORMAT(COMP.UPT_DT, "%Y-%m-%d %H:%i:%s") AS uptDt
-			, FN_GET_USER_NM(COMP.UPT_SEQ) AS uptNm			
+			, FN_GET_USER_NM(COMP.UPT_SEQ) AS uptNm
+			, LOGIN.USER_SEQ AS loginUserSeq			
 		FROM TB_COMPANY COMP
-		WHERE COMP.DEL_YN = 'N'
-			AND COMP.USE_YN = 'Y'
+		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
+		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE COMP.DEL_YN = 'N' AND COMP.USE_YN = 'Y' END)			
 	</sql>
 	
 	<resultMap id="resultCompMap" type="com.iwi.iwms.api.comp.domain.CompInfo">
 		<result property="compSeq" column="compSeq"/>
-	   	<collection property="depts" column="compSeq" 
-			ofType="com.iwi.iwms.api.comp.domain.DeptInfo" select="com.iwi.iwms.api.comp.mapper.DeptMapper.listDeptByCompSeq"/>
-	   	<collection property="users" column="compSeq" 
-			ofType="com.iwi.iwms.api.user.domain.UserInfo" select="com.iwi.iwms.api.user.mapper.UserMapper.listUserByCompSeq"/>
+	   	<collection property="depts" column="compSeq=compSeq,loginUserSeq=loginUserSeq" 
+			ofType="com.iwi.iwms.api.comp.domain.DeptInfo" select="listDeptByCompSeq"/>
+	   	<collection property="users" column="compSeq=compSeq,loginUserSeq=loginUserSeq" 
+			ofType="com.iwi.iwms.api.user.domain.UserInfo" select="listUserByCompSeq"/>
 	</resultMap>
 	
 	<!-- 소속 목록 조회 -->
@@ -48,8 +51,8 @@
 		SELECT 
 			COUNT(*)
 		FROM TB_COMPANY COMP
-		WHERE COMP.DEL_YN = 'N'
-			AND COMP.USE_YN = 'Y'
+		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
+		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE COMP.DEL_YN = 'N' AND COMP.USE_YN = 'Y' END)		
 		<if test='search != null and search != ""'>
 			AND COMP.COMP_NM LIKE CONCAT('%', #{search}, '%') 
 			OR COMP.COMP_TEL LIKE CONCAT('%', #{search}, '%') 
@@ -57,11 +60,58 @@
 	</select>	
 		
 	<!-- 소속 단일 조회 -->
-	<select id="getCompBySeq" parameterType="long"
+	<select id="getCompBySeq" parameterType="hashMap"
 		resultMap="resultCompMap">
 		<include refid="selectComp"></include>
 			AND COMP.COMP_SEQ = #{compSeq}
 	</select>	
+	
+	<!-- 소속별 사용자 목록 조회 -->
+	<select id="listUserByCompSeq" parameterType="hashMap"
+		resultType="com.iwi.iwms.api.user.domain.UserInfo">
+		SELECT 
+			ROW_NUMBER() OVER(ORDER BY USER.USER_SEQ) AS rowNum
+			, USER.USER_SEQ AS userSeq
+			, USER.USER_ID AS userId
+			, USER.USER_NM AS userNm
+			, USER.USER_EMAIL AS userEmail
+			, USER.SSO_KEY AS ssoKey
+			, AUTH.AUTH_SEQ AS authSeq
+			, AUTH.AUTH_CD AS authCd
+			, AUTH.AUTH_NM AS authNm
+			, USER.COMP_SEQ AS compSeq
+			, COMP.COMP_NM AS compNm
+			, USER.DEPT_SEQ AS deptSeq
+			, DEPT.DEPT_NM AS deptNm
+			, USER.POSI_NM AS posiNm
+			, USER.USER_GB_CD AS userGbCd
+			, FN_GET_CODE_NM('USER_GB_CD', USER.USER_GB_CD)  AS userGb
+			, USER.BUSI_ROLL_CD AS busiRollCd
+			, FN_GET_CODE_NM('BUSI_ROLL_CD', USER.BUSI_ROLL_CD)  AS busiRoll
+			, USER.USER_TEL AS userTel
+			, USER.USER_HP AS userHp
+			, USER.USER_POST_NO AS userPostNo
+			, USER.USER_ADDR AS userAddr
+			, USER.USER_DTL_ADDR AS userDtlAddr
+			, USER.VERIFY_YN AS verifyYn
+			, USER.PWD_RESET_YN AS pwdResetYn
+			, USER.LOGIN_ERR_CNT AS loginErrCnt
+			, USER.LAST_LOGIN_IP AS lastLoginIp
+			, USER.LAST_LOGIN_DT AS lastLoginDt
+			, USER.USE_YN AS useYn			
+			, DATE_FORMAT(USER.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+			, FN_GET_USER_NM(USER.REG_SEQ) AS regNm    
+			, DATE_FORMAT(USER.UPT_DT, "%Y-%m-%d %H:%i:%s") AS uptDt
+			, FN_GET_USER_NM(USER.UPT_SEQ) AS uptNm		
+		FROM TB_USER USER
+		INNER JOIN TB_COMPANY COMP ON USER.COMP_SEQ = COMP.COMP_SEQ
+		INNER JOIN TB_AUTH AUTH ON USER.AUTH_SEQ = AUTH.AUTH_SEQ
+		LEFT JOIN TB_DEPT DEPT ON USER.DEPT_SEQ = DEPT.DEPT_SEQ  
+		WHERE USER.DEL_YN = 'N'
+			AND USER.USE_YN = 'Y'
+			AND USER.COMP_SEQ = #{compSeq}		
+		ORDER BY USER.USER_SEQ DESC
+	</select>		
 	
 	<!-- 소속 등록 -->
 	<insert id="insertComp" parameterType="com.iwi.iwms.api.comp.domain.Comp"
@@ -78,7 +128,7 @@
 			, #{compGbCd}
 			, #{compTel}
 			, #{useYn}
-			, #{regSeq}
+			, #{loginUserSeq}
 		)		
 	</insert>		
 
@@ -91,7 +141,7 @@
 			, COMP_TEL = #{compTel}
 			, USE_YN = #{useYn}
 			, UPT_DT = CURRENT_TIMESTAMP
-			, UPT_SEQ = #{uptSeq}
+			, UPT_SEQ = #{loginUserSeq}
 		WHERE COMP_SEQ = #{compSeq}	
 	</update>	
 	
@@ -101,4 +151,91 @@
 		FROM TB_COMPANY
 		WHERE COMP_SEQ = #{compSeq}	 
 	</delete>
+	
+
+	<sql id="selectDept">
+		SELECT 
+			DEPT.DEPT_SEQ AS deptSeq
+			, DEPT.DEPT_NM AS deptNm
+			, DEPT.DEPT_DESC AS deptDesc
+			, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = DEPT.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn					
+			, DEPT.USE_YN AS useYn
+			, LOGIN.USER_SEQ AS loginUserSeq
+		FROM TB_DEPT DEPT
+		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
+		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE DEPT.USE_YN = 'Y' END)			
+	</sql>
+
+	<resultMap id="resultDeptMap" type="com.iwi.iwms.api.comp.domain.DeptInfo">
+		<result property="deptSeq" column="deptSeq"/>
+	   	<collection property="subDepts" column="deptSeq=deptSeq,loginUserSeq=loginUserSeq" 
+			ofType="com.iwi.iwms.api.comp.domain.DeptInfo" select="listDeptByUpDeptSeq"/>
+	</resultMap>
+	
+	<!-- 소속별 부서 목록 조회 -->
+	<select id="listDeptByCompSeq" parameterType="hashMap"
+		resultMap="resultDeptMap">
+		<include refid="selectDept"></include>
+			AND DEPT.COMP_SEQ = #{compSeq}
+			AND DEPT.UP_DEPT_SEQ IS NULL
+		ORDER BY DEPT.DEPT_ORDER_NO		
+	</select>	
+	
+	<!-- 하위 부서 목록 조회 -->	
+	<select id="listDeptByUpDeptSeq" resultType="com.iwi.iwms.api.comp.domain.DeptInfo">
+		<include refid="selectDept"></include>
+			AND DEPT.UP_DEPT_SEQ = #{deptSeq}
+		ORDER BY DEPT.DEPT_ORDER_NO		
+	</select>
+	
+	<!-- 부서 단일 조회 -->	
+	<select id="getDeptBySeq" parameterType="hashMap"
+		resultMap="resultDeptMap">
+		<include refid="selectDept"></include>
+			AND DEPT.DEPT_SEQ = #{deptSeq}
+	</select>	
+
+	<!-- 부서 등록 -->
+	<insert id="insertDept" parameterType="com.iwi.iwms.api.comp.domain.Dept"
+		useGeneratedKeys="true" keyProperty="deptSeq">
+		INSERT INTO TB_DEPT
+		(
+			COMP_SEQ
+			, DEPT_NM
+			, DEPT_DESC
+			, UP_DEPT_SEQ
+			, DEPT_ORDER_NO
+			, USE_YN
+			, REG_SEQ
+		) VALUES (
+			#{compSeq}
+			, #{deptNm}
+			, #{deptDesc}
+			, #{upDeptSeq}
+			, #{deptOrderNo}
+			, #{useYn}
+			, #{loginUserSeq}
+		)		
+	</insert>		
+
+	<!-- 부서 수정 -->
+	<update id="updateDept" parameterType="com.iwi.iwms.api.comp.domain.Dept">
+		UPDATE TB_DEPT 
+		SET
+		    DEPT_NM = #{deptNm}
+		    , DEPT_DESC = #{deptDesc}
+		    , UP_DEPT_SEQ = #{upDeptSeq}
+		    , DEPT_ORDER_NO = #{deptOrderNo}
+			, USE_YN = #{useYn}
+			, UPT_DT = CURRENT_TIMESTAMP
+			, UPT_SEQ = #{loginUserSeq}
+		WHERE DEPT_SEQ = #{deptSeq}	
+	</update>	
+
+	<!-- 부서 삭제 -->	
+	<delete id="deleteDept" parameterType="com.iwi.iwms.api.comp.domain.Dept">
+		DELETE 
+		FROM TB_DEPT
+		WHERE DEPT_SEQ = #{deptSeq}	 
+	</delete>	
 </mapper>

@@ -1,5 +1,6 @@
 package com.iwi.iwms.api.comp.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -13,7 +14,6 @@ import com.iwi.iwms.api.comp.domain.CompInfo;
 import com.iwi.iwms.api.comp.domain.Dept;
 import com.iwi.iwms.api.comp.domain.DeptInfo;
 import com.iwi.iwms.api.comp.mapper.CompMapper;
-import com.iwi.iwms.api.comp.mapper.DeptMapper;
 import com.iwi.iwms.api.comp.service.CompService;
 
 import lombok.RequiredArgsConstructor;
@@ -23,8 +23,6 @@ import lombok.RequiredArgsConstructor;
 public class CompServiceImpl implements CompService {
 
 	private final CompMapper compMapper;
-	
-	private final DeptMapper deptMapper;
 	
 	@Override
 	public List<CompInfo> listComp(Map<String, Object> map) {
@@ -37,9 +35,13 @@ public class CompServiceImpl implements CompService {
 	}
 
 	@Override
-	public CompInfo getCompBySeq(long compSeq) {
-		return Optional.ofNullable(compMapper.getCompBySeq(compSeq))
-					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "소속을 찾을 수 없습니다."));
+	public CompInfo getCompBySeq(long compSeq, long loginUserSeq) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("compSeq", compSeq);
+		map.put("loginUserSeq", loginUserSeq);
+		
+		return Optional.ofNullable(compMapper.getCompBySeq(map))
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "소속을 찾을 수 없습니다."));
 	}
 
 	@Override
@@ -49,37 +51,46 @@ public class CompServiceImpl implements CompService {
 
 	@Override
 	public int updateComp(Comp comp) {
-		this.getCompBySeq(comp.getCompSeq());
+		this.getCompBySeq(comp.getCompSeq(), comp.getLoginUserSeq());
 		return compMapper.updateComp(comp);
 	}
 
 	@Override
 	public int deleteComp(Comp comp) {
-		this.getCompBySeq(comp.getCompSeq());		
+		this.getCompBySeq(comp.getCompSeq(), comp.getLoginUserSeq());		
 		return compMapper.deleteComp(comp);
 	}
 
 	@Override
-	public List<DeptInfo> listDeptByCompSeq(long compSeq) {
-		return deptMapper.listDeptByCompSeq(compSeq);
+	public List<DeptInfo> listDeptByCompSeq(Map<String, Object> map) {
+		return compMapper.listDeptByCompSeq(map);
+	}
+
+	@Override
+	public DeptInfo getDeptBySeq(long deptSeq, long loginUserSeq) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("deptSeq", deptSeq);
+		map.put("loginUserSeq", loginUserSeq);
+		
+		return Optional.ofNullable(compMapper.getDeptBySeq(map))
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "부서를 찾을 수 없습니다."));
 	}
 
 	@Override
 	public void insertDept(Dept dept) {
-		this.getCompBySeq(dept.getCompSeq());		
-		deptMapper.insertDept(dept);
+		compMapper.insertDept(dept);
 	}
 
 	@Override
 	public int updateDept(Dept dept) {
-		this.getCompBySeq(dept.getCompSeq());		
-		return deptMapper.updateDept(dept);
+		this.getCompBySeq(dept.getCompSeq(), dept.getLoginUserSeq());		
+		return compMapper.updateDept(dept);
 	}
 
 	@Override
 	public int deleteDept(Dept dept) {
-		this.getCompBySeq(dept.getCompSeq());		
-		return deptMapper.deleteDept(dept);
+		this.getCompBySeq(dept.getCompSeq(), dept.getLoginUserSeq());		
+		return compMapper.deleteDept(dept);
 	}
 
 }

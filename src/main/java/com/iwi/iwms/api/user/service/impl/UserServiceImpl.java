@@ -1,5 +1,6 @@
 package com.iwi.iwms.api.user.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -14,7 +15,9 @@ import com.iwi.iwms.api.auth.mapper.AuthMapper;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.user.domain.User;
 import com.iwi.iwms.api.user.domain.UserInfo;
+import com.iwi.iwms.api.user.domain.UserProjInfo;
 import com.iwi.iwms.api.user.domain.UserPwd;
+import com.iwi.iwms.api.user.domain.UserSiteInfo;
 import com.iwi.iwms.api.user.domain.UserUpdate;
 import com.iwi.iwms.api.user.mapper.UserMapper;
 import com.iwi.iwms.api.user.service.UserService;
@@ -45,8 +48,12 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public UserInfo getUserBySeq(long userSeq) {
-		return Optional.ofNullable(userMapper.getUserBySeq(userSeq))
+	public UserInfo getUserBySeq(long userSeq, long loginUserSeq) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("userSeq", userSeq);
+		map.put("loginUserSeq", loginUserSeq);
+		
+		return Optional.ofNullable(userMapper.getUserBySeq(map))
 					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다"));
 	}
 	
@@ -88,7 +95,7 @@ public class UserServiceImpl implements UserService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateUser(UserUpdate userUpdate) {
-		UserInfo userInfo = this.getUserBySeq(userUpdate.getUserSeq());
+		UserInfo userInfo = this.getUserBySeq(userUpdate.getUserSeq(), userUpdate.getLoginUserSeq());
 		
 		AuthInfo authInfo = Optional.ofNullable(authMapper.getAuthByAuthCd(userUpdate.getAuthCd()))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 권한을 찾을 수 없습니다."));
@@ -120,7 +127,7 @@ public class UserServiceImpl implements UserService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int deleteUser(User user) {
-		UserInfo userInfo = this.getUserBySeq(user.getUserSeq());
+		UserInfo userInfo = this.getUserBySeq(user.getUserSeq(), user.getLoginUserSeq());
 
 		int result = userMapper.deleteUser(user);
 		
@@ -135,7 +142,7 @@ public class UserServiceImpl implements UserService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int passwordChange(UserPwd userPwd) {
-		UserInfo userInfo = this.getUserBySeq(userPwd.getUserSeq());
+		UserInfo userInfo = this.getUserBySeq(userPwd.getUserSeq(), userPwd.getLoginUserSeq());
 		
 		int result = userMapper.updatePassword(userPwd);
 		
@@ -149,7 +156,7 @@ public class UserServiceImpl implements UserService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int passwordReset(UserPwd userPwd) {
-		UserInfo userInfo = this.getUserBySeq(userPwd.getUserSeq());
+		UserInfo userInfo = this.getUserBySeq(userPwd.getUserSeq(), userPwd.getLoginUserSeq());
 		
 		int result = userMapper.updatePassword(userPwd);
 		
@@ -161,9 +168,19 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public LoginUserInfo getLoginUser(String ssoId) {
-		return Optional.ofNullable(userMapper.getLoginUser(ssoId))
+	public LoginUserInfo getLoginUser(String ssoKey) {
+		return Optional.ofNullable(userMapper.getLoginUser(ssoKey))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "사용자를 찾을 수 없습니다"));
 	}
+
+	@Override
+	public List<UserProjInfo> listProjByUserSeq(long userSeq) {
+		return userMapper.listProjByUserSeq(userSeq);
+	}
 	
+	@Override
+	public List<UserSiteInfo> listSiteByUserSeq(long userSeq) {
+		return userMapper.listSiteByUserSeq(userSeq);
+	}
+
 }

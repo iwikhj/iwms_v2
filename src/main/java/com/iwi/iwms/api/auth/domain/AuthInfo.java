@@ -1,5 +1,7 @@
 package com.iwi.iwms.api.auth.domain;
 
+import java.util.List;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -23,6 +25,12 @@ public class AuthInfo {
 	
 	@Schema(description = "권한 이름")
 	private String authNm;
+	
+	@Schema(description = "권한 메뉴")
+	private List<AuthMenuInfo> authMenus;
+	
+	@Schema(description = "작성자 여부") 
+	private String ownerYn;
 	
 	@Schema(description = "사용 여부") 
 	private String useYn;

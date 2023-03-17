@@ -39,6 +39,9 @@ public class ReqDtlCmtInfo {
 	@Schema(description = "첨부된 파일 정보")
 	private List<UploadFileInfo> attachedFiles;
 	
+	@Schema(description = "작성자 여부") 
+	private String ownerYn;
+	
 	@Schema(description = "사용 여부")
 	private String useYn;
 	

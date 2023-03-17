@@ -6,7 +6,9 @@ import java.util.Map;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.user.domain.User;
 import com.iwi.iwms.api.user.domain.UserInfo;
+import com.iwi.iwms.api.user.domain.UserProjInfo;
 import com.iwi.iwms.api.user.domain.UserPwd;
+import com.iwi.iwms.api.user.domain.UserSiteInfo;
 import com.iwi.iwms.api.user.domain.UserUpdate;
 
 public interface UserService {
@@ -15,7 +17,7 @@ public interface UserService {
 	
 	int countUser(Map<String, Object> map);
 
-	UserInfo getUserBySeq(long userSeq);
+	UserInfo getUserBySeq(long userSeq, long loginUserSeq);
 	
 	boolean checkExistsUserId(String userId);
 	
@@ -29,5 +31,10 @@ public interface UserService {
 	
 	int passwordReset(UserPwd userPwd);
 	
-	LoginUserInfo getLoginUser(String ssoId);
+	LoginUserInfo getLoginUser(String ssoKey);
+	
+	List<UserProjInfo> listProjByUserSeq(long userSeq);
+
+	List<UserSiteInfo> listSiteByUserSeq(long userSeq);
+
 }

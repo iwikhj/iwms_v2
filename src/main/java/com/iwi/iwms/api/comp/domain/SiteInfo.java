@@ -32,6 +32,9 @@ public class SiteInfo {
 	
 	@Schema(description = "사이트 구분") 
 	private String siteGb;
+
+	@Schema(description = "작성자 여부") 
+	private String ownerYn;
 	
 	@Schema(description = "사용 여부")
 	private String useYn;

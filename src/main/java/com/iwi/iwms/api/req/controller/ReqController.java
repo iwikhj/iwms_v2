@@ -58,6 +58,7 @@ public class ReqController {
 	@Operation(summary = "요청사항 목록", description = "요청사항 목록")
 	@GetMapping(value = "")
 	public ResponseEntity<ApiListResponse<List<ReqInfo>>> listReq(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
 			, @RequestParam(value = "search", required = false) String search
@@ -65,6 +66,7 @@ public class ReqController {
 			, @RequestParam(value = "endDate", required = false) String endDate) {
 		
 		Map<String, Object> map = new HashMap<>();
+		map.put("userSeq", loginUserInfo.getUserSeq());
 		map.put("search", search);
 		map.put("startDate", startDate);
 		map.put("endDate", endDate);

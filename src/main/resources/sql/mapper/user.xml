@@ -32,7 +32,9 @@
 			, USER.LOGIN_ERR_CNT AS loginErrCnt
 			, USER.LAST_LOGIN_IP AS lastLoginIp
 			, USER.LAST_LOGIN_DT AS lastLoginDt
-			, USER.USE_YN AS useYn			
+			, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = USER.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn
+			, USER.USE_YN AS useYn		
+			, USER.DEL_YN AS delYn	
 			, DATE_FORMAT(USER.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 			, FN_GET_USER_NM(USER.REG_SEQ) AS regNm    
 			, DATE_FORMAT(USER.UPT_DT, "%Y-%m-%d %H:%i:%s") AS uptDt
@@ -41,21 +43,13 @@
 		INNER JOIN TB_COMPANY COMP ON USER.COMP_SEQ = COMP.COMP_SEQ
 		INNER JOIN TB_AUTH AUTH ON USER.AUTH_SEQ = AUTH.AUTH_SEQ
 		LEFT JOIN TB_DEPT DEPT ON USER.DEPT_SEQ = DEPT.DEPT_SEQ  
-		WHERE USER.DEL_YN = 'N'
-			AND USER.USE_YN = 'Y'
+		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
+		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE USER.DEL_YN = 'N' AND USER.USE_YN = 'Y' END)		
 	</sql>
 
-	<resultMap id="resultUserMap" type="com.iwi.iwms.api.user.domain.UserInfo">
-		<!-- 
-		<result property="userSeq" column="userSeq"/>
-	   	<collection property="projects" column="userSeq" 
-			ofType="com.iwi.iwms.api.comp.domain.ProjInfo" select="com.iwi.iwms.api.comp.mapper.ProjMapper.listProjByUserSeq"/>
-		 -->					
-	</resultMap>
-		
 	<!-- 사용자 목록 조회 -->
 	<select id="listUser" parameterType="hashMap"
-		resultMap="resultUserMap">
+		resultType="com.iwi.iwms.api.user.domain.UserInfo">
 		<include refid="selectUser"></include>
 		<if test='search != null and search != ""'>
 			AND USER.USER_NM LIKE CONCAT('%', #{search}, '%') 
@@ -76,8 +70,8 @@
 		INNER JOIN TB_COMPANY COMP ON USER.COMP_SEQ = COMP.COMP_SEQ
 		INNER JOIN TB_AUTH AUTH ON USER.AUTH_SEQ = AUTH.AUTH_SEQ
 		LEFT JOIN TB_DEPT DEPT ON USER.DEPT_SEQ = DEPT.DEPT_SEQ  
-		WHERE USER.DEL_YN = 'N'
-			AND USER.USE_YN = 'Y'		
+		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
+		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE USER.DEL_YN = 'N' AND USER.USE_YN = 'Y' END)	
 		<if test='search != null and search != ""'>
 			AND USER.USER_NM LIKE CONCAT('%', #{search}, '%') 
 			OR COMP.COMP_NM LIKE CONCAT('%', #{search}, '%')
@@ -85,25 +79,24 @@
 	</select>	
 	
 	<!-- 사용자 단일 조회 -->
-	<select id="getUserBySeq" parameterType="long"
-		resultMap="resultUserMap">
+	<select id="getUserBySeq" parameterType="hashMap"
+		resultType="com.iwi.iwms.api.user.domain.UserInfo">
 		<include refid="selectUser"></include>
 			AND USER.USER_SEQ = #{userSeq}
 	</select>	
 	
 	<!-- 아이디와 일치하는 사용자 조회 -->
 	<select id="getUserById" parameterType="String"
-		resultMap="resultUserMap">
-		<include refid="selectUser"></include>
-			AND USER.USER_ID = #{userId}
-	</select>	
-	
-	<!-- 소속별 사용자 목록 조회 -->
-	<select id="listUserByCompSeq" parameterType="long"
-		resultMap="resultUserMap">
-		<include refid="selectUser"></include>
-			AND USER.COMP_SEQ = #{compSeq}		
-		ORDER BY USER.USER_SEQ DESC
+		resultType="com.iwi.iwms.api.user.domain.UserInfo">
+		SELECT 
+			USER_SEQ AS userSeq
+			, USER_ID AS userId
+			, SSO_KEY AS ssoKey
+			, LOGIN_ERR_CNT AS loginErrCnt
+			, USE_YN AS useYn		
+		FROM TB_USER	
+		WHERE DEL_YN = 'N' 	
+			AND USER_ID = #{userId}
 	</select>	
 	
 	<!-- 사용자 정보 등록 -->
@@ -147,7 +140,7 @@
 			, #{userDtlAddr}
 			, #{verifyYn}
 			, #{useYn}
-			, #{regSeq}
+			, #{loginUserSeq}
 		)		
 	</insert>		
 
@@ -171,7 +164,7 @@
 			, VERIFY_YN = #{verifyYn}
 			, USE_YN = #{useYn}
 			, UPT_DT = CURRENT_TIMESTAMP
-			, UPT_SEQ = #{uptSeq}
+			, UPT_SEQ = #{loginUserSeq}
 		WHERE USER_SEQ = #{userSeq}	
 	</update>	
 	
@@ -189,7 +182,7 @@
 		    LOGIN_ERR_CNT = 0
 			, PWD_RESET_YN = #{pwdResetYn}
 			, UPT_DT = CURRENT_TIMESTAMP
-			, UPT_SEQ = #{uptSeq}
+			, UPT_SEQ = #{loginUserSeq}
 		WHERE USER_SEQ = #{userSeq}	
 	</update>	
 	
@@ -237,6 +230,53 @@
 		INNER JOIN TB_COMPANY COMP ON USER.COMP_SEQ = COMP.COMP_SEQ
 		INNER JOIN TB_AUTH AUTH ON USER.AUTH_SEQ = AUTH.AUTH_SEQ
 		LEFT JOIN TB_DEPT DEPT ON USER.DEPT_SEQ = DEPT.DEPT_SEQ    
-		WHERE USER.SSO_KEY = #{ssoKey}
+		WHERE USER.DEL_YN = 'N'
+			AND USER.USE_YN = 'Y'		
+			AND USER.SSO_KEY = #{ssoKey}
 	</select>
+	
+	
+	<!-- 사용자별 이용가능한 프로젝트 목록 조회 -->	
+	<select id="listProjByUserSeq" parameterType="long"
+		resultType="com.iwi.iwms.api.user.domain.UserProjInfo">
+		SELECT 
+			ROW_NUMBER() OVER(ORDER BY PROJ.PROJ_SEQ) AS rowNum
+			, PROJ.COMP_SEQ AS projSeq
+			, PROJ.PROJ_SEQ AS projSeq
+			, PROJ.PROJ_NM AS projNm
+			, PROJ.PROJ_SW_NM AS projSwNm
+			, PROJ.PROJ_STD_YMD AS projStdYmd
+			, PROJ.PROJ_END_YMD AS projEndYmd
+		FROM TB_PROJ PROJ
+		INNER JOIN TB_COMPANY COMP ON PROJ.COMP_SEQ = COMP.COMP_SEQ
+		INNER JOIN TB_PROJ_USER PU ON PROJ.PROJ_SEQ = PU.PROJ_SEQ
+		WHERE COMP.DEL_YN = 'N'
+			AND COMP.USE_YN = 'Y'	
+			AND PROJ.USE_YN = 'Y'		
+			AND PU.USER_SEQ = #{userSeq}
+		ORDER BY PROJ.PROJ_SEQ DESC
+	</select>	
+	
+	<!-- 사용자별 이용가능한 사이트 목록 조회 -->	
+	<select id="listSiteByUserSeq" parameterType="long"
+		resultType="com.iwi.iwms.api.user.domain.UserSiteInfo">
+		SELECT 
+			ROW_NUMBER() OVER(ORDER BY SITE.SITE_SEQ) AS rowNum
+			, SITE.PROJ_SEQ AS projSeq
+			, SITE.SITE_SEQ AS siteSeq
+			, SITE.SITE_NM AS siteNm
+			, SITE.SITE_SW_NM AS siteSwNm
+			, SITE.SITE_GB_CD AS siteGbCd
+			, FN_GET_CODE_NM('SITE_GB_CD', SITE.SITE_GB_CD) AS siteGb
+		FROM TB_SITE SITE
+		INNER JOIN TB_PROJ PROJ ON SITE.PROJ_SEQ = PROJ.PROJ_SEQ
+		INNER JOIN TB_COMPANY COMP ON PROJ.COMP_SEQ = COMP.COMP_SEQ
+		INNER JOIN TB_PROJ_USER PU ON PROJ.PROJ_SEQ = PU.PROJ_SEQ
+		WHERE COMP.DEL_YN = 'N'
+			AND COMP.USE_YN = 'Y'			
+			AND PROJ.USE_YN = 'Y'
+			AND SITE.USE_YN = 'Y'
+			AND PU.USER_SEQ  = #{userSeq}
+		ORDER BY SITE.SITE_SEQ DESC		
+	</select>		
 </mapper>

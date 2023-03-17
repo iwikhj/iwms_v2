@@ -1,6 +1,8 @@
 package com.iwi.iwms.api.req.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
@@ -36,15 +38,23 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 	private final FileService fileService;
 
 	@Override
-	public ReqDtlCmtInfo getReqDtlCmtBySeq(long reqDtlCmtSeq) {
-		return Optional.ofNullable(reqDtlCmtMapper.getReqDtlCmtBySeq(reqDtlCmtSeq))
+	public ReqDtlCmtInfo getReqDtlCmtBySeq(long reqDtlCmtSeq, long loginUserSeq) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("reqDtlCmtSeq", reqDtlCmtSeq);
+		map.put("loginUserSeq", loginUserSeq);
+		
+		return Optional.ofNullable(reqDtlCmtMapper.getReqDtlCmtBySeq(map))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항 상세 코멘트를 찾을 수 없습니다."));
 	}
 	
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public void insertReqDtlCmt(ReqDtlCmt reqDtlCmt) {
-		ReqDtlInfo reqDtlInfo = Optional.ofNullable(reqDtlMapper.getReqDtlBySeq(reqDtlCmt.getReqDtlSeq()))
+		Map<String, Object> map = new HashMap<>();
+		map.put("reqDtlSeq", reqDtlCmt.getReqDtlSeq());
+		map.put("loginUserSeq", reqDtlCmt.getLoginUserSeq());
+		
+		ReqDtlInfo reqDtlInfo = Optional.ofNullable(reqDtlMapper.getReqDtlBySeq(map))
 			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항 상세를 찾을 수 없습니다."));
 		
 		reqDtlCmtMapper.insertReqDtlCmt(reqDtlCmt);
@@ -61,7 +71,7 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateReqDtlCmt(ReqDtlCmt reqDtlCmt) {
-		ReqDtlCmtInfo reqDtlCmtInfo = this.getReqDtlCmtBySeq(reqDtlCmt.getReqDtlCmtSeq());
+		ReqDtlCmtInfo reqDtlCmtInfo = this.getReqDtlCmtBySeq(reqDtlCmt.getReqDtlCmtSeq(), reqDtlCmt.getLoginUserSeq());
 		
 		int result = reqDtlCmtMapper.updateReqDtlCmt(reqDtlCmt);
 		
@@ -83,7 +93,7 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int deleteReqDtlCmt(ReqDtlCmt reqDtlCmt) {
-		this.getReqDtlCmtBySeq(reqDtlCmt.getReqDtlCmtSeq());
+		this.getReqDtlCmtBySeq(reqDtlCmt.getReqDtlCmtSeq(), reqDtlCmt.getLoginUserSeq());
 
 		int result = reqDtlCmtMapper.deleteReqDtlCmt(reqDtlCmt);
 		

@@ -37,15 +37,11 @@ public class Comp {
 	@Schema(description = "사용 여부", allowableValues = {"Y", "N"}) 
 	private String useYn;
 	
-	@Schema(hidden = true, description = "등록자 SEQ") 
-	private long regSeq;
-	
-	@Schema(hidden = true, description = "수정자 SEQ") 
-	private long uptSeq;
+	@Schema(hidden = true, description = "로그인 사용자 SEQ") 
+	private long loginUserSeq;
 	
 	public Comp of(final LoginUserInfo loginUserInfo) {
-		this.regSeq = loginUserInfo.getUserSeq();
-		this.uptSeq = loginUserInfo.getUserSeq();
+		this.loginUserSeq = loginUserInfo.getUserSeq();
 		return this;
 	}
 }

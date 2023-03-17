@@ -14,12 +14,6 @@ import lombok.ToString;
 @AllArgsConstructor
 public class ProjUserInfo {
 
-	@Schema(description = "번호")
-	private long rowNum;
-	
-	@Schema(description = "프로젝트 SEQ")
-	private long projSeq;
-	
 	@Schema(description = "소속 이름")
 	private String compNm;
 	
@@ -28,6 +22,12 @@ public class ProjUserInfo {
 	
 	@Schema(description = "사용자 이름")
 	private String userNm;
+	
+	@Schema(description = "사용자 구분 코드") 
+	private String userGbCd;
+	
+	@Schema(description = "사용자 구분") 
+	private String userGb;
 	
 	@Schema(description = "사용자 업무 코드") 
 	private String busiRollCd;
@@ -42,5 +42,5 @@ public class ProjUserInfo {
 	private String posiNm;
 	
 	@Schema(description = "사용자 프로젝트 담당 여부") 
-	private String assigned;
+	private String assignYn;
 }

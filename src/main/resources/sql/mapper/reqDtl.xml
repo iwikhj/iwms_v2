@@ -26,28 +26,29 @@
 			, DHIS.REQ_DTL_HIS_SEQ AS reqDtlHisSeq
             , DHIS.REQ_DTL_STAT_CD AS reqDtlStatCd
 			, FN_GET_CODE_NM('REQ_DTL_STAT_CD', DHIS.REQ_DTL_STAT_CD) AS reqDtlStat 
+			, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = REQ.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn
 			, DTL.USE_YN AS useYn
 			, DATE_FORMAT(DTL.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 			, FN_GET_USER_NM(DTL.REG_SEQ) AS regNm	
+			, LOGIN.USER_SEQ AS loginUserSeq
 		FROM TB_REQ REQ
 		INNER JOIN TB_SITE SITE ON REQ.SITE_SEQ = SITE.SITE_SEQ
 		INNER JOIN TB_REQ_HIS RHIS ON REQ.REQ_SEQ = RHIS.REQ_SEQ
 			AND RHIS.REQ_HIS_SEQ = (SELECT MAX(REQ_HIS_SEQ) FROM TB_REQ_HIS WHERE REQ_SEQ = REQ.REQ_SEQ)	
 		LEFT JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ		
-			AND DTL.USE_YN = 'Y'	
 		LEFT JOIN TB_REQ_DTL_HIS DHIS ON DTL.REQ_DTL_SEQ = DHIS.REQ_DTL_SEQ
-			AND DHIS.REQ_DTL_HIS_SEQ = (SELECT MAX(REQ_DTL_HIS_SEQ) FROM TB_REQ_DTL_HIS WHERE REQ_DTL_SEQ = DTL.REQ_DTL_SEQ)				
-		WHERE REQ.DEL_YN = 'N'
-			AND REQ.USE_YN = 'Y'
+			AND DHIS.REQ_DTL_HIS_SEQ = (SELECT MAX(REQ_DTL_HIS_SEQ) FROM TB_REQ_DTL_HIS WHERE REQ_DTL_SEQ = DTL.REQ_DTL_SEQ)		
+		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
+		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE REQ.DEL_YN = 'N' AND REQ.USE_YN = 'Y'END)				
 	</sql>
 
 	<resultMap id="resultReqDtlMap" type="com.iwi.iwms.api.req.domain.ReqDtlInfo">
 		<result property="reqSeq" column="reqSeq"/>
 		<result property="reqDtlSeq" column="reqDtlSeq"/>
-	   	<collection property="histories" column="reqSeq=reqSeq,reqDtlSeq=reqDtlSeq" 
+	   	<collection property="histories" column="reqSeq=reqSeq,reqDtlSeq=reqDtlSeq,loginUserSeq=loginUserSeq" 
 			ofType="com.iwi.iwms.api.req.domain.ReqDtlHisInfo" select="listHisByReqAndDtlSeq"/>
-	   	<collection property="comments" column="reqSeq=reqSeq,reqDtlSeq=reqDtlSeq" 
-			ofType="com.iwi.iwms.api.req.domain.ReqDtlCmtInfo" select="listCmtByReqAndDtlSeq"/>			
+	   	<collection property="comments" column="reqSeq=reqSeq,reqDtlSeq=reqDtlSeq,loginUserSeq=loginUserSeq" 
+			ofType="com.iwi.iwms.api.req.domain.ReqDtlCmtInfo" select="listCmtByReqAndDtlSeq"/>	
 	</resultMap>
 
 	<!-- 요청사항 상세 단일 조회 -->		
@@ -62,12 +63,10 @@
 	</select>	
 	
 	<!-- 요청사항 상세 단일 조회 -->		
-	<select id="getReqDtlBySeq" parameterType="long"
+	<select id="getReqDtlBySeq" parameterType="hashMap"
 		resultMap="resultReqDtlMap">
 		<include refid="selectReqDtl"></include>
-		<if test='reqDtlSeq != null and reqDtlSeq != ""'>
-			AND DTL.REQ_DTL_SEQ = #{reqDtlSeq}
-		</if>			
+			AND DTL.REQ_DTL_SEQ = #{reqDtlSeq}		
 	</select>	
 
 	<!-- 접수: 담당자 배정 -->	
@@ -100,7 +99,7 @@
 			, #{reqDtlStatCd}
 			, #{tgtMm}
 			, #{useYn}
-			, #{regSeq}
+			, #{loginUserSeq}
 		)		
 	</insert>	
 	
@@ -111,9 +110,9 @@
 			REQ_DTL_STAT_CD = #{reqDtlStatCd}
 			, REQ_DTL_STD_YMD = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
 			, MNG_OK_YMD = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
-			, MNG_OK_USER_SEQ = #{uptSeq}
+			, MNG_OK_USER_SEQ = #{loginUserSeq}
 			, UPT_DT = CURRENT_TIMESTAMP
-			, UPT_SEQ = #{uptSeq}
+			, UPT_SEQ = #{loginUserSeq}
 		WHERE REQ_DTL_SEQ = #{reqDtlSeq}	
 	</update>		
 
@@ -125,7 +124,7 @@
 			, PROC_YMD = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
 			, PROC_HH = #{procHh}
 			, UPT_DT = CURRENT_TIMESTAMP
-			, UPT_SEQ = #{uptSeq}
+			, UPT_SEQ = #{loginUserSeq}
 		WHERE REQ_DTL_SEQ = #{reqDtlSeq}	
 	</update>	
 
@@ -136,11 +135,11 @@
 			REQ_DTL_STAT_CD = #{reqDtlStatCd}
 			, REQ_DTL_END_YMD = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
 			, CUS_OK_YMD = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
-			, CUS_OK_USER_SEQ = #{uptSeq}
+			, CUS_OK_USER_SEQ = #{loginUserSeq}
 			, REQ_DTL_EVAL_SCORE = #{reqDtlEvalScore}
 			, REQ_DTL_EVAL_CMT = #{reqDtlEvalCmt}
 			, UPT_DT = CURRENT_TIMESTAMP
-			, UPT_SEQ = #{uptSeq}
+			, UPT_SEQ = #{loginUserSeq}
 		WHERE REQ_DTL_SEQ = #{reqDtlSeq}	
 	</update>	
 	
@@ -150,9 +149,9 @@
 		SET
 			REQ_DTL_STAT_CD = #{reqDtlStatCd}
 			, CANCEL_YMD = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
-			, CANCEL_USER_SEQ = #{uptSeq}
+			, CANCEL_USER_SEQ = #{loginUserSeq}
 			, UPT_DT = CURRENT_TIMESTAMP
-			, UPT_SEQ = #{uptSeq}
+			, UPT_SEQ = #{loginUserSeq}
 		WHERE REQ_DTL_SEQ = #{reqDtlSeq}	
 	</update>	
 	
@@ -163,7 +162,7 @@
 			TGT_MM = #{tgtMm}
 			, USE_YN = #{useYn}
 			, UPT_DT = CURRENT_TIMESTAMP
-			, UPT_SEQ = #{uptSeq}
+			, UPT_SEQ = #{loginUserSeq}
 		WHERE REQ_DTL_SEQ = #{reqDtlSeq}	
 	</update>
 	
@@ -186,7 +185,7 @@
 			#{reqDtlSeq}
 			, #{reqDtlStatCd}
 			, #{reqDtlStatCmt}
-			, #{regSeq}
+			, #{loginUserSeq}
 		)		
 	</insert>
 	
@@ -203,13 +202,13 @@
 				, HIS.REQ_STAT_CD AS reqDtlStatCd
 				, FN_GET_CODE_NM('REQ_STAT_CD', HIS.REQ_STAT_CD) AS reqDtlStat			
 				, HIS.REQ_STAT_CMT AS reqDtlStatCmt
+				, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = HIS.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn
 				, DATE_FORMAT(HIS.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 				, FN_GET_USER_NM(HIS.REG_SEQ) AS regNm
 			FROM TB_REQ REQ
 			INNER JOIN TB_REQ_HIS HIS ON REQ.REQ_SEQ = HIS.REQ_SEQ
-			WHERE REQ.DEL_YN = 'N'
-				AND REQ.USE_YN = 'Y'
-				AND REQ.REQ_SEQ = #{reqSeq}
+			LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
+			WHERE REQ.REQ_SEQ = #{reqSeq}
 			UNION ALL    
 			SELECT
 				REQ.REQ_SEQ AS reqSeq
@@ -217,15 +216,14 @@
 				, HIS.REQ_DTL_STAT_CD AS reqDtlStatCd
 				, FN_GET_CODE_NM('REQ_DTL_STAT_CD', HIS.REQ_DTL_STAT_CD) AS reqDtlStat
 				, HIS.REQ_DTL_STAT_CMT AS reqDtlStatCmt
+				, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = HIS.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn
 				, DATE_FORMAT(HIS.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 				, FN_GET_USER_NM(HIS.REG_SEQ) AS regNm
 			FROM TB_REQ REQ
 			INNER JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ
 			INNER JOIN TB_REQ_DTL_HIS HIS ON DTL.REQ_DTL_SEQ = HIS.REQ_DTL_SEQ
-			WHERE REQ.DEL_YN = 'N'
-				AND REQ.USE_YN = 'Y'
-				AND DTL.USE_YN = 'Y'
-				AND DTL.REQ_DTL_SEQ = #{reqDtlSeq}
+			LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
+			WHERE DTL.REQ_DTL_SEQ = #{reqDtlSeq}
 		) STAT
         ORDER BY regDt
 	</select>		
@@ -249,6 +247,7 @@
 				, CMT.REQ_CMT AS reqDtlCmt
 				, HIS.REQ_STAT_CD AS reqDtlStatCd
 				, FN_GET_CODE_NM('REQ_STAT_CD', HIS.REQ_STAT_CD) AS reqDtlStat
+				, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = CMT.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn
 				, CMT.USE_YN AS useYn
 				, DATE_FORMAT(CMT.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 				, FN_GET_USER_NM(CMT.REG_SEQ) AS regNm
@@ -258,9 +257,8 @@
 			INNER JOIN TB_REQ_CMT CMT ON REQ.REQ_SEQ = CMT.REQ_SEQ
 			INNER JOIN TB_REQ_HIS HIS ON CMT.REQ_SEQ = HIS.REQ_SEQ
 				AND CMT.REQ_HIS_SEQ = HIS.REQ_HIS_SEQ
-			WHERE REQ.DEL_YN = 'N'
-				AND REQ.USE_YN = 'Y'
-				AND CMT.USE_YN = 'Y'
+			LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}	
+			WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE CMT.USE_YN = 'Y' END)	
 				AND REQ.REQ_SEQ = #{reqSeq}
 			UNION ALL    
 			SELECT
@@ -270,6 +268,7 @@
 				, CMT.REQ_DTL_CMT AS reqDtlCmt
 				, HIS.REQ_DTL_STAT_CD AS reqDtlStatCd
 				, FN_GET_CODE_NM('REQ_DTL_STAT_CD', HIS.REQ_DTL_STAT_CD) AS reqDtlStat
+				, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = CMT.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn
 				, CMT.USE_YN AS useYn
 				, DATE_FORMAT(CMT.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 				, FN_GET_USER_NM(CMT.REG_SEQ) AS regNm
@@ -280,10 +279,8 @@
 			INNER JOIN TB_REQ_DTL_CMT CMT ON DTL.REQ_DTL_SEQ = CMT.REQ_DTL_SEQ
 			INNER JOIN TB_REQ_DTL_HIS HIS ON CMT.REQ_DTL_SEQ = HIS.REQ_DTL_SEQ
 				AND CMT.REQ_DTL_HIS_SEQ = HIS.REQ_DTL_HIS_SEQ
-			WHERE REQ.DEL_YN = 'N'
-				AND REQ.USE_YN = 'Y'
-				AND DTL.USE_YN = 'Y'
-				AND CMT.USE_YN = 'Y'
+			LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}	
+			WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE CMT.USE_YN = 'Y' END)	
 				AND DTL.REQ_DTL_SEQ = #{reqDtlSeq}
 		) STAT
         ORDER BY regDt

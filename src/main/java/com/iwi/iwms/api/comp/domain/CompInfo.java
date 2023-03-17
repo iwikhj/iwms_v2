@@ -40,6 +40,12 @@ public class CompInfo {
 	@Schema(description = "소속 사용자 목록")
 	private List<UserInfo> users;
 	
+	@Schema(description = "작성자 여부") 
+	private String ownerYn;
+	
+	@Schema(description = "삭제 여부") 
+	private String delYn;	
+	
 	@Schema(description = "사용 여부")
 	private String useYn;
 	

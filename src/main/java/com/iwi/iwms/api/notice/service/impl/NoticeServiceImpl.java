@@ -44,10 +44,10 @@ public class NoticeServiceImpl implements NoticeService {
 	}
 
 	@Override
-	public NoticeInfo getNoticeBySeq(long noticeSeq, long userSeq) {
+	public NoticeInfo getNoticeBySeq(long noticeSeq, long loginUserSeq) {
 		Map<String, Object> map = new HashMap<>();
 		map.put("noticeSeq", noticeSeq);
-		map.put("userSeq", userSeq);
+		map.put("loginUserSeq", loginUserSeq);
 		
 		return Optional.ofNullable(noticeMapper.getNoticeBySeq(map))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "공지사항을 찾을 수 없습니다."));
@@ -72,7 +72,7 @@ public class NoticeServiceImpl implements NoticeService {
 	@Override
 	public int updateNotice(Notice notice) {
 		
-		this.getNoticeBySeq(notice.getNoticeSeq(), notice.getUptSeq());
+		this.getNoticeBySeq(notice.getNoticeSeq(), notice.getLoginUserSeq());
 		
 		int result = noticeMapper.updateNotice(notice);
 
@@ -96,7 +96,7 @@ public class NoticeServiceImpl implements NoticeService {
 	@Override
 	public int deleteNotice(Notice notice) {
 		
-		this.getNoticeBySeq(notice.getNoticeSeq(), notice.getUptSeq());
+		this.getNoticeBySeq(notice.getNoticeSeq(), notice.getLoginUserSeq());
 		
 		int result = noticeMapper.deleteNotice(notice);
 		

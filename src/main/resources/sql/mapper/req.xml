@@ -18,23 +18,28 @@
             , CASE WHEN DTL.REQ_DTL_SEQ IS NULL THEN HIS.REQ_STAT_CD ELSE DTL.REQ_DTL_STAT_CD END AS reqStatCd
 			, CASE WHEN DTL.REQ_DTL_SEQ IS NULL THEN FN_GET_CODE_NM('REQ_STAT_CD', HIS.REQ_STAT_CD) ELSE FN_GET_CODE_NM('REQ_DTL_STAT_CD', DTL.REQ_DTL_STAT_CD) END AS reqStat 
 			, HIS.REQ_STAT_CMT AS reqStatCmt
-			, REQ.USE_YN AS useYn
+			, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = REQ.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn
+			, REQ.DEL_YN AS delYn	
+			, REQ.USE_YN AS useYn	
 			, DATE_FORMAT(REQ.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
-			, FN_GET_USER_NM(REQ.REG_SEQ) AS regNm	
+			, FN_GET_USER_NM(REQ.REG_SEQ) AS regNm
+			, LOGIN.USER_SEQ AS loginUserSeq
 		FROM TB_REQ REQ
 		INNER JOIN TB_SITE SITE ON REQ.SITE_SEQ = SITE.SITE_SEQ
 		INNER JOIN TB_REQ_HIS HIS ON REQ.REQ_SEQ = HIS.REQ_SEQ
 			AND HIS.REQ_HIS_SEQ = (SELECT MAX(REQ_HIS_SEQ) FROM TB_REQ_HIS WHERE REQ_SEQ = REQ.REQ_SEQ)	
 		LEFT JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ					
-			AND DTL.REQ_DTL_STAT_CD = (SELECT MIN(REQ_DTL_STAT_CD) FROM TB_REQ_DTL WHERE REQ_SEQ = REQ.REQ_SEQ)	
-		WHERE REQ.DEL_YN = 'N'
-			AND REQ.USE_YN = 'Y'
+			AND DTL.REQ_DTL_STAT_CD = (SELECT MIN(REQ_DTL_STAT_CD) FROM TB_REQ_DTL WHERE REQ_SEQ = REQ.REQ_SEQ)		
+		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
+		INNER JOIN TB_PROJ_USER PU ON SITE.PROJ_SEQ = PU.PROJ_SEQ
+			AND (PU.USER_SEQ = LOGIN.USER_SEQ OR LOGIN.AUTH_SEQ = 1 )
+		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE REQ.DEL_YN = 'N' AND REQ.USE_YN = 'Y' END)		
 	</sql>
 
 	<resultMap id="resultReqMap" type="com.iwi.iwms.api.req.domain.ReqInfo">
 		<result property="reqSeq" column="reqSeq"/>			
 	   	<collection property="tasks" column="reqSeq" 
-			ofType="com.iwi.iwms.api.req.domain.ReqTaskInfo" select="listTaskByReqSeq"/>			
+			ofType="com.iwi.iwms.api.req.domain.ReqTaskInfo" select="listTaskByReqSeq"/>	
 	</resultMap>
 	
 	<!-- 요청사항 목록 조회 -->		
@@ -45,10 +50,46 @@
 			AND SITE.SITE_NM LIKE CONCAT('%', #{search}, '%') 
 			OR REQ.REQ_TITLE LIKE CONCAT('%', #{search}, '%')
 		</if>			
+		GROUP BY REQ.REQ_SEQ	
 		ORDER BY REQ.REQ_SEQ DESC
 		<if test='pagination != null and pagination != ""'>
 			LIMIT #{pagination.limitPerPage} OFFSET #{pagination.offset}
 		</if>
+	</select>	
+		
+	<!-- 요청사항 수 -->
+	<select id="countReq" parameterType="hashMap"
+		resultType="int">
+		SELECT 
+			COUNT(*)
+		FROM (
+			SELECT 
+				REQ.REQ_SEQ
+			FROM TB_REQ REQ
+			INNER JOIN TB_SITE SITE ON REQ.SITE_SEQ = SITE.SITE_SEQ
+			INNER JOIN TB_REQ_HIS HIS ON REQ.REQ_SEQ = HIS.REQ_SEQ
+				AND HIS.REQ_HIS_SEQ = (SELECT MAX(REQ_HIS_SEQ) FROM TB_REQ_HIS WHERE REQ_SEQ = REQ.REQ_SEQ)	
+			LEFT JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ					
+				AND DTL.REQ_DTL_STAT_CD = (SELECT MIN(REQ_DTL_STAT_CD) FROM TB_REQ_DTL WHERE REQ_SEQ = REQ.REQ_SEQ)		
+			LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
+			INNER JOIN TB_PROJ_USER PU ON SITE.PROJ_SEQ = PU.PROJ_SEQ
+				AND (PU.USER_SEQ = LOGIN.USER_SEQ OR LOGIN.AUTH_SEQ = 1 )
+			WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE REQ.DEL_YN = 'N' AND REQ.USE_YN = 'Y' END)		
+			<if test='search != null and search != ""'>
+				AND SITE.SITE_NM LIKE CONCAT('%', #{search}, '%') 
+				OR REQ.REQ_TITLE LIKE CONCAT('%', #{search}, '%') 
+				OR REQ.REQ_CONTENT LIKE CONCAT('%', #{search}, '%') 
+			</if>				
+			GROUP BY REQ.REQ_SEQ			
+		) A
+	</select>	
+	
+	<!-- 요청사항 단일 조회 -->	
+	<select id="getReqBySeq" parameterType="hashMap"
+		resultMap="resultReqMap">
+		<include refid="selectReq"></include>
+			AND REQ.REQ_SEQ = #{reqSeq}
+		GROUP BY REQ.REQ_SEQ		
 	</select>	
 
 	<!-- 요청사항 담당자 작업 내역 -->		
@@ -77,32 +118,7 @@
 			AND DTL.REQ_SEQ = #{reqSeq} 
 		ORDER BY DTL.REQ_DTL_SEQ
 	</select>	
-		
-	<!-- 요청사항 수 -->
-	<select id="countReq" parameterType="hashMap"
-		resultType="int">
-		SELECT 
-			COUNT(*)
-		FROM TB_REQ REQ
-		INNER JOIN TB_SITE SITE ON REQ.SITE_SEQ = SITE.SITE_SEQ
-		INNER JOIN TB_REQ_HIS HIS ON REQ.REQ_SEQ = HIS.REQ_SEQ
-			AND HIS.REQ_HIS_SEQ = (SELECT MAX(REQ_HIS_SEQ) FROM TB_REQ_HIS WHERE REQ_SEQ = REQ.REQ_SEQ)
-		WHERE REQ.DEL_YN = 'N'
-			AND REQ.USE_YN = 'Y'
-		<if test='search != null and search != ""'>
-			AND SITE.SITE_NM LIKE CONCAT('%', #{search}, '%') 
-			OR REQ.REQ_TITLE LIKE CONCAT('%', #{search}, '%') 
-			OR REQ.REQ_CONTENT LIKE CONCAT('%', #{search}, '%') 
-		</if>				
-	</select>	
 	
-	<!-- 요청사항 단일 조회 -->	
-	<select id="getReqBySeq" parameterType="long"
-		resultMap="resultReqMap">
-		<include refid="selectReq"></include>
-		AND REQ.REQ_SEQ = #{reqSeq}
-	</select>	
-
 	<!-- 요청사항 등록 -->	
 	<insert id="insertReq" parameterType="com.iwi.iwms.api.req.domain.Req"
 		useGeneratedKeys="true" keyProperty="reqSeq">
@@ -135,7 +151,7 @@
 			, #{reqTitle}
 			, #{reqContent}
 			, #{useYn}
-			, #{regSeq}
+			, #{loginUserSeq}
 		)		
 	</insert>		
 
@@ -150,7 +166,7 @@
 			, REQ_CONTENT = #{reqContent}
 			, USE_YN = #{useYn}
 			, UPT_DT = CURRENT_TIMESTAMP
-			, UPT_SEQ = #{uptSeq}
+			, UPT_SEQ = #{loginUserSeq}
 		WHERE REQ_SEQ = #{reqSeq}	
 	</update>	
 	
@@ -173,7 +189,7 @@
 			#{reqSeq}
 			, #{reqStatCd}
 			, #{reqStatCmt}
-			, #{regSeq}
+			, #{loginUserSeq}
 		)		
 	</insert>
 </mapper>

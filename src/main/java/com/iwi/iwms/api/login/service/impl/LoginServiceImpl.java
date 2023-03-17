@@ -43,6 +43,11 @@ public class LoginServiceImpl implements LoginService{
 		UserInfo userInfo = Optional.ofNullable(userMapper.getUserById(login.getUsername()))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "등록되지 않은 사용자 또는 잘못된 비밀번호입니다."));
 				
+		// 사용불가 ID
+		if(userInfo.getUseYn().equals("N")) {
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "사용 정지된 아이디입니다.");
+		}
+		
 		// 비밀번호 5회 이상 불일치
 		if(userInfo.getLoginErrCnt() >= 5) {
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 5회 이상 일치하지 않아 사용할 수 없는 계정입니다. 담당자에게 연락주시기 바랍니다.");

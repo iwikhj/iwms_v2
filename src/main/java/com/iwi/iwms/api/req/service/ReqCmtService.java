@@ -5,7 +5,7 @@ import com.iwi.iwms.api.req.domain.ReqCmtInfo;
 
 public interface ReqCmtService {
 
-	ReqCmtInfo getReqCmtBySeq(long reqCmtSeq);
+	ReqCmtInfo getReqCmtBySeq(long reqCmtSeq, long loginUserSeq);
 	
 	void insertReqCmt(ReqCmt reqCmt);
 	

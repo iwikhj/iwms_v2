@@ -14,7 +14,7 @@ public interface CompService {
 	
 	int countComp(Map<String, Object> map);
 
-	CompInfo getCompBySeq(long compSeq);
+	CompInfo getCompBySeq(long compSeq, long loginUserSeq);
 	
 	void insertComp(Comp comp);
 	
@@ -22,7 +22,9 @@ public interface CompService {
 	
 	int deleteComp(Comp comp);
 	
-	List<DeptInfo> listDeptByCompSeq(long compSeq);
+	List<DeptInfo> listDeptByCompSeq(Map<String, Object> map);
+	
+	DeptInfo getDeptBySeq(long deptSeq, long loginUserSeq);
 
 	void insertDept(Dept dept);
 	

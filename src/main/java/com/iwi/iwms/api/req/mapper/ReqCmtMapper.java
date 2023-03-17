@@ -1,6 +1,6 @@
 package com.iwi.iwms.api.req.mapper;
 
-import java.util.List;
+import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
@@ -10,9 +10,7 @@ import com.iwi.iwms.api.req.domain.ReqCmtInfo;
 @Mapper
 public interface ReqCmtMapper {
 	
-	List<ReqCmtInfo> listReqCmtByReqSeq(long reqSeq);
-	
-	ReqCmtInfo getReqCmtBySeq(long reqCmtSeq);
+	ReqCmtInfo getReqCmtBySeq(Map<String, Object> map);
 
 	void insertReqCmt(ReqCmt reqCmt);
 	

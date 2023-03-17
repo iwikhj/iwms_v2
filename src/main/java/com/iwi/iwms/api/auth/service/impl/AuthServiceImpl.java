@@ -1,17 +1,19 @@
 package com.iwi.iwms.api.auth.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.server.ResponseStatusException;
 
 import com.iwi.iwms.api.auth.domain.Auth;
 import com.iwi.iwms.api.auth.domain.AuthInfo;
 import com.iwi.iwms.api.auth.domain.AuthMenu;
-import com.iwi.iwms.api.auth.domain.AuthMenuInfo;
 import com.iwi.iwms.api.auth.mapper.AuthMapper;
 import com.iwi.iwms.api.auth.service.AuthService;
 
@@ -36,8 +38,12 @@ public class AuthServiceImpl implements AuthService {
 	}
 
 	@Override
-	public AuthInfo getAuthBySeq(long authSeq) {
-		return Optional.ofNullable(authMapper.getAuthBySeq(authSeq))
+	public AuthInfo getAuthBySeq(long authSeq, long loginUserSeq) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("authSeq", authSeq);
+		map.put("loginUserSeq", loginUserSeq);
+		
+		return Optional.ofNullable(authMapper.getAuthBySeq(map))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "권한을 찾을 수 없습니다"));
 	}
 
@@ -47,31 +53,29 @@ public class AuthServiceImpl implements AuthService {
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "권한을 찾을 수 없습니다"));
 	}
 
-	@Override
-	public void insertAuth(Auth auth) {
-		authMapper.insertAuth(auth);
-	}
-
+	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateAuth(Auth auth) {
-		this.getAuthBySeq(auth.getAuthSeq());
-		return authMapper.updateAuth(auth);
-	}
-
-	@Override
-	public int deleteAuth(Auth auth) {
-		this.getAuthBySeq(auth.getAuthSeq());
-		return authMapper.deleteAuth(auth);
-	}
-
-	@Override
-	public List<AuthMenuInfo> getAuthMenuByAuthSeq(long authSeq) {
-		this.getAuthBySeq(authSeq);
-		return authMapper.getAuthMenuByAuthSeq(authSeq);
-	}
-	
-	@Override
-	public void updateAuthMenu(AuthMenu authMenu) {
-		authMapper.updateAuthMenu(authMenu);
+		AuthInfo authInfo = this.getAuthBySeq(auth.getAuthSeq(), auth.getLoginUserSeq());
+		
+		if(CollectionUtils.isEmpty(auth.getAuthMenuSeq()) || auth.getAuthMenuSeq().size() != authInfo.getAuthMenus().size()) {
+			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "모든 메뉴의 데이터를를 입력해주세요.");
+		}
+		
+		for(int i = 0; i < auth.getAuthMenuSeq().size(); i++) {
+			AuthMenu authMenu = AuthMenu.builder()
+				.authMenuSeq(auth.getAuthMenuSeq().get(i))
+				.readYn(auth.getMenuReadYn().get(i))
+				.writeYn(auth.getMenuWriteYn().get(i))
+				.execYn(auth.getMenuExecYn().get(i))
+				.useYn(auth.getMenuUseYn().get(i))
+				.loginUserSeq(auth.getLoginUserSeq())
+				.build();
+			
+			authMapper.updateAuthMenu(authMenu);
+		}
+		authMapper.updateAuth(auth);
+		return 1;
 	}
 }
+

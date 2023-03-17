@@ -9,6 +9,8 @@ import com.iwi.iwms.api.comp.domain.Proj;
 import com.iwi.iwms.api.comp.domain.ProjInfo;
 import com.iwi.iwms.api.comp.domain.ProjUser;
 import com.iwi.iwms.api.comp.domain.ProjUserInfo;
+import com.iwi.iwms.api.comp.domain.Site;
+import com.iwi.iwms.api.comp.domain.SiteInfo;
 
 @Mapper
 public interface ProjMapper {
@@ -17,7 +19,7 @@ public interface ProjMapper {
 	
 	int countProj(Map<String, Object> map);
 	
-	ProjInfo getProjBySeq(long projSeq);
+	ProjInfo getProjBySeq(Map<String, Object> map);
 	
 	void insertProj(Proj proj);
 	
@@ -29,7 +31,19 @@ public interface ProjMapper {
 	
 	List<ProjUserInfo> listPerfProjUser(long projSeq);
 	
-	int updateProjUser(List<ProjUser> projUserList);
+	int updateProjUser(ProjUser projUser);
 	
-	int deleteProjUser(long projSeq);
+	int deleteProjUser(ProjUser projUser);
+	
+	List<SiteInfo> listSite(Map<String, Object> map);
+	
+	int countSite(Map<String, Object> map);
+	
+	SiteInfo getSiteBySeq(Map<String, Object> map);
+	
+	void insertSite(Site site);
+	
+	int updateSite(Site site);
+	
+	int deleteSite(Site site);
 }

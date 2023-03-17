@@ -10,7 +10,6 @@ import javax.validation.Valid;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,7 +27,9 @@ import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.user.domain.User;
 import com.iwi.iwms.api.user.domain.UserInfo;
+import com.iwi.iwms.api.user.domain.UserProjInfo;
 import com.iwi.iwms.api.user.domain.UserPwd;
+import com.iwi.iwms.api.user.domain.UserSiteInfo;
 import com.iwi.iwms.api.user.domain.UserUpdate;
 import com.iwi.iwms.api.user.service.UserService;
 import com.iwi.iwms.utils.Pagination;
@@ -52,6 +53,7 @@ public class UserController {
 	@Operation(summary = "사용자 목록", description = "사용자 목록")
 	@GetMapping(value = "")
 	public ResponseEntity<ApiListResponse<List<UserInfo>>> listUser(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
 			, @RequestParam(value = "search", required = false) String search
@@ -59,6 +61,7 @@ public class UserController {
 			, @RequestParam(value = "endDate", required = false) String endDate) {
 		
 		Map<String, Object> map = new HashMap<>();
+		map.put("loginUserSeq", loginUserInfo.getUserSeq());
 		map.put("search", search);
 		map.put("startDate", startDate);
 		map.put("endDate", endDate);
@@ -77,9 +80,10 @@ public class UserController {
     @Operation(summary = "사용자 정보", description = "사용자 정보")
     @GetMapping(value = "/{userSeq}")
     public ResponseEntity<ApiResponse<UserInfo>> getUserBySeq(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
     		, @PathVariable long userSeq) {
     	
-    	UserInfo user = userService.getUserBySeq(userSeq);
+    	UserInfo user = userService.getUserBySeq(userSeq, loginUserInfo.getUserSeq());
     	
 		return ResponseEntity.ok(ApiResponse.<UserInfo>builder()
 				.request(request)
@@ -153,7 +157,7 @@ public class UserController {
     public ResponseEntity<ApiResponse<UserInfo>> getMe(HttpServletRequest request, HttpServletResponse response
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
 
-    	UserInfo user = userService.getUserBySeq(loginUserInfo.getUserSeq());
+    	UserInfo user = userService.getUserBySeq(loginUserInfo.getUserSeq(), loginUserInfo.getUserSeq());
     	
 		return ResponseEntity.ok(ApiResponse.<UserInfo>builder()
 				.request(request)
@@ -190,6 +194,32 @@ public class UserController {
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
 				.request(request)
 				.data(result)
+				.build());
+	}
+    
+	@Operation(summary = "사용자별 이용 가능한 프로젝트 목록", description = "사용자별 이용 가능한 프로젝트 목록")
+	@GetMapping(value = "/{userSeq}/projects")
+	public ResponseEntity<ApiResponse<List<UserProjInfo>>> listProjByUserSeq(HttpServletRequest request
+			, @PathVariable long userSeq) {
+		
+    	List<UserProjInfo> listProj = userService.listProjByUserSeq(userSeq);
+		
+		return ResponseEntity.ok(ApiResponse.<List<UserProjInfo>>builder()
+				.request(request)
+				.data(listProj)
+				.build());
+	}
+	
+	@Operation(summary = "사용자별 이용 가능한 사이트 목록", description = "사용자별 이용 가능한 사이트 목록")
+	@GetMapping(value = "/{userSeq}/sites")
+	public ResponseEntity<ApiResponse<List<UserSiteInfo>>> listSiteByUserSeq(HttpServletRequest request
+			, @PathVariable long userSeq) {
+		
+    	List<UserSiteInfo> listSite = userService.listSiteByUserSeq(userSeq);
+		
+		return ResponseEntity.ok(ApiResponse.<List<UserSiteInfo>>builder()
+				.request(request)
+				.data(listSite)
 				.build());
 	}
 }

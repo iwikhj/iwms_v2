@@ -1,9 +1,8 @@
 package com.iwi.iwms.api.auth.domain;
 
-import com.iwi.iwms.api.login.domain.LoginUserInfo;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,6 +10,7 @@ import lombok.ToString;
 
 @Getter
 @Setter
+@Builder
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,12 +31,7 @@ public class AuthMenu {
 	@Schema(description = "사용 여부", allowableValues = {"Y", "N"}) 
 	private String useYn;
 	
-	@Schema(hidden = true, description = "수정자 SEQ") 
-	private long uptSeq;
-	
-	public AuthMenu of(final LoginUserInfo loginUserInfo) {
-		this.uptSeq = loginUserInfo.getUserSeq();
-		return this;
-	}
+	@Schema(hidden = true, description = "로그인 사용자 SEQ") 
+	private long loginUserSeq;
 	
 }

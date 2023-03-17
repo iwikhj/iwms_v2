@@ -88,6 +88,9 @@ public class ReqDtlInfo {
 	@Schema(description = "코멘트 목록") 
 	private List<ReqDtlCmtInfo> comments;
 	
+	@Schema(description = "작성자 여부") 
+	private String ownerYn;	
+	
 	@Schema(description = "사용 여부")
 	private String useYn;
 	

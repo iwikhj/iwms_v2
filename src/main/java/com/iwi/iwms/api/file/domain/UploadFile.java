@@ -39,8 +39,8 @@ public class UploadFile {
 	@Schema(hidden = true, description = "첨부 파일 저장 경로")
 	private String fileRealPath;
 	
-	@Schema(hidden = true, description = "등록자 SEQ") 
-	private long regSeq;
+	@Schema(hidden = true, description = "로그인 사용자 SEQ") 
+	private long loginUserSeq;
 	
 	public static UploadFile of(UploadFileInfo uploadFileInfo) {
 		UploadFile uploadFile = new UploadFile();

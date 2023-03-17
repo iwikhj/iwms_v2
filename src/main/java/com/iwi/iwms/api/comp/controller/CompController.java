@@ -47,6 +47,7 @@ public class CompController {
 	@Operation(summary = "소속 목록", description = "소속 목록")
 	@GetMapping(value = "")
 	public ResponseEntity<ApiListResponse<List<CompInfo>>> listComp(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
 			, @RequestParam(value = "search", required = false) String search
@@ -54,6 +55,7 @@ public class CompController {
 			, @RequestParam(value = "endDate", required = false) String endDate) {
 		
 		Map<String, Object> map = new HashMap<>();
+		map.put("userSeq", loginUserInfo.getUserSeq());
 		map.put("search", search);
 		map.put("startDate", startDate);
 		map.put("endDate", endDate);
@@ -71,9 +73,10 @@ public class CompController {
     @Operation(summary = "소속 정보", description = "소속 정보")
     @GetMapping(value = "/{compSeq}")
     public ResponseEntity<ApiResponse<CompInfo>> getCompBySeq(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
     		, @PathVariable long compSeq) {
     	
-    	CompInfo comp = compService.getCompBySeq(compSeq);
+    	CompInfo comp = compService.getCompBySeq(compSeq, loginUserInfo.getUserSeq());
     	
 		return ResponseEntity.ok(ApiResponse.<CompInfo>builder()
 				.request(request)
@@ -128,9 +131,14 @@ public class CompController {
 	@Operation(summary = "소속 부서 목록", description = "소속 부서 목록")
 	@GetMapping(value = "/{compSeq}/depts")
 	public ResponseEntity<ApiListResponse<List<DeptInfo>>> listDept(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
 			, @PathVariable long compSeq) {
 		
-		List<DeptInfo> positionList = compService.listDeptByCompSeq(compSeq);
+		Map<String, Object> map = new HashMap<>();
+		map.put("userSeq", loginUserInfo.getUserSeq());
+		map.put("compSeq", compSeq);
+		
+		List<DeptInfo> positionList = compService.listDeptByCompSeq(map);
 
 		return ResponseEntity.ok(ApiListResponse.<List<DeptInfo>>builder()
 				.request(request)

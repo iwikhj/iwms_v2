@@ -29,6 +29,9 @@ public class ReqDtlHisInfo {
 	@Schema(description = "요청사항 상태 코멘트") 
 	private String reqDtlStatCmt;
 	
+	@Schema(description = "작성자 여부") 
+	private String ownerYn;
+	
 	@Schema(description = "등록 일자") 
 	private String regDt;
 	

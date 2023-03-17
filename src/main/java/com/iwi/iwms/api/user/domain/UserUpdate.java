@@ -78,12 +78,12 @@ public class UserUpdate {
 	@Schema(description = "사용 여부", allowableValues = {"Y", "N"}) 
 	private String useYn;
 	
-	@Schema(hidden = true, description = "수정자 SEQ") 
-	private long uptSeq;
+	@Schema(hidden = true, description = "로그인 사용자 SEQ") 
+	private long loginUserSeq;
 	
 	public UserUpdate of(final LoginUserInfo loginUserInfo) {
 		this.authCd = "ROLE_IWMS_" + this.authCd;
-		this.uptSeq = loginUserInfo.getUserSeq();
+		this.loginUserSeq = loginUserInfo.getUserSeq();
 		return this;
 	}
 	

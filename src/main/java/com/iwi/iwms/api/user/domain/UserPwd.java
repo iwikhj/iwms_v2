@@ -29,11 +29,11 @@ public class UserPwd {
 	@Schema(hidden = true, description = "비밀번호 초기화 여부", allowableValues = {"Y", "N"}) 
 	private String pwdResetYn;
 	
-	@Schema(hidden = true, description = "수정자 SEQ") 
-	private long uptSeq;
+	@Schema(hidden = true, description = "로그인 사용자 SEQ") 
+	private long loginUserSeq;
 	
 	public UserPwd of(final LoginUserInfo loginUserInfo) {
-		this.uptSeq = loginUserInfo.getUserSeq();
+		this.loginUserSeq = loginUserInfo.getUserSeq();
 		return this;
 	}
 }

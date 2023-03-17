@@ -2,6 +2,7 @@ package com.iwi.iwms.api.req.service.impl;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
@@ -41,18 +42,25 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 		return reqDtlMapper.getReqDtlByReqAndDtlSeq(map);
 	}
 	
-
 	@Override
-	public ReqDtlInfo getReqDtlBySeq(long reqSeq) {
-		return Optional.ofNullable(reqDtlMapper.getReqDtlBySeq(reqSeq))
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요구사항 상세를 찾을 수 없습니다."));
+	public ReqDtlInfo getReqDtlBySeq(long reqDtlSeq, long loginUserSeq) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("reqDtlSeq", reqDtlSeq);
+		map.put("loginUserSeq", loginUserSeq);
+		
+		return Optional.ofNullable(reqDtlMapper.getReqDtlBySeq(map))
+				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항 상세를 찾을 수 없습니다."));
 	}
 	
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public void insertReqDtl(ReqDtl reqDtl) {
-		Optional.ofNullable(reqMapper.getReqBySeq(reqDtl.getReqSeq()))
-			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요구사항을 찾을 수 없습니다."));
+		Map<String, Object> map = new HashMap<>();
+		map.put("reqSeq", reqDtl.getReqSeq());
+		map.put("loginUserSeq", reqDtl.getLoginUserSeq());
+		
+		Optional.ofNullable(reqMapper.getReqBySeq(map))
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항을 찾을 수 없습니다."));
 		
 		if(CollectionUtils.isEmpty(reqDtl.getReqDtlUserSeqs())) {
 			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "담당자는 필수 입력 사항입니다");
@@ -73,7 +81,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 					.reqDtlSeq(reqDtl.getReqDtlSeq())
 					.reqDtlStatCd(status.getCode())
 					.reqDtlStatCmt(status.getMessage())
-					.regSeq(reqDtl.getUptSeq())
+					.loginUserSeq(reqDtl.getLoginUserSeq())
 					.build();
 			
 			reqDtlMapper.insertReqDtlHis(reqDtlHis);
@@ -83,7 +91,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateReqDtl(ReqDtl reqDtl) {
-		this.getReqDtlBySeq(reqDtl.getReqDtlSeq());
+		this.getReqDtlBySeq(reqDtl.getReqDtlSeq(), reqDtl.getLoginUserSeq());
 		int result = reqDtlMapper.updateReqDtl(reqDtl);
 		
 		return result;		
@@ -93,7 +101,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int deleteReqDtl(ReqDtl reqDtl) {
-		ReqDtlInfo reqDtlInfo = this.getReqDtlBySeq(reqDtl.getReqDtlSeq());
+		ReqDtlInfo reqDtlInfo = this.getReqDtlBySeq(reqDtl.getReqDtlSeq(), reqDtl.getLoginUserSeq());
 		
 		int result = reqDtlMapper.deleteReqDtl(reqDtl);
 		
@@ -110,7 +118,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateReqDtlStatByInProgress(ReqDtl reqDtl) {
-		this.getReqDtlBySeq(reqDtl.getReqDtlSeq());
+		this.getReqDtlBySeq(reqDtl.getReqDtlSeq(), reqDtl.getLoginUserSeq());
 		
 		ReqDtlStatCode status = ReqDtlStatCode.IN_PROGRESS;	//IN_PROGRESS
 		
@@ -121,7 +129,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 				.reqDtlSeq(reqDtl.getReqDtlSeq())
 				.reqDtlStatCd(status.getCode())
 				.reqDtlStatCmt(status.getMessage())
-				.regSeq(reqDtl.getUptSeq())
+				.loginUserSeq(reqDtl.getLoginUserSeq())
 				.build();
 		
 		reqDtlMapper.insertReqDtlHis(reqDtlHis);
@@ -132,7 +140,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateReqDtlStatByProcessed(ReqDtl reqDtl) {
-		this.getReqDtlBySeq(reqDtl.getReqDtlSeq());
+		this.getReqDtlBySeq(reqDtl.getReqDtlSeq(), reqDtl.getLoginUserSeq());
 
 		ReqDtlStatCode status = ReqDtlStatCode.PROCESSED;	//PROCESSED
 		
@@ -143,7 +151,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 				.reqDtlSeq(reqDtl.getReqDtlSeq())
 				.reqDtlStatCd(status.getCode())
 				.reqDtlStatCmt(status.getMessage())
-				.regSeq(reqDtl.getUptSeq())
+				.loginUserSeq(reqDtl.getLoginUserSeq())
 				.build();
 		
 		reqDtlMapper.insertReqDtlHis(reqDtlHis);
@@ -154,7 +162,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateReqDtlStatByInspectionCompleted(ReqDtl reqDtl) {
-		this.getReqDtlBySeq(reqDtl.getReqDtlSeq());
+		this.getReqDtlBySeq(reqDtl.getReqDtlSeq(), reqDtl.getLoginUserSeq());
 
 		ReqDtlStatCode status = ReqDtlStatCode.INSPECTION_COMPLETED;	//INSPECTION_COMPLETED
 		
@@ -165,7 +173,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 				.reqDtlSeq(reqDtl.getReqDtlSeq())
 				.reqDtlStatCd(status.getCode())
 				.reqDtlStatCmt(status.getMessage())
-				.regSeq(reqDtl.getUptSeq())
+				.loginUserSeq(reqDtl.getLoginUserSeq())
 				.build();
 		
 		reqDtlMapper.insertReqDtlHis(reqDtlHis);
@@ -176,7 +184,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateReqDtlStatByCancel(ReqDtl reqDtl) {
-		this.getReqDtlBySeq(reqDtl.getReqDtlSeq());
+		this.getReqDtlBySeq(reqDtl.getReqDtlSeq(), reqDtl.getLoginUserSeq());
 	
 		ReqDtlStatCode status = ReqDtlStatCode.CANCEL;	//CANCEL
 		
@@ -187,7 +195,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 				.reqDtlSeq(reqDtl.getReqDtlSeq())
 				.reqDtlStatCd(status.getCode())
 				.reqDtlStatCmt(status.getMessage())
-				.regSeq(reqDtl.getUptSeq())
+				.loginUserSeq(reqDtl.getLoginUserSeq())
 				.build();
 		
 		reqDtlMapper.insertReqDtlHis(reqDtlHis);

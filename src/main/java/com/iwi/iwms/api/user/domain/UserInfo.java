@@ -100,8 +100,14 @@ public class UserInfo {
 	@Schema(description = "마지막 로그인 시간") 
 	private String lastLoginDt;
 	
+	@Schema(description = "작성자 여부") 
+	private String ownerYn;
+	
 	@Schema(description = "사용 여부") 
 	private String useYn;
+	
+	@Schema(description = "삭제 여부") 
+	private String delYn;
 	
 	@Schema(description = "등록 일자") 
 	private String regDt;

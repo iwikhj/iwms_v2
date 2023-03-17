@@ -2,7 +2,9 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iwi.iwms.api.req.mapper.ReqDtlCmtMapper">
 
-	<sql id="selectReqDtlCmt">
+	<!-- 요청사항 상세 코멘트 단일 조회 -->				
+	<select id="getReqDtlCmtBySeq" parameterType="hashMap"
+		resultType="com.iwi.iwms.api.req.domain.ReqDtlCmtInfo">
 		SELECT
 			DTL.REQ_SEQ AS reqSeq
 			, CMT.REQ_DTL_SEQ AS reqDtlSeq
@@ -10,36 +12,16 @@
 			, CMT.REQ_DTL_CMT AS reqDtlCmt
 			, HIS.REQ_DTL_STAT_CD AS reqDtlStatCd
 			, FN_GET_CODE_NM('REQ_DTL_STAT_CD', HIS.REQ_DTL_STAT_CD) AS reqDtlStat
+			, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = CMT.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn
 			, CMT.USE_YN AS useYn
 			, DATE_FORMAT(CMT.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 			, FN_GET_USER_NM(CMT.REG_SEQ) AS regNm
-			, 'TB_REQ_DTL_CMT' AS fileRefTb
-			, 'REQ_DTL_CMT_SEQ' AS fileRefCol			
 		FROM TB_REQ_DTL DTL
 		INNER JOIN TB_REQ_DTL_CMT CMT ON DTL.REQ_DTL_SEQ = CMT.REQ_DTL_SEQ
 		INNER JOIN TB_REQ_DTL_HIS HIS ON CMT.REQ_DTL_SEQ = HIS.REQ_DTL_SEQ
 			AND CMT.REQ_DTL_HIS_SEQ = HIS.REQ_DTL_HIS_SEQ
-		WHERE CMT.USE_YN = 'Y'
-	</sql>
-
-	<resultMap id="resultReqDtlCmtMap" type="com.iwi.iwms.api.req.domain.ReqDtlCmtInfo">
-		<result property="reqDtlCmtSeq" column="reqDtlCmtSeq"/>
-	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=reqDtlCmtSeq" 
-			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>
-	</resultMap>
-		
-	<!-- 요청사항 상세별 코멘트 목록 조회 -->			
-	<select id="listReqDtlCmtByReqDtlSeq" parameterType="long"
-		resultMap="resultReqDtlCmtMap">
-		<include refid="selectReqDtlCmt"></include>
-			AND CMT.REQ_DTL_SEQ = #{reqDtlSeq}
-		ORDER BY CMT.REQ_DTL_CMT_SEQ DESC	
-	</select>	
-		
-	<!-- 요청사항 상세 코멘트 단일 조회 -->				
-	<select id="getReqDtlCmtBySeq" parameterType="long"
-		resultMap="resultReqDtlCmtMap">
-		<include refid="selectReqDtlCmt"></include>
+		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
+		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE CMT.USE_YN = 'Y' END)	
 			AND CMT.REQ_DTL_CMT_SEQ = #{reqDtlCmtSeq}
 	</select>	
 		
@@ -58,7 +40,7 @@
 			, #{reqDtlHisSeq}
 			, #{reqDtlCmt}
 			, #{useYn}
-			, #{regSeq}
+			, #{loginUserSeq}
 		)		
 	</insert>		
 
@@ -69,7 +51,7 @@
 			REQ_DTL_CMT = #{reqDtlCmt}
 			, useYn = #{useYn}
 			, UPT_DT = CURRENT_TIMESTAMP
-			, UPT_SEQ = #{uptSeq}
+			, UPT_SEQ = #{loginUserSeq}
 		WHERE REQ_DTL_CMT_SEQ = #{reqDtlCmtSeq}	
 	</update>
 

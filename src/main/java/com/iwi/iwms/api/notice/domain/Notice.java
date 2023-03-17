@@ -57,21 +57,11 @@ public class Notice {
 	@Schema(description = "사용 여부", allowableValues = {"Y", "N"}) 
 	private String useYn;
 	
-	@Schema(hidden = true, description = "등록자 SEQ") 
-	private long regSeq;
-	
-	@Schema(hidden = true, description = "수정자 SEQ") 
-	private long uptSeq;
-	
-	@Schema(hidden = true, description = "수정자 SEQ") 
-	private String userAuthCd;
-	
-	@Schema(hidden = true, description = "수정자 SEQ") 
-	private long userCompSeq;
+	@Schema(hidden = true, description = "로그인 사용자 SEQ") 
+	private long loginUserSeq;
 	
 	public Notice of(final LoginUserInfo loginUserInfo) {
-		this.regSeq = loginUserInfo.getUserSeq();
-		this.uptSeq = loginUserInfo.getUserSeq();
+		this.loginUserSeq = loginUserInfo.getUserSeq();
 		
 		this.fileInfo = new UploadFile();
 		this.fileInfo.setFileRefTb("TB_NOTICE");
@@ -79,7 +69,7 @@ public class Notice {
 		if(this.noticeSeq != null && this.noticeSeq != 0) {
 			this.fileInfo.setFileRefSeq(this.noticeSeq);
 		}
-		this.fileInfo.setRegSeq(loginUserInfo.getUserSeq());
+		this.fileInfo.setLoginUserSeq(loginUserInfo.getUserSeq());
 		return this;
 	}
 

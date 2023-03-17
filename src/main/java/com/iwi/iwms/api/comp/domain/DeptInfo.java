@@ -23,6 +23,9 @@ public class DeptInfo {
 	@Schema(description = "부서 설명")
 	private String deptDesc;
 	
+	@Schema(description = "작성자 여부") 
+	private String ownerYn;
+	
 	@Schema(description = "사용 여부")
 	private String useYn;
 	

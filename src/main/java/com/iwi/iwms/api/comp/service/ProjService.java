@@ -5,8 +5,10 @@ import java.util.Map;
 
 import com.iwi.iwms.api.comp.domain.Proj;
 import com.iwi.iwms.api.comp.domain.ProjInfo;
+import com.iwi.iwms.api.comp.domain.ProjUser;
 import com.iwi.iwms.api.comp.domain.ProjUserInfo;
-import com.iwi.iwms.api.comp.domain.ProjUserList;
+import com.iwi.iwms.api.comp.domain.Site;
+import com.iwi.iwms.api.comp.domain.SiteInfo;
 
 public interface ProjService {
 
@@ -14,7 +16,7 @@ public interface ProjService {
 	
 	int countProj(Map<String, Object> map);
 
-	ProjInfo getProjBySeq(long projSeq);
+	ProjInfo getProjBySeq(long projSeq, long loginUserSeq);
 	
 	void insertProj(Proj proj);
 	
@@ -26,5 +28,17 @@ public interface ProjService {
 	
 	List<ProjUserInfo> listPerfProjUser(long projSeq);
 
-	int updateProjUser(ProjUserList projUserList);
+	int updateProjUser(ProjUser projUser);
+	
+	List<SiteInfo> listSite(Map<String, Object> map);
+	
+	int countSite(Map<String, Object> map);
+
+	SiteInfo getSiteBySeq(long siteSeq, long loginUserSeq);
+	
+	void insertSite(Site site);
+	
+	int updateSite(Site site);
+	
+	int deleteSite(Site site);
 }

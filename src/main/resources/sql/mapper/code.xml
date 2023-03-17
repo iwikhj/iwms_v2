@@ -8,14 +8,17 @@
 			, CODE.CODE_CD AS codeCd
 			, CODE.CODE_NM AS codeNm
 			, CODE.UP_CODE_CD AS upCodeCd
+			, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = CODE.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn					
 			, CODE.USE_YN AS useYn
+			, LOGIN.USER_SEQ AS loginUserSeq			
 		FROM TB_CODE CODE
-		WHERE CODE.USE_YN = 'Y'
+		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
+		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE CODE.USE_YN = 'Y' END)			
 	</sql>
 	
 	<resultMap id="resultCodeMap" type="com.iwi.iwms.api.code.domain.CodeInfo">
 		<result property="codeCd" column="codeCd"/>
-	   	<collection property="subCodes" column="codeCd" 
+	   	<collection property="subCodes" column="codeCd=codeCd,loginUserSeq=loginUserSeq" 
 			ofType="com.iwi.iwms.api.code.domain.CodeInfo" select="listCodeByUpCode"/>
 	</resultMap>
 
@@ -53,7 +56,7 @@
 			, #{codeNm}
 			, #{upCodeCd}
 			, #{useYn}
-			, #{regSeq}
+			, #{loginUserSeq}
 		)		
 	</insert>		
 
@@ -66,7 +69,7 @@
 			, UP_CODE_CD = #{upCodeCd}
 			, USE_YN = #{useYn}
 			, UPT_DT = CURRENT_TIMESTAMP
-			, UPT_SEQ = #{uptSeq}
+			, UPT_SEQ = #{loginUserSeq}
 		WHERE CODE_SEQ = #{codeSeq}	
 	</update>	
 

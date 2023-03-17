@@ -7,6 +7,8 @@ import org.apache.ibatis.annotations.Mapper;
 
 import com.iwi.iwms.api.comp.domain.Comp;
 import com.iwi.iwms.api.comp.domain.CompInfo;
+import com.iwi.iwms.api.comp.domain.Dept;
+import com.iwi.iwms.api.comp.domain.DeptInfo;
 
 @Mapper
 public interface CompMapper {
@@ -15,11 +17,21 @@ public interface CompMapper {
 	
 	int countComp(Map<String, Object> map);
 	
-	CompInfo getCompBySeq(long compSeq);
+	CompInfo getCompBySeq(Map<String, Object> map);
 	
 	void insertComp(Comp comp);
 	
 	int updateComp(Comp comp);
 	
 	int deleteComp(Comp comp);
+	
+	List<DeptInfo> listDeptByCompSeq(Map<String, Object> map);
+	
+	DeptInfo getDeptBySeq(Map<String, Object> map);
+	
+	void insertDept(Dept dept);
+	
+	int updateDept(Dept dept);
+	
+	int deleteDept(Dept dept);
 }

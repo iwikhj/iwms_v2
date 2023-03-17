@@ -26,6 +26,9 @@ public class CodeInfo {
 	@Schema(description = "상위 코드")
 	private String upCodeCd;
 	
+	@Schema(description = "작성자 여부") 
+	private String ownerYn;	
+	
 	@Schema(description = "사용 여부") 
 	private String useYn;
 	

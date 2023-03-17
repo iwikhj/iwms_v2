@@ -1,6 +1,8 @@
 package com.iwi.iwms.api.comp.domain;
 
-import org.springframework.util.StringUtils;
+import java.util.List;
+
+import javax.validation.constraints.NotNull;
 
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 
@@ -21,29 +23,18 @@ public class ProjUser {
 	@Schema(hidden = true, description = "프로젝트 SEQ")
 	private long projSeq;
 	
-	@Schema(hidden = true, description = "사용자 SEQ")
-	private long userSeq;
+	@NotNull(message = "담당자 구분은 필수 입력 사항입니다")
+	@Schema(description = "담당자 구분: [1:수행사, 2:고객사]", allowableValues = {"1", "2"})
+	private int projUserGb;
 	
-	@Schema(hidden = true, description = "대표자 여부", defaultValue = "N", allowableValues = {"Y", "N"}) 
-	private String repUserYn;
+	@Schema(description = "배정된 담당자 SEQ")
+	private List<Long> usersSeq;
 	
-	@Schema(hidden = true, description = "사용자 업무 코드: [PN: 기획, DS: 디자인, UI: 퍼블리싱, DV: 개발, DB: DB, ET: 기타]", allowableValues = {"PN", "DS", "UI", "DV", "DB", "ET"}) 
-	private String busiRollCd;
-	
-	@Schema(hidden = true, description = "사용 여부", defaultValue = "Y", allowableValues = {"Y", "N"}) 
-	private String useYn;
-	
-	@Schema(hidden = true, description = "등록자 SEQ") 
-	private long regSeq;
-	
-	@Schema(hidden = true, description = "수정자 SEQ") 
-	private long uptSeq;
+	@Schema(hidden = true, description = "로그인 사용자 SEQ") 
+	private long loginUserSeq;
 	
 	public ProjUser of(final LoginUserInfo loginUserInfo) {
-		this.repUserYn = StringUtils.hasText(this.repUserYn) ? this.repUserYn : "N";
-		this.useYn = StringUtils.hasText(this.useYn) ? this.useYn : "Y";
-		this.regSeq = loginUserInfo.getUserSeq();
-		this.uptSeq = loginUserInfo.getUserSeq();
+		this.loginUserSeq = loginUserInfo.getUserSeq();
 		return this;
 	}
 }

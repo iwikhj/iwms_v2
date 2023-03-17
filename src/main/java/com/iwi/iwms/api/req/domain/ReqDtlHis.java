@@ -30,11 +30,11 @@ public class ReqDtlHis {
 	@Schema(description = "요청사항 상세 상태 코멘트") 
 	private String reqDtlStatCmt;
 	
-	@Schema(hidden = true, description = "등록자 SEQ") 
-	private long regSeq;
+	@Schema(hidden = true, description = "로그인 사용자 SEQ") 
+	private long loginUserSeq;
 	
 	public ReqDtlHis of(final LoginUserInfo loginUserInfo) {
-		this.regSeq = loginUserInfo.getUserSeq();
+		this.loginUserSeq = loginUserInfo.getUserSeq();
 		return this;
 	}
 }

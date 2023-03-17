@@ -89,7 +89,7 @@ public class MenuPageController {
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
 		Map<String, Object> map = new HashMap<>();
-		map.put("userSeq", loginUserInfo.getUserSeq());
+		map.put("loginUserSeq", loginUserInfo.getUserSeq());
 		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, noticeService.countNotice(map)));
     	List<NoticeInfo> listNotice = noticeService.listNotice(map);
     	
@@ -125,6 +125,7 @@ public class MenuPageController {
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
 		Map<String, Object> map = new HashMap<>();
+		map.put("loginUserSeq", loginUserInfo.getUserSeq());
 		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, reqService.countReq(map)));
     	
     	List<ReqInfo> listReq = reqService.listReq(map);
@@ -140,11 +141,12 @@ public class MenuPageController {
     @Operation(summary = "유지보수 - 유지보수 - 상세 ", description = "유지보수 상세")
     @GetMapping(value = "/maintain/request/detail")
     public ResponseEntity<Response<ReqDtlInfo>> maintainRequestDetail(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
     		, @RequestParam(value = "rSeq", required = true) Long reqSeq
-    		, @RequestParam(value = "dSeq", required = false) Long reqDtlSeq
-    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+    		, @RequestParam(value = "dSeq", required = false) Long reqDtlSeq) {
     	
     	Map<String, Object> map = new HashMap<>();
+    	map.put("loginUserSeq", loginUserInfo.getUserSeq());
 		map.put("reqSeq", reqSeq);
 		if(reqDtlSeq != null && reqDtlSeq != 0) {
 			map.put("reqDtlSeq", reqDtlSeq);
@@ -207,6 +209,7 @@ public class MenuPageController {
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
 		Map<String, Object> map = new HashMap<>();
+		map.put("loginUserSeq", loginUserInfo.getUserSeq());
 		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, projService.countProj(map)));
 		
 		List<ProjInfo> listProj = projService.listProj(map);
@@ -263,6 +266,7 @@ public class MenuPageController {
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
 		Map<String, Object> map = new HashMap<>();
+		map.put("loginUserSeq", loginUserInfo.getUserSeq());
 		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, userService.countUser(map)));
     	
     	List<UserInfo> listUser = userService.listUser(map);
@@ -282,6 +286,7 @@ public class MenuPageController {
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
 		Map<String, Object> map = new HashMap<>();
+		map.put("loginUserSeq", loginUserInfo.getUserSeq());
 		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, compService.countComp(map)));
     	
 		List<CompInfo> listComp = compService.listComp(map);
@@ -301,6 +306,7 @@ public class MenuPageController {
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
 		Map<String, Object> map = new HashMap<>();
+		map.put("loginUserSeq", loginUserInfo.getUserSeq());
 		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, projService.countProj(map)));
 		
 		List<ProjInfo> listProj = projService.listProj(map);
@@ -320,6 +326,7 @@ public class MenuPageController {
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
 		Map<String, Object> map = new HashMap<>();
+		map.put("loginUserSeq", loginUserInfo.getUserSeq());
 		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, authService.countAuth(map)));
 		
 		List<AuthInfo> listAuth = authService.listAuth(map);

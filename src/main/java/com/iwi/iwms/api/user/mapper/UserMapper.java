@@ -8,7 +8,9 @@ import org.apache.ibatis.annotations.Mapper;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.user.domain.User;
 import com.iwi.iwms.api.user.domain.UserInfo;
+import com.iwi.iwms.api.user.domain.UserProjInfo;
 import com.iwi.iwms.api.user.domain.UserPwd;
+import com.iwi.iwms.api.user.domain.UserSiteInfo;
 import com.iwi.iwms.api.user.domain.UserUpdate;
 
 @Mapper
@@ -18,7 +20,7 @@ public interface UserMapper {
 	
 	int countUser(Map<String, Object> map);
 	
-	UserInfo getUserBySeq(long userSeq);
+	UserInfo getUserBySeq(Map<String, Object> map);
 	
 	UserInfo getUserById(String userId);
 	
@@ -34,5 +36,10 @@ public interface UserMapper {
 	
 	int updateLoginFailure(User user);
 	
-	LoginUserInfo getLoginUser(String ssoId);
+	LoginUserInfo getLoginUser(String ssoKey);
+	
+	List<UserProjInfo> listProjByUserSeq(long userSeq);
+	
+	List<UserSiteInfo> listSiteByUserSeq(long userSeq);
+
 }

@@ -61,6 +61,12 @@ public class ReqInfo {
 	@Schema(description = "담당자 상세 목록") 
 	private List<ReqTaskInfo> tasks;
 	
+	@Schema(description = "작성자 여부") 
+	private String ownerYn;
+	
+	@Schema(description = "삭제 여부") 
+	private String delYn;
+	
 	@Schema(description = "사용 여부")
 	private String useYn;
 	

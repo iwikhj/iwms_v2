@@ -10,7 +10,7 @@ public interface ReqDtlService {
 
 	ReqDtlInfo getReqDtlByReqAndDtlSeq(Map<String, Object> map);
 	
-	ReqDtlInfo getReqDtlBySeq(long reqSeq);
+	ReqDtlInfo getReqDtlBySeq(long reqSeq, long loginUserSeq);
 
 	void insertReqDtl(ReqDtl reqDtl);
 	

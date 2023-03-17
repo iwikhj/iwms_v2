@@ -1,5 +1,6 @@
 package com.iwi.iwms.api.req.service.impl;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -46,8 +47,12 @@ public class ReqServiceImpl implements ReqService {
 	}
 
 	@Override
-	public ReqInfo getReqBySeq(long reqSeq) {
-		return Optional.ofNullable(reqMapper.getReqBySeq(reqSeq))
+	public ReqInfo getReqBySeq(long reqSeq, long loginUserSeq) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("reqSeq", reqSeq);
+		map.put("loginUserSeq", loginUserSeq);
+		
+		return Optional.ofNullable(reqMapper.getReqBySeq(map))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항을 찾을 수 없습니다."));
 	}
 
@@ -68,7 +73,7 @@ public class ReqServiceImpl implements ReqService {
 					.reqSeq(req.getReqSeq())
 					.reqStatCd(status.getCode())
 					.reqStatCmt(status.getMessage())
-					.regSeq(req.getRegSeq())
+					.loginUserSeq(req.getLoginUserSeq())
 					.build();
 			
 			reqMapper.insertReqHis(reqHis);
@@ -86,7 +91,7 @@ public class ReqServiceImpl implements ReqService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateReq(Req req) {
-		this.getReqBySeq(req.getReqSeq());
+		this.getReqBySeq(req.getReqSeq(), req.getLoginUserSeq());
 		
 		int result = reqMapper.updateReq(req);
 		
@@ -108,7 +113,7 @@ public class ReqServiceImpl implements ReqService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int deleteReq(Req req) {
-		this.getReqBySeq(req.getReqSeq());
+		this.getReqBySeq(req.getReqSeq(), req.getLoginUserSeq());
 		
 		int result = reqMapper.deleteReq(req);
 		
@@ -123,7 +128,7 @@ public class ReqServiceImpl implements ReqService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public void insertReqHis(ReqHis reqHis) {
-		this.getReqBySeq(reqHis.getReqSeq());
+		this.getReqBySeq(reqHis.getReqSeq(), reqHis.getLoginUserSeq());
 		
 		if(!StringUtils.hasText(reqHis.getReqStatCmt())) {
 			reqHis.setReqStatCmt(ReqStatCode.toMessage(reqHis.getReqStatCd()));

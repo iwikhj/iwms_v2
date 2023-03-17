@@ -8,7 +8,6 @@ import org.apache.ibatis.annotations.Mapper;
 import com.iwi.iwms.api.auth.domain.Auth;
 import com.iwi.iwms.api.auth.domain.AuthInfo;
 import com.iwi.iwms.api.auth.domain.AuthMenu;
-import com.iwi.iwms.api.auth.domain.AuthMenuInfo;
 
 @Mapper
 public interface AuthMapper {
@@ -17,18 +16,12 @@ public interface AuthMapper {
 	
 	int countAuth(Map<String, Object> map);
 	
-	AuthInfo getAuthBySeq(long authSeq);
+	AuthInfo getAuthBySeq(Map<String, Object> map);
 	
 	AuthInfo getAuthByAuthCd(String authCd);
 	
-	void insertAuth(Auth auth);
-	
 	int updateAuth(Auth auth);
 	
-	int deleteAuth(Auth auth);
-	
-	List<AuthMenuInfo> getAuthMenuByAuthSeq(long authSeq);
-
 	void updateAuthMenu(AuthMenu authMenu);
 
 }

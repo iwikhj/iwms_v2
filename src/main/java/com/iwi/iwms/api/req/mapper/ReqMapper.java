@@ -16,7 +16,7 @@ public interface ReqMapper {
 	
 	int countReq(Map<String, Object> map);
 	
-	ReqInfo getReqBySeq(long reqSeq);
+	ReqInfo getReqBySeq(Map<String, Object> map);
 	
 	void insertReq(Req req);
 	
