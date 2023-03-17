@@ -53,7 +53,7 @@ public class NoticeController {
 			, @RequestParam(value = "endDate", required = false) String endDate) {
 		
 		Map<String, Object> map = new HashMap<>();
-		map.put("userSeq", loginUserInfo.getUserSeq());
+		map.put("loginUserSeq", loginUserInfo.getUserSeq());
 		map.put("search", search);
 		map.put("startDate", startDate);
 		map.put("endDate", endDate);

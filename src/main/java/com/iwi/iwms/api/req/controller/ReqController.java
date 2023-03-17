@@ -66,7 +66,7 @@ public class ReqController {
 			, @RequestParam(value = "endDate", required = false) String endDate) {
 		
 		Map<String, Object> map = new HashMap<>();
-		map.put("userSeq", loginUserInfo.getUserSeq());
+		map.put("loginUserSeq", loginUserInfo.getUserSeq());
 		map.put("search", search);
 		map.put("startDate", startDate);
 		map.put("endDate", endDate);
@@ -189,10 +189,12 @@ public class ReqController {
     @Operation(summary = "요청사항 상세", description = "요청사항 상세")
     @GetMapping(value = "/{reqSeq}/details")
     public ResponseEntity<ApiResponse<ReqDtlInfo>> getReqDtlByReqAndDtlSeq(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
     		, @PathVariable long reqSeq
 			, @RequestParam(value = "reqDtlSeq", required = false) Long reqDtlSeq) {
 		
     	Map<String, Object> map = new HashMap<>();
+    	map.put("loginUserSeq", loginUserInfo.getUserSeq());
 		map.put("reqSeq", reqSeq);
 		if(reqDtlSeq != null && reqDtlSeq != 0) {
 			map.put("reqDtlSeq", reqDtlSeq);

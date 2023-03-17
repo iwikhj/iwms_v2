@@ -55,7 +55,7 @@ public class CompController {
 			, @RequestParam(value = "endDate", required = false) String endDate) {
 		
 		Map<String, Object> map = new HashMap<>();
-		map.put("userSeq", loginUserInfo.getUserSeq());
+		map.put("loginUserSeq", loginUserInfo.getUserSeq());
 		map.put("search", search);
 		map.put("startDate", startDate);
 		map.put("endDate", endDate);
@@ -135,7 +135,7 @@ public class CompController {
 			, @PathVariable long compSeq) {
 		
 		Map<String, Object> map = new HashMap<>();
-		map.put("userSeq", loginUserInfo.getUserSeq());
+		map.put("loginUserSeq", loginUserInfo.getUserSeq());
 		map.put("compSeq", compSeq);
 		
 		List<DeptInfo> positionList = compService.listDeptByCompSeq(map);

@@ -59,7 +59,7 @@ public class ProjController {
 			, @RequestParam(value = "endDate", required = false) String endDate) {
 		
 		Map<String, Object> map = new HashMap<>();
-		map.put("userSeq", loginUserInfo.getUserSeq());
+		map.put("loginUserSeq", loginUserInfo.getUserSeq());
 		if(compSeq.isPresent()) {
 			map.put("compSeq", compSeq.get());
 		}
@@ -174,6 +174,7 @@ public class ProjController {
 	@Operation(summary = "사이트 목록", description = "사이트 목록")
 	@GetMapping(value = "/{projSeq}/sites")
 	public ResponseEntity<ApiListResponse<List<SiteInfo>>> listSite(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long projSeq
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
@@ -182,6 +183,7 @@ public class ProjController {
 			, @RequestParam(value = "endDate", required = false) String endDate) {
 		
 		Map<String, Object> map = new HashMap<>();
+		map.put("loginUserSeq", loginUserInfo.getUserSeq());
 		map.put("projSeq", projSeq);
 		map.put("search", search);
 		map.put("startDate", startDate);

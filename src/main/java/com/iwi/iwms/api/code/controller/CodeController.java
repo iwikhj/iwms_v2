@@ -43,9 +43,11 @@ public class CodeController {
     @Operation(summary = "코드 목록", description = "전체 코드 목록")
     @GetMapping(value = "")
     public ResponseEntity<ApiResponse<List<CodeInfo>>> listAllCode(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
     		, @Parameter(description = "코드 또는 코드 이름으로 검색") @RequestParam(value = "search", required = false) String search) {
     	
     	Map<String, Object> map = new HashMap<>();
+    	map.put("loginUserSeq", loginUserInfo.getUserSeq());
     	map.put("search", search);
     	
     	List<CodeInfo> codeList = codeService.listCode(map);
