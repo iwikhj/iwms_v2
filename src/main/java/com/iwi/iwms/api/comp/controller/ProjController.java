@@ -83,11 +83,11 @@ public class ProjController {
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
     		, @PathVariable long projSeq) {
     	
-    	ProjInfo project = projService.getProjBySeq(projSeq, loginUserInfo.getUserSeq());
+    	ProjInfo projInfo = projService.getProjBySeq(projSeq, loginUserInfo.getUserSeq());
     	
 		return ResponseEntity.ok(ApiResponse.<ProjInfo>builder()
 				.request(request)
-				.data(project)
+				.data(projInfo)
 				.build());
     }
     
@@ -206,11 +206,11 @@ public class ProjController {
     		, @PathVariable long projSeq
     		, @PathVariable long siteSeq) {
     	
-    	SiteInfo Siteect = projService.getSiteBySeq(siteSeq, loginUserInfo.getUserSeq());
+    	SiteInfo siteInfo = projService.getSiteBySeq(siteSeq, loginUserInfo.getUserSeq());
     	
 		return ResponseEntity.ok(ApiResponse.<SiteInfo>builder()
 				.request(request)
-				.data(Siteect)
+				.data(siteInfo)
 				.build());
     }
     

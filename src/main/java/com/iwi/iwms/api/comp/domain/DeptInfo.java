@@ -1,7 +1,5 @@
 package com.iwi.iwms.api.comp.domain;
 
-import java.util.List;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,6 +11,12 @@ import lombok.ToString;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeptInfo {
+	
+	@Schema(description = "소속 SEQ")
+	private long compSeq;
+
+	@Schema(description = "소속 이름")
+	private String compNm;
 	
 	@Schema(description = "부서 SEQ")
 	private long deptSeq;
@@ -28,8 +32,5 @@ public class DeptInfo {
 	
 	@Schema(description = "사용 여부")
 	private String useYn;
-	
-	@Schema(description = "하위 부서 목록")
-	private List<DeptInfo> subDepts;
 	
 }

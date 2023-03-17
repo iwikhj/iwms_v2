@@ -62,8 +62,8 @@ public class CompServiceImpl implements CompService {
 	}
 
 	@Override
-	public List<DeptInfo> listDeptByCompSeq(Map<String, Object> map) {
-		return compMapper.listDeptByCompSeq(map);
+	public List<DeptInfo> listDept(Map<String, Object> map) {
+		return compMapper.listDept(map);
 	}
 
 	@Override

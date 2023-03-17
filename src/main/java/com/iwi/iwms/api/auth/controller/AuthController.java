@@ -74,11 +74,11 @@ public class AuthController {
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
     		, @PathVariable long authSeq) {
     	
-    	AuthInfo auth = authService.getAuthBySeq(authSeq, loginUserInfo.getUserSeq());
+    	AuthInfo authInfo = authService.getAuthBySeq(authSeq, loginUserInfo.getUserSeq());
     	
 		return ResponseEntity.ok(ApiResponse.<AuthInfo>builder()
 				.request(request)
-				.data(auth)
+				.data(authInfo)
 				.build());
     }
     

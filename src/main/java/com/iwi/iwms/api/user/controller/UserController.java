@@ -83,11 +83,11 @@ public class UserController {
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
     		, @PathVariable long userSeq) {
     	
-    	UserInfo user = userService.getUserBySeq(userSeq, loginUserInfo.getUserSeq());
+    	UserInfo userInfo = userService.getUserBySeq(userSeq, loginUserInfo.getUserSeq());
     	
 		return ResponseEntity.ok(ApiResponse.<UserInfo>builder()
 				.request(request)
-				.data(user)
+				.data(userInfo)
 				.build());
     }
 	

@@ -25,7 +25,7 @@ public interface CompMapper {
 	
 	int deleteComp(Comp comp);
 	
-	List<DeptInfo> listDeptByCompSeq(Map<String, Object> map);
+	List<DeptInfo> listDept(Map<String, Object> map);
 	
 	DeptInfo getDeptBySeq(Map<String, Object> map);
 	

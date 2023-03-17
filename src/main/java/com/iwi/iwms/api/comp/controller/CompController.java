@@ -76,11 +76,11 @@ public class CompController {
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
     		, @PathVariable long compSeq) {
     	
-    	CompInfo comp = compService.getCompBySeq(compSeq, loginUserInfo.getUserSeq());
+    	CompInfo compInfo = compService.getCompBySeq(compSeq, loginUserInfo.getUserSeq());
     	
 		return ResponseEntity.ok(ApiResponse.<CompInfo>builder()
 				.request(request)
-				.data(comp)
+				.data(compInfo)
 				.build());
     }
     
@@ -138,13 +138,28 @@ public class CompController {
 		map.put("loginUserSeq", loginUserInfo.getUserSeq());
 		map.put("compSeq", compSeq);
 		
-		List<DeptInfo> positionList = compService.listDeptByCompSeq(map);
+		List<DeptInfo> positionList = compService.listDept(map);
 
 		return ResponseEntity.ok(ApiListResponse.<List<DeptInfo>>builder()
 				.request(request)
 				.data(positionList)
 				.build());
 	}
+	
+    @Operation(summary = "소속 부서 정보", description = "소속 부서 정보")
+    @GetMapping(value = "/{compSeq}/depts/{deptSeq}")
+    public ResponseEntity<ApiResponse<DeptInfo>> getDeptBySeq(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
+    		, @PathVariable long compSeq
+    		, @PathVariable long deptSeq) {
+    	
+    	DeptInfo deptInfo = compService.getDeptBySeq(deptSeq, loginUserInfo.getUserSeq());
+    	
+		return ResponseEntity.ok(ApiResponse.<DeptInfo>builder()
+				.request(request)
+				.data(deptInfo)
+				.build());
+    }	
     
     @Operation(summary = "소속 부서 등록", description = "소속 부서 등록")
 	@PostMapping(value = "/{compSeq}/depts", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)

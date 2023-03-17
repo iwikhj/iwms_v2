@@ -49,9 +49,9 @@
 
 	<resultMap id="resultCompMap" type="com.iwi.iwms.api.comp.domain.CompInfo">
 		<result property="compSeq" column="compSeq"/>
-	   	<collection property="depts" column="compSeq=compSeq,loginUserSeq=loginUserSeq" 
+	   	<collection property="depts" column="compSeq" 
 			ofType="com.iwi.iwms.api.comp.domain.DeptInfo" select="listDeptByCompSeq"/>
-	   	<collection property="users" column="compSeq=compSeq,loginUserSeq=loginUserSeq" 
+	   	<collection property="users" column="compSeq" 
 			ofType="com.iwi.iwms.api.user.domain.UserInfo" select="listUserByCompSeq"/>
 	</resultMap>
 			
@@ -79,7 +79,7 @@
 	</select>	
 	
 	<!-- 소속별 사용자 목록 조회 -->
-	<select id="listUserByCompSeq" parameterType="hashMap"
+	<select id="listUserByCompSeq" parameterType="long"
 		resultType="com.iwi.iwms.api.user.domain.UserInfo">
 		SELECT 
 			ROW_NUMBER() OVER(ORDER BY USER.USER_SEQ) AS rowNum
@@ -164,49 +164,62 @@
 		WHERE COMP_SEQ = #{compSeq}	 
 	</delete>
 	
-
-	<sql id="selectDept">
+	<!-- 부서 목록 조회 -->
+	<select id="listDept" parameterType="hashMap"
+		resultType="com.iwi.iwms.api.comp.domain.DeptInfo">
 		SELECT 
-			DEPT.DEPT_SEQ AS deptSeq
+			COMP.COMP_SEQ AS compSeq
+			, COMP.COMP_NM AS compNm
+			, DEPT.DEPT_SEQ AS deptSeq
 			, DEPT.DEPT_NM AS deptNm
 			, DEPT.DEPT_DESC AS deptDesc
 			, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = DEPT.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn					
 			, DEPT.USE_YN AS useYn
-			, LOGIN.USER_SEQ AS loginUserSeq
 		FROM TB_DEPT DEPT
+		INNER JOIN TB_COMPANY COMP ON DEPT.COMP_SEQ = COMP.COMP_SEQ
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
-		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE DEPT.USE_YN = 'Y' END)			
-	</sql>
-
-	<resultMap id="resultDeptMap" type="com.iwi.iwms.api.comp.domain.DeptInfo">
-		<result property="deptSeq" column="deptSeq"/>
-	   	<collection property="subDepts" column="deptSeq=deptSeq,loginUserSeq=loginUserSeq" 
-			ofType="com.iwi.iwms.api.comp.domain.DeptInfo" select="listDeptByUpDeptSeq"/>
-	</resultMap>
-	
-	<!-- 소속별 부서 목록 조회 -->
-	<select id="listDeptByCompSeq" parameterType="hashMap"
-		resultMap="resultDeptMap">
-		<include refid="selectDept"></include>
+		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE DEPT.USE_YN = 'Y' END)
+		<if test='compSeq != null and compSeq != ""'>
 			AND DEPT.COMP_SEQ = #{compSeq}
-			AND DEPT.UP_DEPT_SEQ IS NULL
+		</if>	
 		ORDER BY DEPT.DEPT_ORDER_NO		
-	</select>	
-	
-	<!-- 하위 부서 목록 조회 -->	
-	<select id="listDeptByUpDeptSeq" resultType="com.iwi.iwms.api.comp.domain.DeptInfo">
-		<include refid="selectDept"></include>
-			AND DEPT.UP_DEPT_SEQ = #{deptSeq}
-		ORDER BY DEPT.DEPT_ORDER_NO		
-	</select>
+	</select>		
 	
 	<!-- 부서 단일 조회 -->	
 	<select id="getDeptBySeq" parameterType="hashMap"
-		resultMap="resultDeptMap">
-		<include refid="selectDept"></include>
+		resultType="com.iwi.iwms.api.comp.domain.DeptInfo">
+		SELECT 
+			COMP.COMP_SEQ AS compSeq
+			, COMP.COMP_NM AS compNm		
+			, DEPT.DEPT_SEQ AS deptSeq
+			, DEPT.DEPT_NM AS deptNm
+			, DEPT.DEPT_DESC AS deptDesc
+			, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = DEPT.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn					
+			, DEPT.USE_YN AS useYn
+		FROM TB_DEPT DEPT
+		INNER JOIN TB_COMPANY COMP ON DEPT.COMP_SEQ = COMP.COMP_SEQ
+		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
+		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE DEPT.USE_YN = 'Y' END)
 			AND DEPT.DEPT_SEQ = #{deptSeq}
 	</select>	
-
+	
+	<!-- 소속별 부서 목록 조회 -->
+	<select id="listDeptByCompSeq" parameterType="long"
+		resultType="com.iwi.iwms.api.comp.domain.DeptInfo">
+		SELECT 
+			DEPT.COMP_SEQ AS compSeq
+			, COMP.COMP_NM AS compNm	
+			, DEPT.DEPT_SEQ AS deptSeq
+			, DEPT.DEPT_NM AS deptNm
+			, DEPT.DEPT_DESC AS deptDesc
+			, DEPT.USE_YN AS useYn
+		FROM TB_DEPT DEPT
+		INNER JOIN TB_COMPANY COMP ON DEPT.COMP_SEQ = COMP.COMP_SEQ
+		WHERE DEPT.USE_YN = 'Y'
+			AND DEPT.COMP_SEQ = #{compSeq}
+		ORDER BY DEPT.DEPT_ORDER_NO		
+	</select>
+	
 	<!-- 부서 등록 -->
 	<insert id="insertDept" parameterType="com.iwi.iwms.api.comp.domain.Dept"
 		useGeneratedKeys="true" keyProperty="deptSeq">

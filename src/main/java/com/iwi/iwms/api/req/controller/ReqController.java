@@ -200,11 +200,11 @@ public class ReqController {
 			map.put("reqDtlSeq", reqDtlSeq);
 		}
 		
-    	ReqDtlInfo reqDtl = reqDtlService.getReqDtlByReqAndDtlSeq(map);
+    	ReqDtlInfo reqDtlInfo = reqDtlService.getReqDtlByReqAndDtlSeq(map);
     	
 		return ResponseEntity.ok(ApiResponse.<ReqDtlInfo>builder()
 				.request(request)
-				.data(reqDtl)
+				.data(reqDtlInfo)
 				.build());
     }
 

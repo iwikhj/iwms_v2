@@ -22,7 +22,7 @@ public interface CompService {
 	
 	int deleteComp(Comp comp);
 	
-	List<DeptInfo> listDeptByCompSeq(Map<String, Object> map);
+	List<DeptInfo> listDept(Map<String, Object> map);
 	
 	DeptInfo getDeptBySeq(long deptSeq, long loginUserSeq);
 
