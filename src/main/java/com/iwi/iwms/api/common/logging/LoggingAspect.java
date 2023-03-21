@@ -57,6 +57,5 @@ public class LoggingAspect {
         	}
         }
         return params;
-
-      }
+	}
 }

@@ -8,6 +8,7 @@ import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import javax.servlet.FilterChain;
@@ -52,20 +53,19 @@ public class AuthenticationFilter extends GenericFilterBean {
         
         String token = resolveAuthHeader(request);
         AuthCode tokenStatus = tokenValidation(token);
+     
+        printLog(request, tokenStatus);
         
-        log.info("[Referer] <{}>", request.getHeader("Referer"));
-        log.info("[Token status] <{}>", tokenStatus);
-
         if(AuthCode.VERIFIED.equals(tokenStatus)) {
         	//ok
         } else if(AuthCode.EXPIRED.equals(tokenStatus)) {
-			//sendError(request, response, HttpStatus.UNAUTHORIZED, tokenStatus.name());
+			//responseError(request, response, HttpStatus.UNAUTHORIZED, tokenStatus.name());
 			//return;
         	passAuthentication("bfb1e1d6-9018-4b50-8c69-f48c939b763b", Arrays.asList("ROLE_IWMS_ADMIN"));
     		request = ignoreRequestHeader(servletRequest, request, HttpHeaders.AUTHORIZATION);
     		
         } else if(AuthCode.INVALID.equals(tokenStatus)) {
-			//sendError(request, response, HttpStatus.UNAUTHORIZED, tokenStatus.name());
+			//responseError(request, response, HttpStatus.UNAUTHORIZED, tokenStatus.name());
 			//return;
         	passAuthentication("bfb1e1d6-9018-4b50-8c69-f48c939b763b", Arrays.asList("ROLE_IWMS_ADMIN"));
         	//passAuthentication("f983803e-4d8e-45ec-a0c9-8fbef7c8263f", Arrays.asList("ROLE_IWMS_ENG"));
@@ -167,7 +167,32 @@ public class AuthenticationFilter extends GenericFilterBean {
         };
     }
     
-    private void sendError(HttpServletRequest request, HttpServletResponse response, HttpStatus status, String errorMessage) {
+	private void printLog(HttpServletRequest request, AuthCode authCode) {
+		try {
+			String bearerToken = StringUtils.hasText(request.getHeader(HttpHeaders.AUTHORIZATION)) ? request.getHeader(HttpHeaders.AUTHORIZATION) : "";
+			String remoteAddr = StringUtils.hasText(request.getRemoteAddr()) ? request.getRemoteAddr() : "-";
+			String url = StringUtils.hasText(request.getRequestURL()) ? request.getRequestURL().toString() : "";
+			String method = StringUtils.hasText(request.getMethod()) ? request.getMethod() : "-";
+			String queryString = StringUtils.hasText(request.getQueryString()) ? request.getQueryString() : "";
+			String referer = StringUtils.hasText(request.getHeader("Referer")) ? request.getHeader("Referer") : "-";
+			String agent = StringUtils.hasText(request.getHeader("User-Agent")) ? request.getHeader("User-Agent") : "-";;
+			String fullUrl = url;
+			fullUrl += StringUtils.hasText(queryString)? "?"+queryString:queryString;
+			
+	        StringJoiner sj = new StringJoiner(">, <", "<", ">");
+	        sj.add("Status:" + authCode.name());
+	        sj.add("Len:" + bearerToken.length());
+	        sj.add("IP:" + remoteAddr);
+	        sj.add("Method:" + method);
+	        sj.add("URL:" + fullUrl);
+	        sj.add("Referer:" + referer);
+	        sj.add("User-Agent:" + agent);
+
+	        log.info("[FILTER LOG] {}", sj);
+		} catch(Exception e) {}
+	}
+    
+    private void responseError(HttpServletRequest request, HttpServletResponse response, HttpStatus status, String errorMessage) {
     	try {
             response.setStatus(status.value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
