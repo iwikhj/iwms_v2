@@ -54,8 +54,8 @@ public class AuthenticationFilter extends GenericFilterBean {
         AuthCode tokenStatus = tokenValidation(token);
         
         log.info("[Referer] <{}>", request.getHeader("Referer"));
-        log.info("[Token status] <{}>", tokenStatus.name());
-        
+        log.info("[Token status] <{}>", tokenStatus);
+
         if(AuthCode.VERIFIED.equals(tokenStatus)) {
         	//ok
         } else if(AuthCode.EXPIRED.equals(tokenStatus)) {
@@ -65,13 +65,13 @@ public class AuthenticationFilter extends GenericFilterBean {
     		request = ignoreRequestHeader(servletRequest, request, HttpHeaders.AUTHORIZATION);
     		
         } else if(AuthCode.INVALID.equals(tokenStatus)) {
-			//sendError(request, response, HttpStatus.BAD_REQUEST, tokenStatus.name());
+			//sendError(request, response, HttpStatus.UNAUTHORIZED, tokenStatus.name());
 			//return;
         	passAuthentication("bfb1e1d6-9018-4b50-8c69-f48c939b763b", Arrays.asList("ROLE_IWMS_ADMIN"));
         	//passAuthentication("f983803e-4d8e-45ec-a0c9-8fbef7c8263f", Arrays.asList("ROLE_IWMS_ENG"));
     		request = ignoreRequestHeader(servletRequest, request, HttpHeaders.AUTHORIZATION);
         }
-
+        
         chain.doFilter(request, response);
 	}
     

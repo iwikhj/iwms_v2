@@ -22,4 +22,6 @@ public class Reissue {
 	@Schema(description = "리프레시 토큰") 
     private String refreshToken;
     
+    @Schema(hidden = true, description = "로그인 아이피") 
+    private String loginIp;
 }

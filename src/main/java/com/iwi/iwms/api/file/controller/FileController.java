@@ -45,7 +45,7 @@ public class FileController {
     @Operation(summary = "파일 업로드", description = "파일 업로드")
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<FileStorageResponse>> upload(HttpServletRequest request
-			, @Parameter(hidden = true) LoginUserInfo loginUserInfo	
+			//, @Parameter(hidden = true) LoginUserInfo loginUserInfo	
 			, @RequestParam(value = "file", required = true) MultipartFile multipartFile) {
     	
     	String ms = String.valueOf(System.currentTimeMillis()) ;
@@ -64,7 +64,7 @@ public class FileController {
 	@Operation(hidden = true, summary = "파일 링크", description = "파일 링크")
 	@GetMapping(value = "/link/{path1}/{path2}/{filename:.+}")
 	public ResponseEntity<Resource> link(HttpServletRequest request
-			, @Parameter(hidden = true) LoginUserInfo loginUserInfo	
+			//, @Parameter(hidden = true) LoginUserInfo loginUserInfo	
 			, @PathVariable String path1
 			, @PathVariable String path2
 			, @PathVariable String filename) throws IOException {
@@ -99,7 +99,7 @@ public class FileController {
 	@Operation(hidden = true, summary = "파일 다운로드", description = "파일 다운로드")
 	@GetMapping(value = "/download/{fileSeq}")
 	public ResponseEntity<Resource> download(HttpServletRequest request
-			, @Parameter(hidden = true) LoginUserInfo loginUserInfo	
+			//, @Parameter(hidden = true) LoginUserInfo loginUserInfo	
 			, @PathVariable long fileSeq) throws IOException {
 		
 		UploadFileInfo fileInfo = fileService.getFileBySeq(fileSeq);

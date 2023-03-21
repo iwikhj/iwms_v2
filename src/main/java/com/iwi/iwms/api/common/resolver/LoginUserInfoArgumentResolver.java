@@ -16,9 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
-import com.iwi.iwms.api.user.service.UserService;
 import com.iwi.iwms.config.redis.RedisProvider;
-import com.iwi.iwms.utils.CookieUtil;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,8 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @Component
 public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResolver {
-
-	private final UserService userService;
 	
     private final RedisProvider redis;
     
@@ -42,31 +38,30 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
 	@Override
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-		//HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+		HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 		//String userId = (String)((ServletWebRequest) webRequest).getRequest().getAttribute("u");
 
 		//Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		Authentication authentication = (Authentication) webRequest.getUserPrincipal();
+		Authentication authentication = Optional.ofNullable((Authentication) webRequest.getUserPrincipal())
+			.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "인증되지 않은 사용자입니다."));
+		
 		String ssoKey = authentication.getName();
 		
-		//Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-		//authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_IWMS_USER"));
-
-		//redis: 로그인 사용자 정보 불러오기 
+		if(request.getRequestURI().indexOf("logout") != -1) {
+			redis.delete(ssoKey);
+			return null;
+		}
+		
+		/*
 		LoginUserInfo loginUserInfo = objectMapper.convertValue(redis.getHash(ssoKey, "user"), LoginUserInfo.class);
-        log.info("============== User info in Redis: {}", loginUserInfo == null ? "Not found user <null>" : loginUserInfo);
-        
 		if(loginUserInfo == null) {
 			loginUserInfo = userService.getLoginUser(ssoKey);
 		}
-		
-		//db에서 직접 찾는 부분은 추후 예외 처리로 변경
-		//return Optional.ofNullable(objectMapper.convertValue(redis.getHash(ssoKey, "user"), LoginUserInfo.class))
-		//				.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "인증 정보를 불러오는데 실패했습니다"));
-		
-		//request.setAttribute("user", loginUserInfo);
-		
 		return loginUserInfo;
+		*/
+		
+		return Optional.ofNullable(objectMapper.convertValue(redis.getHash(ssoKey, "user"), LoginUserInfo.class))
+					.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인 정보를 찾을 수 없습니다."));
 	}
 
 }

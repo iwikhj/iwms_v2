@@ -3,8 +3,10 @@ package com.iwi.iwms.api.common.errors;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.InternalServerErrorException;
 
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -40,7 +42,6 @@ public class ExceptionHandlers {
 				    			.map(v -> v.getDefaultMessage())
 				    			.findFirst()
 				    			.get();
-    	
         return setErrorResponse(request, HttpStatus.BAD_REQUEST, message, e);
     }
     
@@ -50,14 +51,22 @@ public class ExceptionHandlers {
     	String message = bindingResult.getFieldErrors().stream()
 				    			.map(v -> v.getDefaultMessage())
 				    			.collect(Collectors.joining(", "));
-    	
         return setErrorResponse(request, HttpStatus.BAD_REQUEST, message, e);
     }
-    
     
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException e, HttpServletRequest request){
         return setErrorResponse(request, HttpStatus.FORBIDDEN, "호출 권한이 없습니다.", e);
+    }
+    
+    @ExceptionHandler(InternalServerErrorException.class)
+    public ResponseEntity<?> handleInternalServerErrorException(InternalServerErrorException e, HttpServletRequest request){
+        return setErrorResponse(request, HttpStatus.INTERNAL_SERVER_ERROR, "인증 서버에 연결할 수 없습니다.", e);
+    }
+    
+    @ExceptionHandler(RedisConnectionFailureException.class)
+    public ResponseEntity<?> handleRedisConnectionFailureException(RedisConnectionFailureException e, HttpServletRequest request){
+        return setErrorResponse(request, HttpStatus.INTERNAL_SERVER_ERROR, "로그인 서버에 연결할 수 없습니다.", e);
     }
     
     @ExceptionHandler(IllegalArgumentException.class)

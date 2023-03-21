@@ -3,6 +3,7 @@ package com.iwi.iwms.api.login.service.impl;
 import java.time.Duration;
 import java.util.Optional;
 
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotAuthorizedException;
 
 import org.keycloak.representations.AccessTokenResponse;
@@ -11,10 +12,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwi.iwms.api.login.domain.Login;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.login.domain.Reissue;
 import com.iwi.iwms.api.login.service.LoginService;
+import com.iwi.iwms.api.user.domain.User;
 import com.iwi.iwms.api.user.domain.UserInfo;
 import com.iwi.iwms.api.user.mapper.UserMapper;
 import com.iwi.iwms.config.redis.RedisProvider;
@@ -35,10 +38,11 @@ public class LoginServiceImpl implements LoginService{
 	private final AuthProvider authProvider;
 	
     private final RedisProvider redis;
+    
+    private final ObjectMapper objectMapper;
 	
 	@Override
 	public AccessTokenResponse login(Login login) {
-		
 		// 등록된 ID 확인
 		UserInfo userInfo = Optional.ofNullable(userMapper.getUserById(login.getUsername()))
 				.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "등록되지 않은 사용자 또는 잘못된 비밀번호입니다."));
@@ -71,14 +75,17 @@ public class LoginServiceImpl implements LoginService{
 			redis.setHash(key, "refreshToken", accessTokenResponse.getRefreshToken(), timeout);
 			
 			// 로그인한 사용자의 접속IP를 저장 및 LOGIN_ERR_CNT 초기화. 
-			userInfo.setLastLoginIp(login.getLoginIp());
-			userMapper.updateLoginSuccess(userInfo.asUser());
+			userMapper.updateLoginSuccess(User.builder()
+					.lastLoginIp(login.getLoginIp()).userSeq(userInfo.getUserSeq()).build());
 			
 			return accessTokenResponse;
-		} catch(RedisConnectionFailureException e) {
-			throw new ResponseStatusException(HttpStatus.GATEWAY_TIMEOUT, "Unable to connect to Redis");
+		} catch(InternalServerErrorException e) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "인증 서버에 연결할 수 없습니다.");
+		}  catch(RedisConnectionFailureException e) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "로그인 서버에 연결할 수 없습니다.");
 		} catch(NotAuthorizedException e) {
-			userMapper.updateLoginFailure(userInfo.asUser());
+			userMapper.updateLoginFailure(User.builder()
+					.userId(userInfo.getUserId()).build());
 			log.info("USERNAME: [{}], LOGIN ERROR COUNT: [{}]", userInfo.getUserId(), userInfo.getLoginErrCnt() + 1);
 			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "등록되지 않은 사용자 또는 잘못된 비밀번호입니다.");
 		} catch(Exception e) {
@@ -87,20 +94,24 @@ public class LoginServiceImpl implements LoginService{
 		} 
 		
 	}
-
+	
 	@Override
 	public ReissueResponse reissue(Reissue reissue) {
-		
         IntrospectResponse introspect = authProvider.tokenIntrospect(reissue.getRefreshToken());
-        log.info("[Refresh token introspect] <{}>", introspect);
+        log.info("[Introspect Response] <{}>", introspect);
         
         if(introspect == null || !introspect.isActive()) {
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 만료되었거나 유효하지 않습니다");
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "리프레시 토큰 검증에 실패했습니다.");
+        }
+        
+        LoginUserInfo loginUserInfo = objectMapper.convertValue(redis.getHash(introspect.getSub(), "user"), LoginUserInfo.class);
+        if(loginUserInfo == null || !loginUserInfo.getLoginIp().equals(reissue.getLoginIp())) {
+        	throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인 아이피와 요청 아이피가 일치하지 않습니다.");
         }
         
 		String storedRefreshtoken = (String) redis.getHash(introspect.getSub(), "refreshToken");
 		if(storedRefreshtoken == null || !storedRefreshtoken.equals(reissue.getRefreshToken())) {
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "리프레시 토큰이 유효하지 않습니다");
+			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "요청한 리프레시 토큰과 서버에 저장된 리프레시 토큰이 일치하지 않습니다.");
 		}
     	
     	return authProvider.reissue(reissue.getRefreshToken());

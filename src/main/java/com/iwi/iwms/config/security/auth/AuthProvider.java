@@ -3,6 +3,8 @@ package com.iwi.iwms.config.security.auth;
 import java.util.Arrays;
 
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 
 import org.keycloak.OAuth2Constants;
@@ -60,22 +62,24 @@ public class AuthProvider {
 	 * @return AccessTokenResponse
 	 */
 	public AccessTokenResponse grantToken(@NotNull String username, @NotNull String password) {
-        // keycloak Connecting
-        Keycloak keycloak = KeycloakBuilder.builder()
+		try (Keycloak keycloak = KeycloakBuilder.builder()
         		.serverUrl(authServerUrl)
         		.realm(realm)
                 .grantType(OAuth2Constants.PASSWORD)
                 .clientId(authClientId)
                 .username(username)
                 .password(password)
-                .build();
-        
-        TokenManager tokenManager = keycloak.tokenManager();
-        AccessTokenResponse accessTokenResponse = tokenManager.grantToken();
-        
-        keycloak.close();
-        
-        return accessTokenResponse;
+                .build()) {
+			
+	        TokenManager tokenManager = keycloak.tokenManager();
+	        AccessTokenResponse accessTokenResponse = tokenManager.grantToken();
+	        
+	        return accessTokenResponse;
+		} catch(ProcessingException | InternalServerErrorException e) {
+			throw new InternalServerErrorException(e.getMessage(), e);
+		} catch(Exception e) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+		}
 	}
 	
 	/**
@@ -84,9 +88,6 @@ public class AuthProvider {
 	 * @return ReissueResponse
 	 */
 	public ReissueResponse reissue(@NotNull String refreshToken) {
-		if(!StringUtils.hasText(refreshToken)) {
-			return null;
-		}
     	Call<ReissueResponse> call = authTokenApi.reissue(OAuth2Constants.REFRESH_TOKEN, refreshToken, authClientId);
 		return retrofitProvider.execute(call);
 	}
@@ -107,42 +108,28 @@ public class AuthProvider {
 	}
 	
 	/**
-	 * keycloak 접속
-	 * @return Keycloak
-	 */
-	private Keycloak connectKeycloak() {
-        // keycloak Connecting
-        return  KeycloakBuilder.builder()
-        		.serverUrl(authServerUrl)
-        		.realm(realm)
-                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .build();
-	}
-	
-	/**
 	 * 사용자 아이디 중복 체크
 	 * @param String username
 	 * @return boolean
 	 */
 	public boolean existsUsername(String username) {
-        Keycloak keycloak = connectKeycloak();
-		
-        RealmResource realmResource = keycloak.realm(realm);
-        UsersResource usersResource = realmResource.users();
-        
-        boolean result = usersResource.list().stream().anyMatch(v -> v.getUsername().equals(username));
-        
-        if(result) {
-        	log.info("Username already registered: {}", username);
-        } else {
-        	log.info("Username available: {}", username);
-        }
-        
-        keycloak.close();
-        
-        return result;
+		try (Keycloak keycloak = KeycloakBuilder.builder()
+        		.serverUrl(authServerUrl)
+        		.realm(realm)
+                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .build()) {
+			
+            RealmResource realmResource = keycloak.realm(realm);
+            UsersResource usersResource = realmResource.users();
+            
+            return usersResource.list().stream().anyMatch(v -> v.getUsername().equals(username));
+		} catch(ProcessingException | InternalServerErrorException e) {
+			throw new InternalServerErrorException(e.getMessage(), e);
+		} catch(Exception e) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+		}         
 	}
 	
 	/**
@@ -156,14 +143,19 @@ public class AuthProvider {
 	 * @return String
 	 */
 	public String insertUser(@NotNull String username, @NotNull String password, String firstName, String lastName, String email, @NotNull String role) {
-        Keycloak keycloak = connectKeycloak();
+		String ssoKey = null;
 		
-        RealmResource realmResource = keycloak.realm(realm);
-        UsersResource usersResource = realmResource.users();
-        
-        String ssoId = null;
-        
-        try {
+		try (Keycloak keycloak = KeycloakBuilder.builder()
+        		.serverUrl(authServerUrl)
+        		.realm(realm)
+                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .build()) {
+			
+            RealmResource realmResource = keycloak.realm(realm);
+            UsersResource usersResource = realmResource.users();
+            
             // Define user
             UserRepresentation idmUser = new UserRepresentation();
             idmUser.setEnabled(true);
@@ -172,29 +164,22 @@ public class AuthProvider {
             idmUser.setLastName(StringUtils.hasText(lastName) ? lastName : "");
             idmUser.setEmail(StringUtils.hasText(email) ? email : "");
             idmUser.setEmailVerified(false);
-			
+    		
             Response response = usersResource.create(idmUser);
             log.info("Response: {} {}", response.getStatus(), response.getStatusInfo());
             log.info("Call: {}", response.getLocation());
             
             // Get keycloak id
-            ssoId = CreatedResponseUtil.getCreatedId(response);
-            log.info("User created with userId: {}", ssoId);
-		} catch(Exception e) {
-			if(keycloak != null) {
-				keycloak.close();
-			}
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "사용자 등록에 실패했습니다.");
-		}
-        
-        try {
+            ssoKey = CreatedResponseUtil.getCreatedId(response);
+            log.info("User created with userId: {}", ssoKey);
+            
             // Define password 
             CredentialRepresentation passwordRep = new CredentialRepresentation();
             passwordRep.setTemporary(false);
             passwordRep.setType(CredentialRepresentation.PASSWORD);
             passwordRep.setValue(password);
             
-            UserResource userResource = usersResource.get(ssoId);
+            UserResource userResource = usersResource.get(ssoKey);
             userResource.resetPassword(passwordRep);
             log.info("Create password-type credentials.");
             
@@ -206,115 +191,154 @@ public class AuthProvider {
             // Remove Default Role 
             RoleRepresentation defaultRoleRep = realmResource.roles().get("default-roles-master").toRepresentation();
             userResource.roles().realmLevel().remove(Arrays.asList(defaultRoleRep));
-            log.info("Unassign roles: {}", defaultRoleRep);            
-          
-            return ssoId;
-        } catch(Exception e) {
-			this.deleteUser(ssoId);
-			keycloak.close();
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "사용자 등록에 실패했습니다.");
-		}
+            log.info("Unassign roles: {}", defaultRoleRep);   
+            
+            return ssoKey;
+		} catch(ProcessingException | InternalServerErrorException e) {
+			throw new InternalServerErrorException(e.getMessage(), e);
+		} catch(Exception e) {
+			if(ssoKey != null) {
+				this.deleteUser(ssoKey);
+			}
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+		}          
+        
 	}
 	
 	/**
 	 * 인증서버 사용자 정보 변경
-	 * @param String ssoId
+	 * @param String ssoKey
 	 * @param String firstName
 	 * @param String lastName
 	 * @param String email
 	 */
-	public void updateUser(String ssoId, String firstName, String lastName, String email) {
-		log.info("by userId: {}", ssoId);
-		
-        Keycloak keycloak = connectKeycloak();
-		
-        RealmResource realmResource = keycloak.realm(realm);
-        UsersResource usersResource = realmResource.users();
-        UserResource userResource = usersResource.get(ssoId);
-
-        // Define user
-        UserRepresentation idmUser = new UserRepresentation();
-        idmUser.setFirstName(StringUtils.hasText(firstName) ? firstName : "");
-        idmUser.setLastName(StringUtils.hasText(lastName) ? lastName : "");
-        idmUser.setEmail(StringUtils.hasText(email) ? email : "");
-        idmUser.setEmailVerified(false);        
-        
-        // update user
-        userResource.update(idmUser);
-        log.info("Updated a user by userId: {}", ssoId);
-        
-        keycloak.close();
+	public void updateUser(String ssoKey, String firstName, String lastName, String email) {
+		try (Keycloak keycloak = KeycloakBuilder.builder()
+        		.serverUrl(authServerUrl)
+        		.realm(realm)
+                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .build()) {
+			
+            RealmResource realmResource = keycloak.realm(realm);
+            UsersResource usersResource = realmResource.users();
+            UserResource userResource = usersResource.get(ssoKey);
+            
+            // Define user
+            UserRepresentation idmUser = new UserRepresentation();
+            idmUser.setFirstName(StringUtils.hasText(firstName) ? firstName : "");
+            idmUser.setLastName(StringUtils.hasText(lastName) ? lastName : "");
+            idmUser.setEmail(StringUtils.hasText(email) ? email : "");
+            idmUser.setEmailVerified(false);        
+            
+            // update user
+            userResource.update(idmUser);
+            log.info("Updated a user by userId: {}", ssoKey);
+            
+		} catch(ProcessingException | InternalServerErrorException e) {
+			throw new InternalServerErrorException(e.getMessage(), e);
+		} catch(Exception e) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+		}          
 	}
 	
 	/**
 	 * 인증서버 사용자 권한 변경
-	 * @param String ssoId
+	 * @param String ssoKey
 	 * @param String oldRole
 	 * @param String newRole
 	 */
-	public void updateRole(@NotNull String ssoId, @NotNull String oldRole, @NotNull String newRole) {
-		
-        Keycloak keycloak = connectKeycloak();
-		
-        RealmResource realmResource = keycloak.realm(realm);
-        UsersResource usersResource = realmResource.users();
-        UserResource userResource = usersResource.get(ssoId);
+	public void updateRole(@NotNull String ssoKey, @NotNull String oldRole, @NotNull String newRole) {
+		try (Keycloak keycloak = KeycloakBuilder.builder()
+        		.serverUrl(authServerUrl)
+        		.realm(realm)
+                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .build()) {
+			
+            RealmResource realmResource = keycloak.realm(realm);
+            UsersResource usersResource = realmResource.users();
+            UserResource userResource = usersResource.get(ssoKey);
+            
+            // Remove old Role
+            RoleRepresentation oldRoleRep = realmResource.roles().get(oldRole).toRepresentation();
+    		userResource.roles().realmLevel().remove(Arrays.asList(oldRoleRep));
+    		log.info("Unassign roles: {}", oldRoleRep); 
 
-        // Remove old Role
-        RoleRepresentation oldRoleRep = realmResource.roles().get(oldRole).toRepresentation();
-		userResource.roles().realmLevel().remove(Arrays.asList(oldRoleRep));
-		log.info("Unassign roles: {}", oldRoleRep); 
-
-        // Create new Role
-		RoleRepresentation newRoleRep = realmResource.roles().get(newRole).toRepresentation();
-        userResource.roles().realmLevel().add(Arrays.asList(newRoleRep));
-        log.info("Assign roles: {}", newRoleRep);
-        
-        keycloak.close();
+            // Create new Role
+    		RoleRepresentation newRoleRep = realmResource.roles().get(newRole).toRepresentation();
+            userResource.roles().realmLevel().add(Arrays.asList(newRoleRep));
+            log.info("Assign roles: {}", newRoleRep);
+            
+		} catch(ProcessingException | InternalServerErrorException e) {
+			throw new InternalServerErrorException(e.getMessage(), e);
+		} catch(Exception e) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+		}         
 	}
 	
 	/**
 	 * 인증서버 사용자 비밀번호 변경
-	 * @param String ssoId
+	 * @param String ssoKey
 	 * @param String password
 	 */
-	public void changePassword(@NotNull String ssoId, @NotNull String password) {
-		
-        Keycloak keycloak = connectKeycloak();
-		
-        RealmResource realmResource = keycloak.realm(realm);
-        UsersResource usersResource = realmResource.users();
-        UserResource userResource = usersResource.get(ssoId);
-
-        // Define password 
-        CredentialRepresentation passwordRep = new CredentialRepresentation();
-        passwordRep.setTemporary(false);
-        passwordRep.setType(CredentialRepresentation.PASSWORD);
-        passwordRep.setValue(password);
-        
-        // Set password credential
-        userResource.resetPassword(passwordRep);
-        log.info("Changed password.");
-        
-        keycloak.close();
+	public void changePassword(@NotNull String ssoKey, @NotNull String password) {
+		try (Keycloak keycloak = KeycloakBuilder.builder()
+        		.serverUrl(authServerUrl)
+        		.realm(realm)
+                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .build()) {
+			
+            RealmResource realmResource = keycloak.realm(realm);
+            UsersResource usersResource = realmResource.users();
+            UserResource userResource = usersResource.get(ssoKey);
+            
+            // Define password 
+            CredentialRepresentation passwordRep = new CredentialRepresentation();
+            passwordRep.setTemporary(false);
+            passwordRep.setType(CredentialRepresentation.PASSWORD);
+            passwordRep.setValue(password);
+            
+            // Set password credential
+            userResource.resetPassword(passwordRep);
+            log.info("Changed password.");
+            
+		} catch(ProcessingException | InternalServerErrorException e) {
+			throw new InternalServerErrorException(e.getMessage(), e);
+		} catch(Exception e) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+		} 
 	}
 	
 	/**
 	 * 인증서버 사용자 삭제
-	 * @param String ssoId
+	 * @param String ssoKey
 	 */
-	public void deleteUser(@NotNull String ssoId) {
-		
-        Keycloak keycloak = connectKeycloak();
-		
-        RealmResource realmResource = keycloak.realm(realm);
-        UsersResource usersResource = realmResource.users();
-        UserResource userResource = usersResource.get(ssoId);
-        
-        //Delete User
-        userResource.remove();
-        log.info("Deleted a user by userId: {}", ssoId);
-        
-        keycloak.close();
+	public void deleteUser(@NotNull String ssoKey) {
+		try (Keycloak keycloak = KeycloakBuilder.builder()
+        		.serverUrl(authServerUrl)
+        		.realm(realm)
+                .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .build()) {
+			
+            RealmResource realmResource = keycloak.realm(realm);
+            UsersResource usersResource = realmResource.users();
+            UserResource userResource = usersResource.get(ssoKey);
+            
+            //Delete User
+            userResource.remove();
+            log.info("Deleted a user by userId: {}", ssoKey);
+            
+		} catch(ProcessingException | InternalServerErrorException e) {
+			throw new InternalServerErrorException(e.getMessage(), e);
+		} catch(Exception e) {
+			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+		}  
 	}
 }

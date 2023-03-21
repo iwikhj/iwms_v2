@@ -51,7 +51,7 @@ public class RedisConfig {
         //모든 경우
         //redisTemplate.setDefaultSerializer(new StringRedisSerializer());
         
-        //LoginUserInfo를 Json으로 직렬화 
+        //Json으로 직렬화 
         var serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
         redisTemplate.setValueSerializer(serializer);
         redisTemplate.setHashValueSerializer(serializer);

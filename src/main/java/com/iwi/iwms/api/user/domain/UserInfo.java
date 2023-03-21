@@ -1,7 +1,5 @@
 package com.iwi.iwms.api.user.domain;
 
-import org.springframework.beans.BeanUtils;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -120,10 +118,4 @@ public class UserInfo {
 	
 	@Schema(description = "수정자") 
 	private String uptNm;	
-	
-	public User asUser() {
-		User user = new User();
-		BeanUtils.copyProperties(this, user);
-		return user;
-	}
 }

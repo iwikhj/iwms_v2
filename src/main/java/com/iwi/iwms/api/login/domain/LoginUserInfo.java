@@ -54,6 +54,12 @@ public class LoginUserInfo {
 	@Schema(description = "소속 이름") 
 	private String compNm;
 	
+	@Schema(description = "로그인 IP") 
+	private String loginIp;
+	
+	@Schema(description = "로그인 시간") 
+	private String loginDt;
+	
 	@Schema(description = "메뉴 목록")
 	private List<AuthMenuInfo> menus;
 }

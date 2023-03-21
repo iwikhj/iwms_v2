@@ -65,7 +65,6 @@ public class SecurityConfig {
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
 			.authorizeRequests()
-			.antMatchers("/").permitAll()
 			//jwtAuthenticationConverter 적용으로 scope를 통한 권한 관리는 disabled
 			//.antMatchers("/**").hasAuthority("SCOPE_iwms")
 			.anyRequest().authenticated()
@@ -99,7 +98,7 @@ public class SecurityConfig {
 	@Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
 	    return (web) -> web.ignoring()
-	    		.antMatchers(root + "/login", root + "/reissue", "/apidocs/**", "/swagger-ui/**")
+	    		.antMatchers("/", root + "/login", root + "/reissue", "/apidocs/**", "/swagger-ui/**")
 	    		.requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
