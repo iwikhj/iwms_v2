@@ -171,7 +171,7 @@ public class AuthenticationFilter extends GenericFilterBean {
 		try {
 			String bearerToken = StringUtils.hasText(request.getHeader(HttpHeaders.AUTHORIZATION)) ? request.getHeader(HttpHeaders.AUTHORIZATION) : "";
 			String remoteAddr = StringUtils.hasText(request.getRemoteAddr()) ? request.getRemoteAddr() : "-";
-			String url = StringUtils.hasText(request.getRequestURL()) ? request.getRequestURL().toString() : "";
+			String url = StringUtils.hasText(request.getRequestURI()) ? request.getRequestURI().toString() : "";
 			String method = StringUtils.hasText(request.getMethod()) ? request.getMethod() : "-";
 			String queryString = StringUtils.hasText(request.getQueryString()) ? request.getQueryString() : "";
 			String referer = StringUtils.hasText(request.getHeader("Referer")) ? request.getHeader("Referer") : "-";
@@ -184,7 +184,7 @@ public class AuthenticationFilter extends GenericFilterBean {
 	        sj.add("Len:" + bearerToken.length());
 	        sj.add("IP:" + remoteAddr);
 	        sj.add("Method:" + method);
-	        sj.add("URL:" + fullUrl);
+	        sj.add("URI:" + fullUrl);
 	        sj.add("Referer:" + referer);
 	        sj.add("User-Agent:" + agent);
 
