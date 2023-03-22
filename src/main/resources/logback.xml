@@ -54,12 +54,13 @@
     <root level="${LOG_LEVEL}">
         <!-- 콘솔 설정 추가 -->
         <appender-ref ref="CONSOLE"/>
-        <!-- 파일 설정 추가 -->
+        <!-- 파일 설정 추가 
         <appender-ref ref="FILE"/>
+        -->
     </root>
     
-	<logger name="jdbc.sqltiming" level="info"/>
-	<logger name="jdbc.resultsettable" level="info"/>
+	<logger name="jdbc.sqltiming" level="off"/>
+	<logger name="jdbc.resultsettable" level="off"/>
 	
 	<logger name="jdbc.sqlonly" level="off"/>	
   	<logger name="jdbc.audit" level="off"/>
