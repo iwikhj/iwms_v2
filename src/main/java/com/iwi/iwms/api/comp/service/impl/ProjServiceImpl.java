@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.iwi.iwms.api.common.errors.CommonException;
+import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.comp.domain.Proj;
 import com.iwi.iwms.api.comp.domain.ProjInfo;
 import com.iwi.iwms.api.comp.domain.ProjUser;
@@ -18,7 +18,6 @@ import com.iwi.iwms.api.comp.domain.Site;
 import com.iwi.iwms.api.comp.domain.SiteInfo;
 import com.iwi.iwms.api.comp.mapper.ProjMapper;
 import com.iwi.iwms.api.comp.service.ProjService;
-import com.iwi.iwms.api.user.domain.UserSiteInfo;
 
 import lombok.RequiredArgsConstructor;
 
@@ -45,7 +44,8 @@ public class ProjServiceImpl implements ProjService {
 		map.put("loginUserSeq", loginUserSeq);
 		
 		return Optional.ofNullable(projMapper.getProjBySeq(map))
-					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "프로젝트를 찾을 수 없습니다."));
+				.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "프로젝트를 찾을 수 없습니다."));
+		
 	}
 
 	@Override
@@ -100,7 +100,7 @@ public class ProjServiceImpl implements ProjService {
 		map.put("loginUserSeq", loginUserSeq);
 		
 		return Optional.ofNullable(projMapper.getSiteBySeq(map))
-					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사이트를 찾을 수 없습니다."));
+				.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "사이트를 찾을 수 없습니다."));
 	}
 
 	@Override

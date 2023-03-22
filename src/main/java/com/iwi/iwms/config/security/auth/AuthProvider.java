@@ -20,11 +20,11 @@ import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.iwi.iwms.api.common.errors.CommonException;
+import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.config.retrofit.RetrofitProvider;
 
 import lombok.RequiredArgsConstructor;
@@ -76,9 +76,9 @@ public class AuthProvider {
 	        
 	        return accessTokenResponse;
 		} catch(ProcessingException | InternalServerErrorException e) {
-			throw new InternalServerErrorException(e.getMessage(), e);
+			throw new InternalServerErrorException(e.getMessage());
 		} catch(Exception e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
 		}
 	}
 	
@@ -125,11 +125,9 @@ public class AuthProvider {
             UsersResource usersResource = realmResource.users();
             
             return usersResource.list().stream().anyMatch(v -> v.getUsername().equals(username));
-		} catch(ProcessingException | InternalServerErrorException e) {
-			throw new InternalServerErrorException(e.getMessage(), e);
 		} catch(Exception e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
-		}         
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+		}        
 	}
 	
 	/**
@@ -194,15 +192,12 @@ public class AuthProvider {
             log.info("Unassign roles: {}", defaultRoleRep);   
             
             return ssoKey;
-		} catch(ProcessingException | InternalServerErrorException e) {
-			throw new InternalServerErrorException(e.getMessage(), e);
 		} catch(Exception e) {
 			if(ssoKey != null) {
 				this.deleteUser(ssoKey);
 			}
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
-		}          
-        
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+		}
 	}
 	
 	/**
@@ -236,11 +231,9 @@ public class AuthProvider {
             userResource.update(idmUser);
             log.info("Updated a user by userId: {}", ssoKey);
             
-		} catch(ProcessingException | InternalServerErrorException e) {
-			throw new InternalServerErrorException(e.getMessage(), e);
 		} catch(Exception e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
-		}          
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+		}           
 	}
 	
 	/**
@@ -272,11 +265,9 @@ public class AuthProvider {
             userResource.roles().realmLevel().add(Arrays.asList(newRoleRep));
             log.info("Assign roles: {}", newRoleRep);
             
-		} catch(ProcessingException | InternalServerErrorException e) {
-			throw new InternalServerErrorException(e.getMessage(), e);
 		} catch(Exception e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
-		}         
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+		}        
 	}
 	
 	/**
@@ -307,10 +298,8 @@ public class AuthProvider {
             userResource.resetPassword(passwordRep);
             log.info("Changed password.");
             
-		} catch(ProcessingException | InternalServerErrorException e) {
-			throw new InternalServerErrorException(e.getMessage(), e);
 		} catch(Exception e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
 		} 
 	}
 	
@@ -335,10 +324,8 @@ public class AuthProvider {
             userResource.remove();
             log.info("Deleted a user by userId: {}", ssoKey);
             
-		} catch(ProcessingException | InternalServerErrorException e) {
-			throw new InternalServerErrorException(e.getMessage(), e);
 		} catch(Exception e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
 		}  
 	}
 }

@@ -53,7 +53,6 @@ public class CodeController {
     	List<CodeInfo> codeList = codeService.listCode(map);
     	
 		return ResponseEntity.ok(ApiResponse.<List<CodeInfo>>builder()
-				.request(request)
 				.data(codeList)
 				.build());
     }
@@ -67,7 +66,6 @@ public class CodeController {
     	codeService.insertCode(code.of(loginUserInfo));
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(true)
 				.build());
 	}
@@ -82,7 +80,6 @@ public class CodeController {
     	boolean result = codeService.updateCode(code.of(loginUserInfo)) > 0 ? true : false;
     	
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -97,7 +94,6 @@ public class CodeController {
     	boolean result = codeService.deleteCode(code.of(loginUserInfo)) > 0 ? true : false;
     	
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}

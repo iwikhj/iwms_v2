@@ -62,7 +62,6 @@ public class NoticeController {
 		List<NoticeInfo> noticeList = noticeService.listNotice(map);
 		
 		return ResponseEntity.ok(ApiListResponse.<List<NoticeInfo>>builder()
-				.request(request)
 				.data(noticeList)
 				.query(map)
 				.build());
@@ -78,7 +77,6 @@ public class NoticeController {
     	noticeService.updateViewCnt(noticeSeq);
     	
 		return ResponseEntity.ok(ApiResponse.<NoticeInfo>builder()
-				.request(request)
 				.data(noticeInfo)
 				.build());
     }
@@ -92,7 +90,6 @@ public class NoticeController {
     	noticeService.insertNotice(notice.of(loginUserInfo));
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(true)
 				.build());
 	}
@@ -107,7 +104,6 @@ public class NoticeController {
     	boolean result = noticeService.updateNotice(notice.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -122,7 +118,6 @@ public class NoticeController {
     	boolean result = noticeService.deleteNotice(notice.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}

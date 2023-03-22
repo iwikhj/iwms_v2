@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.iwi.iwms.api.common.errors.CommonException;
+import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.file.domain.UploadFile;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
 import com.iwi.iwms.api.file.service.FileService;
@@ -53,14 +53,15 @@ public class ReqServiceImpl implements ReqService {
 		map.put("loginUserSeq", loginUserSeq);
 		
 		return Optional.ofNullable(reqMapper.getReqBySeq(map))
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "요청사항을 찾을 수 없습니다."));
+				.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "요청사항을 찾을 수 없습니다."));				
+
 	}
 
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public void insertReq(Req req) {
 		if(CollectionUtils.isEmpty(req.getSitesSeq())) {
-			throw new ResponseStatusException(HttpStatus.NOT_FOUND, "사이트를 선택해주세요.");
+        	throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "사이트를 선택해주세요.");
 		}
 		
 		ReqStatCode status = ReqStatCode.REQUEST;	//REQUEST

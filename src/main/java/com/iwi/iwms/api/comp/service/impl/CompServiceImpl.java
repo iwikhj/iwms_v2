@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.iwi.iwms.api.common.errors.CommonException;
+import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.comp.domain.Comp;
 import com.iwi.iwms.api.comp.domain.CompInfo;
 import com.iwi.iwms.api.comp.domain.Dept;
@@ -41,7 +41,7 @@ public class CompServiceImpl implements CompService {
 		map.put("loginUserSeq", loginUserSeq);
 		
 		return Optional.ofNullable(compMapper.getCompBySeq(map))
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "소속을 찾을 수 없습니다."));
+				.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "소속을 찾을 수 없습니다."));
 	}
 
 	@Override
@@ -73,7 +73,8 @@ public class CompServiceImpl implements CompService {
 		map.put("loginUserSeq", loginUserSeq);
 		
 		return Optional.ofNullable(compMapper.getDeptBySeq(map))
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "부서를 찾을 수 없습니다."));
+				.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "부서를 찾을 수 없습니다."));
+
 	}
 
 	@Override

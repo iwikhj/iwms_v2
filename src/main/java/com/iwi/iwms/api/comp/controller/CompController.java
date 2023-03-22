@@ -64,7 +64,6 @@ public class CompController {
 		List<CompInfo> compList = compService.listComp(map);
 		
 		return ResponseEntity.ok(ApiListResponse.<List<CompInfo>>builder()
-				.request(request)
 				.data(compList)
 				.query(map)
 				.build());
@@ -79,7 +78,6 @@ public class CompController {
     	CompInfo compInfo = compService.getCompBySeq(compSeq, loginUserInfo.getUserSeq());
     	
 		return ResponseEntity.ok(ApiResponse.<CompInfo>builder()
-				.request(request)
 				.data(compInfo)
 				.build());
     }
@@ -93,7 +91,6 @@ public class CompController {
     	compService.insertComp(comp.of(loginUserInfo));
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(true)
 				.build());
 	}
@@ -108,7 +105,6 @@ public class CompController {
     	boolean result = compService.updateComp(comp.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -123,7 +119,6 @@ public class CompController {
     	boolean result = compService.deleteComp(comp.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -141,7 +136,6 @@ public class CompController {
 		List<DeptInfo> positionList = compService.listDept(map);
 
 		return ResponseEntity.ok(ApiListResponse.<List<DeptInfo>>builder()
-				.request(request)
 				.data(positionList)
 				.build());
 	}
@@ -156,7 +150,6 @@ public class CompController {
     	DeptInfo deptInfo = compService.getDeptBySeq(deptSeq, loginUserInfo.getUserSeq());
     	
 		return ResponseEntity.ok(ApiResponse.<DeptInfo>builder()
-				.request(request)
 				.data(deptInfo)
 				.build());
     }	
@@ -171,7 +164,6 @@ public class CompController {
     	compService.insertDept(dept.of(loginUserInfo));
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(true)
 				.build());
 	}
@@ -187,7 +179,6 @@ public class CompController {
     	boolean result = compService.updateDept(dept.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -203,7 +194,6 @@ public class CompController {
     	boolean result = compService.deleteDept(dept.of(loginUserInfo)) > 0 ? true : false;
     	
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}

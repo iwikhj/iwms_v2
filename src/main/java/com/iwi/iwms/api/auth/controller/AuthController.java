@@ -62,7 +62,6 @@ public class AuthController {
 		List<AuthInfo> authList = authService.listAuth(map);
 		
 		return ResponseEntity.ok(ApiListResponse.<List<AuthInfo>>builder()
-				.request(request)
 				.data(authList)
 				.query(map)
 				.build());
@@ -77,7 +76,6 @@ public class AuthController {
     	AuthInfo authInfo = authService.getAuthBySeq(authSeq, loginUserInfo.getUserSeq());
     	
 		return ResponseEntity.ok(ApiResponse.<AuthInfo>builder()
-				.request(request)
 				.data(authInfo)
 				.build());
     }
@@ -92,7 +90,6 @@ public class AuthController {
     	boolean result = authService.updateAuth(auth.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}

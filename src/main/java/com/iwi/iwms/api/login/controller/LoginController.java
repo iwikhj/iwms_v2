@@ -43,7 +43,6 @@ public class LoginController {
 		AccessTokenResponse token = loginService.login(login);
 		
 		return ResponseEntity.ok(ApiResponse.<AccessTokenResponse>builder()
-				.request(request)
 				.data(token)
 				.build());
 	}
@@ -66,7 +65,6 @@ public class LoginController {
 		ReissueResponse token = loginService.reissue(reissue);
 		
 		return ResponseEntity.ok(ApiResponse.<ReissueResponse>builder()
-				.request(request)
 				.data(token)
 				.build());
 	}

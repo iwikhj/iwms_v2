@@ -8,11 +8,11 @@ import javax.ws.rs.NotAuthorizedException;
 
 import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.data.redis.RedisConnectionFailureException;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iwi.iwms.api.common.errors.CommonException;
+import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.login.domain.Login;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.login.domain.Reissue;
@@ -40,27 +40,28 @@ public class LoginServiceImpl implements LoginService{
     private final RedisProvider redis;
     
     private final ObjectMapper objectMapper;
-	
+    
 	@Override
 	public AccessTokenResponse login(Login login) {
 		// 등록된 ID 확인
 		UserInfo userInfo = Optional.ofNullable(userMapper.getUserById(login.getUsername()))
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "등록되지 않은 사용자 또는 잘못된 비밀번호입니다."));
-				
+				.orElseThrow(() -> new CommonException(ErrorCode.LOGIN_FAILED_INCORRECT_ID_PW));				
+		
 		// 사용불가 ID
 		if(userInfo.getUseYn().equals("N")) {
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "사용 정지된 아이디입니다.");
+			throw new CommonException(ErrorCode.LOGIN_FAILED_SUSPENDED_ID);
+
 		}
 		
 		// 비밀번호 5회 이상 불일치
 		if(userInfo.getLoginErrCnt() >= 5) {
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "비밀번호가 5회 이상 일치하지 않아 사용할 수 없는 계정입니다. 담당자에게 연락주시기 바랍니다.");
+			throw new CommonException(ErrorCode.LOGIN_FAILED_RETRY_EXCEEDED);
 		}
 		
 		try {
 			// 인증 서버 인증 요청 
 			AccessTokenResponse accessTokenResponse = authProvider.grantToken(login.getUsername(), login.getPassword());
-			log.info("USERNAME: [{}]", accessTokenResponse);
+			log.info("USERNAME: [{}]", login.getUsername());
 			String key = userInfo.getSsoKey();
 			
 			// 로그인한 사용자의 정보를 Redis 서버에 저장한다. 이후 요청에 대한 사용자 정보는 Redis 서버에서 불러온다.
@@ -75,24 +76,20 @@ public class LoginServiceImpl implements LoginService{
 			redis.setHash(key, "refreshToken", accessTokenResponse.getRefreshToken(), timeout);
 			
 			// 로그인한 사용자의 접속IP를 저장 및 LOGIN_ERR_CNT 초기화. 
-			userMapper.updateLoginSuccess(User.builder()
-					.loginIp(login.getLoginIp()).userSeq(userInfo.getUserSeq()).build());
+			userMapper.updateLoginSuccess(User.builder().loginIp(login.getLoginIp()).userSeq(userInfo.getUserSeq()).build());
 			
 			return accessTokenResponse;
 		} catch(InternalServerErrorException e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "인증 서버에 연결할 수 없습니다.");
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
 		}  catch(RedisConnectionFailureException e) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "로그인 서버에 연결할 수 없습니다.");
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
 		} catch(NotAuthorizedException e) {
-			userMapper.updateLoginFailure(User.builder()
-					.userId(userInfo.getUserId()).build());
-			log.info("USERNAME: [{}], LOGIN ERROR COUNT: [{}]", userInfo.getUserId(), userInfo.getLoginErrCnt() + 1);
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "등록되지 않은 사용자 또는 잘못된 비밀번호입니다.");
+			userMapper.updateLoginFailure(User.builder().userId(userInfo.getUserId()).build());
+			throw new CommonException(ErrorCode.LOGIN_FAILED_INCORRECT_ID_PW);
 		} catch(Exception e) {
 			e.printStackTrace();
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, e.getMessage());
 		} 
-		
 	}
 	
 	@Override
@@ -101,20 +98,20 @@ public class LoginServiceImpl implements LoginService{
         log.info("[Introspect Response] <{}>", introspect);
         
         if(introspect == null || !introspect.isActive()) {
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "리프레시 토큰 검증에 실패했습니다.");
+			throw new CommonException(ErrorCode.AUTHENTICATION_REISSUE_FAILED, "리플레시 토큰 검증 실패.");
         }
-        
-        LoginUserInfo loginUserInfo = objectMapper.convertValue(redis.getHash(introspect.getSub(), "user"), LoginUserInfo.class);
+		
+		        LoginUserInfo loginUserInfo = objectMapper.convertValue(redis.getHash(introspect.getSub(), "user"), LoginUserInfo.class);
         if(loginUserInfo == null || !loginUserInfo.getLoginIp().equals(reissue.getLoginIp())) {
-        	throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인 아이피와 요청 아이피가 일치하지 않습니다.");
+        	throw new CommonException(ErrorCode.AUTHENTICATION_REISSUE_FAILED, "로그인 아이피와 요청 아이피가 일치하지 않음.");
         }
         
 		String storedRefreshtoken = (String) redis.getHash(introspect.getSub(), "refreshToken");
 		if(storedRefreshtoken == null || !storedRefreshtoken.equals(reissue.getRefreshToken())) {
-			throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "요청한 리프레시 토큰과 서버에 저장된 리프레시 토큰이 일치하지 않습니다.");
+        	throw new CommonException(ErrorCode.AUTHENTICATION_REISSUE_FAILED, "요청한 리프레시 토큰과 서버에 저장된 리프레시 토큰이 일치하지 않습니다.");
 		}
     	
-    	return authProvider.reissue(reissue.getRefreshToken());
+    	return authProvider.reissue(reissue.getRefreshToken()).of();
 	}
 
 }

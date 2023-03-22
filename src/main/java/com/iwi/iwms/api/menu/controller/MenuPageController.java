@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -75,7 +74,6 @@ public class MenuPageController {
 		// TODO 홈 비지니스 로직 없음
     	
 		return ResponseEntity.ok(Response.<Void>builder()
-				.request(request)
 				.loginUserInfo(loginUserInfo)
 				.build());
     }
@@ -94,7 +92,6 @@ public class MenuPageController {
     	List<NoticeInfo> listNotice = noticeService.listNotice(map);
     	
 		return ResponseEntity.ok(ListResponse.<List<NoticeInfo>>builder()
-				.request(request)
 				.data(listNotice)
 				.query(map)
 				.loginUserInfo(loginUserInfo)
@@ -110,7 +107,6 @@ public class MenuPageController {
     	NoticeInfo notice = noticeService.getNoticeBySeq(noticeSeq, loginUserInfo.getUserSeq());
     	
 		return ResponseEntity.ok(Response.<NoticeInfo>builder()
-				.request(request)
 				.data(notice)
 				.loginUserInfo(loginUserInfo)
 				.build());
@@ -131,7 +127,6 @@ public class MenuPageController {
     	List<ReqInfo> listReq = reqService.listReq(map);
     	
 		return ResponseEntity.ok(ListResponse.<List<ReqInfo>>builder()
-				.request(request)
 				.data(listReq)
 				.query(map)
 				.loginUserInfo(loginUserInfo)
@@ -155,7 +150,6 @@ public class MenuPageController {
     	ReqDtlInfo reqDtl = reqDtlService.getReqDtlByReqAndDtlSeq(map);
     	
 		return ResponseEntity.ok(Response.<ReqDtlInfo>builder()
-				.request(request)
 				.data(reqDtl)
 				.loginUserInfo(loginUserInfo)
 				.build());
@@ -169,7 +163,6 @@ public class MenuPageController {
     	// TODO 유지보수 기능개발 비지니스 로직 없음
     	
 		return ResponseEntity.ok(Response.<Void>builder()
-				.request(request)
 				.loginUserInfo(loginUserInfo)
 				.build());
     }
@@ -182,7 +175,6 @@ public class MenuPageController {
     	// TODO 유지보수 일정관리 비지니스 로직 없음
     	
 		return ResponseEntity.ok(Response.<Void>builder()
-				.request(request)
 				.loginUserInfo(loginUserInfo)
 				.build());
     }
@@ -195,7 +187,6 @@ public class MenuPageController {
 		// TODO 유지보수 현황 비지니스 로직 없음
     	
 		return ResponseEntity.ok(Response.<Void>builder()
-				.request(request)
 				.loginUserInfo(loginUserInfo)
 				.build());
     }
@@ -215,7 +206,6 @@ public class MenuPageController {
 		List<ProjInfo> listProj = projService.listProj(map);
     	
 		return ResponseEntity.ok(ListResponse.<List<ProjInfo>>builder()
-				.request(request)
 				.data(listProj)
 				.query(map)
 				.loginUserInfo(loginUserInfo)
@@ -233,7 +223,6 @@ public class MenuPageController {
     	// TODO 이력관리 비지니스 로직 없음
     	
 		return ResponseEntity.ok(Response.<Void>builder()
-				.request(request)
 				.loginUserInfo(loginUserInfo)
 				.build());
     }
@@ -250,7 +239,6 @@ public class MenuPageController {
     	// TODO 배포관리 비지니스 로직 없음
     	
 		return ResponseEntity.ok(Response.<Void>builder()
-				.request(request)
 				.loginUserInfo(loginUserInfo)
 				.build());
     }
@@ -272,7 +260,6 @@ public class MenuPageController {
     	List<UserInfo> listUser = userService.listUser(map);
     	
 		return ResponseEntity.ok(ListResponse.<List<UserInfo>>builder()
-				.request(request)
 				.data(listUser)
 				.query(map)
 				.loginUserInfo(loginUserInfo)
@@ -292,7 +279,6 @@ public class MenuPageController {
 		List<CompInfo> listComp = compService.listComp(map);
     	
 		return ResponseEntity.ok(ListResponse.<List<CompInfo>>builder()
-				.request(request)
 				.data(listComp)
 				.query(map)
 				.loginUserInfo(loginUserInfo)
@@ -312,7 +298,6 @@ public class MenuPageController {
 		List<ProjInfo> listProj = projService.listProj(map);
     	
 		return ResponseEntity.ok(ListResponse.<List<ProjInfo>>builder()
-				.request(request)
 				.data(listProj)
 				.query(map)
 				.loginUserInfo(loginUserInfo)
@@ -332,7 +317,6 @@ public class MenuPageController {
 		List<AuthInfo> listAuth = authService.listAuth(map);
 
 		return ResponseEntity.ok(ListResponse.<List<AuthInfo>>builder()
-				.request(request)
 				.data(listAuth)
 				.query(map)
 				.loginUserInfo(loginUserInfo)

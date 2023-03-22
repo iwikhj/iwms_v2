@@ -56,7 +56,6 @@ public class FileController {
 		FileStorageResponse fileStorageResponse = fileService.upload(multipartFile, path);
 		
 		return ResponseEntity.ok(ApiResponse.<FileStorageResponse>builder()
-				.request(request)
 				.data(fileStorageResponse)
 				.build());
     }

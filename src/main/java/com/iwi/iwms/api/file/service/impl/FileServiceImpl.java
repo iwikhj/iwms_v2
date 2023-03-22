@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.core.io.Resource;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.iwi.iwms.api.common.errors.CommonException;
+import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.file.domain.UploadFile;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
 import com.iwi.iwms.api.file.mapper.FileMapper;
@@ -87,7 +87,7 @@ public class FileServiceImpl implements FileService {
 	@Override
 	public UploadFileInfo getFileBySeq(long fileSeq) {
 		return Optional.ofNullable(fileMapper.getFileBySeq(fileSeq))
-					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "파일을 찾을 수 없습니다."));
+					.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "파일을 찾을 수 없습니다."));
 	}
 
 	@Override

@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.iwi.iwms.api.auth.domain.AuthInfo;
 import com.iwi.iwms.api.auth.mapper.AuthMapper;
+import com.iwi.iwms.api.common.errors.CommonException;
+import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.user.domain.User;
 import com.iwi.iwms.api.user.domain.UserInfo;
@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
 		map.put("loginUserSeq", loginUserSeq);
 		
 		return Optional.ofNullable(userMapper.getUserBySeq(map))
-					.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다"));
+					.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "사용자를 찾을 수 없습니다."));
 	}
 	
 	@Override
@@ -73,12 +73,12 @@ public class UserServiceImpl implements UserService {
 		String email = user.getUserEmail();
 		
 		AuthInfo authInfo = Optional.ofNullable(authMapper.getAuthByAuthCd(user.getAuthCd()))
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 권한을 찾을 수 없습니다."));
+				.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "사용자 권한을 찾을 수 없습니다."));				
 
 		String role = authInfo.getAuthCd();
 		
 		if(keycloakProvider.existsUsername(username)) {
-			throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "이미 등록된 사용자 아이디입니다");
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "이미 등록된 사용자 아이디입니다");
 		}
 		
 		String ssoKey = keycloakProvider.insertUser(username, password, firstName, lastName, email, role);
@@ -98,7 +98,7 @@ public class UserServiceImpl implements UserService {
 		UserInfo userInfo = this.getUserBySeq(userUpdate.getUserSeq(), userUpdate.getLoginUserSeq());
 		
 		AuthInfo authInfo = Optional.ofNullable(authMapper.getAuthByAuthCd(userUpdate.getAuthCd()))
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자 권한을 찾을 수 없습니다."));
+				.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "사용자 권한을 찾을 수 없습니다."));				
 
 		userUpdate.setAuthSeq(authInfo.getAuthSeq());
 		int result = userMapper.updateUser(userUpdate);
@@ -170,7 +170,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public LoginUserInfo getLoginUser(String ssoKey) {
 		return Optional.ofNullable(userMapper.getLoginUser(ssoKey))
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "사용자를 찾을 수 없습니다"));
+				.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "사용자 권한을 찾을 수 없습니다."));				
 	}
 
 	@Override

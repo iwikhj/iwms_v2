@@ -75,7 +75,6 @@ public class ReqController {
 		List<ReqInfo> reqList = reqService.listReq(map);
 		
 		return ResponseEntity.ok(ApiListResponse.<List<ReqInfo>>builder()
-				.request(request)
 				.data(reqList)
 				.query(map)
 				.build());
@@ -90,7 +89,6 @@ public class ReqController {
     	reqService.insertReq(req.of(loginUserInfo));
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(true)
 				.build());
 	}
@@ -105,7 +103,6 @@ public class ReqController {
     	boolean result = reqService.updateReq(req.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -120,7 +117,6 @@ public class ReqController {
     	boolean result = reqService.deleteReq(req.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -135,7 +131,6 @@ public class ReqController {
     	reqService.insertReqHis(reqHis.of(loginUserInfo));
     	
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.build());
 	}
 
@@ -149,7 +144,6 @@ public class ReqController {
     	reqCmtService.insertReqCmt(reqCmt.of(loginUserInfo));
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(true)
 				.build());
 	}
@@ -165,7 +159,6 @@ public class ReqController {
     	boolean result = reqCmtService.updateReqCmt(reqCmt.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -181,7 +174,6 @@ public class ReqController {
     	boolean result = reqCmtService.deleteReqCmt(reqCmt.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}    
@@ -203,7 +195,6 @@ public class ReqController {
     	ReqDtlInfo reqDtlInfo = reqDtlService.getReqDtlByReqAndDtlSeq(map);
     	
 		return ResponseEntity.ok(ApiResponse.<ReqDtlInfo>builder()
-				.request(request)
 				.data(reqDtlInfo)
 				.build());
     }
@@ -218,7 +209,6 @@ public class ReqController {
     	reqDtlService.insertReqDtl(reqDtl.of(loginUserInfo));
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(true)
 				.build());
 	}
@@ -234,7 +224,6 @@ public class ReqController {
     	boolean result = reqDtlService.updateReqDtl(reqDtl.of(loginUserInfo)) > 0 ? true : false;
 
     	return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -250,7 +239,6 @@ public class ReqController {
     	boolean result = reqDtlService.deleteReqDtl(reqDtl.of(loginUserInfo)) > 0 ? true : false;
 
     	return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -266,7 +254,6 @@ public class ReqController {
     	boolean result = reqDtlService.updateReqDtlStatByInProgress(reqDtl.of(loginUserInfo)) > 0 ? true : false;
 
     	return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -282,7 +269,6 @@ public class ReqController {
     	boolean result = reqDtlService.updateReqDtlStatByProcessed(reqDtl.of(loginUserInfo)) > 0 ? true : false;
 
     	return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -298,7 +284,6 @@ public class ReqController {
     	boolean result = reqDtlService.updateReqDtlStatByInspectionCompleted(reqDtl.of(loginUserInfo)) > 0 ? true : false;
 
     	return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -314,7 +299,6 @@ public class ReqController {
     	boolean result = reqDtlService.updateReqDtlStatByCancel(reqDtl.of(loginUserInfo)) > 0 ? true : false;
 
     	return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -330,7 +314,6 @@ public class ReqController {
     	reqDtlCmtService.insertReqDtlCmt(reqDtlCmt.of(loginUserInfo));
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(true)
 				.build());
 	}
@@ -347,7 +330,6 @@ public class ReqController {
     	boolean result = reqDtlCmtService.updateReqDtlCmt(reqDtlCmt.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -364,7 +346,6 @@ public class ReqController {
     	boolean result = reqDtlCmtService.deleteReqDtlCmt(reqDtlCmt.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}

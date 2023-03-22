@@ -71,7 +71,6 @@ public class ProjController {
 		List<ProjInfo> projList = projService.listProj(map);
 		
 		return ResponseEntity.ok(ApiListResponse.<List<ProjInfo>>builder()
-				.request(request)
 				.data(projList)
 				.query(map)
 				.build());
@@ -86,7 +85,6 @@ public class ProjController {
     	ProjInfo projInfo = projService.getProjBySeq(projSeq, loginUserInfo.getUserSeq());
     	
 		return ResponseEntity.ok(ApiResponse.<ProjInfo>builder()
-				.request(request)
 				.data(projInfo)
 				.build());
     }
@@ -100,7 +98,6 @@ public class ProjController {
     	projService.insertProj(proj.of(loginUserInfo));
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(true)
 				.build());
 	}
@@ -115,7 +112,6 @@ public class ProjController {
     	boolean result = projService.updateProj(proj.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -130,7 +126,6 @@ public class ProjController {
     	boolean result = projService.deleteProj(proj.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -151,7 +146,6 @@ public class ProjController {
 		}
     	
 		return ResponseEntity.ok(ApiResponse.<List<ProjUserInfo>>builder()
-				.request(request)
 				.data(projUserList)
 				.build());
 	}
@@ -166,7 +160,6 @@ public class ProjController {
     	boolean result = projService.updateProjUser(projUser.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -193,7 +186,6 @@ public class ProjController {
 		List<SiteInfo> SiteList = projService.listSite(map);
 		
 		return ResponseEntity.ok(ApiListResponse.<List<SiteInfo>>builder()
-				.request(request)
 				.data(SiteList)
 				.query(map)
 				.build());
@@ -209,7 +201,6 @@ public class ProjController {
     	SiteInfo siteInfo = projService.getSiteBySeq(siteSeq, loginUserInfo.getUserSeq());
     	
 		return ResponseEntity.ok(ApiResponse.<SiteInfo>builder()
-				.request(request)
 				.data(siteInfo)
 				.build());
     }
@@ -224,7 +215,6 @@ public class ProjController {
     	projService.insertSite(site.of(loginUserInfo));
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(true)
 				.build());
 	}
@@ -240,7 +230,6 @@ public class ProjController {
     	boolean result = projService.updateSite(site.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -256,7 +245,6 @@ public class ProjController {
     	boolean result = projService.deleteSite(site.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}    

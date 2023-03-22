@@ -15,11 +15,11 @@ import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
+import com.iwi.iwms.api.common.errors.CommonException;
+import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.filestorage.FileStorageResponse;
 import com.iwi.iwms.filestorage.service.FileStorageService;
 
@@ -77,7 +77,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         		.build();
         	
         } catch (IOException e) {
-    		throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        	throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "File storage");
         }
 	}
 	
@@ -86,7 +86,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 		try {
         	source = rootPath.resolve(source).normalize();
         	if (!Files.exists(source)) {
-        		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Source file not found");
+            	throw new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "원본 파일이 존재하지 않거나 확인할 수 없습니다.");
         	}
         	
         	target = rootPath.resolve(target).normalize();
@@ -94,7 +94,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         	return Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
         	
         } catch (IOException e) {
-    		throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        	throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "File storage");
         }
 	}
 	
@@ -114,7 +114,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 	public Resource loadAsResource(final Path path) {
 		Path target = rootPath.resolve(path).normalize();
     	if (!Files.exists(target)) {
-    		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found.");
+    		throw new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "파일이 존재하지 않거나 확인할 수 없습니다.");
     	}
     	
     	try {
@@ -122,11 +122,10 @@ public class FileStorageServiceImpl implements FileStorageService {
 	        if(resource.exists() || resource.isReadable()) {
 	            return resource;
 	        } else {
-	    		throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Could not read file.");
-
+            	throw new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "파일을 읽을 수 없습니다.");
 	        }
 		} catch (MalformedURLException e) {
-    		throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        	throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "File storage");
 
 		}
     	//return new InputStreamResource(getClass().getResourceAsStream(target.toString()));
@@ -139,10 +138,10 @@ public class FileStorageServiceImpl implements FileStorageService {
 			try {
 				Files.delete(target);
 	        } catch (IOException e) {
-	    		throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+	        	throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "File storage");
 	        }		
     	} else {
-    		//throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The file does not exist. " + target.toString());
+    		//throw new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "파일이 존재하지 않거나 확인할 수 없습니다.");
     	}
 	}
 	
@@ -156,11 +155,11 @@ public class FileStorageServiceImpl implements FileStorageService {
 					.map(Path::toFile)
 					.forEach(File::delete);
 	        } catch (IOException e) {
-	    		throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+	        	throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "File storage");
 	        	
 	        }		
     	} else {
-    		//throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The directory does not exist. " + target.toString());
+    		//throw new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "디렉토리가 존재하지 않거나 확인할 수 없습니다.");
     	}
 	}
 }

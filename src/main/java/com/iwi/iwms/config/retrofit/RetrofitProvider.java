@@ -2,9 +2,10 @@ package com.iwi.iwms.config.retrofit;
 
 import java.io.IOException;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
+
+import com.iwi.iwms.api.common.errors.CommonException;
+import com.iwi.iwms.api.common.errors.ErrorCode;
 
 import retrofit2.Call;
 import retrofit2.Response;
@@ -18,10 +19,10 @@ public class RetrofitProvider {
             if (response.isSuccessful()) {
                 return response.body();
             } else {
-            	throw new ResponseStatusException(response.code(), response.message(), null);  
+				throw new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, response.message());
             }
         } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, e.getMessage(), e);
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
         }
     }
 }

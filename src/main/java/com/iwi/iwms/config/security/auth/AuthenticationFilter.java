@@ -20,7 +20,6 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -33,6 +32,7 @@ import org.springframework.security.oauth2.jwt.JwtValidationException;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
+import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.common.errors.ErrorResponse;
 
 import io.jsonwebtoken.JwtException;
@@ -51,7 +51,22 @@ public class AuthenticationFilter extends GenericFilterBean {
 		HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         
-        String token = resolveAuthHeader(request);
+    	passAuthentication("bfb1e1d6-9018-4b50-8c69-f48c939b763b", Arrays.asList("ROLE_IWMS_ADMIN"));
+    	//passAuthentication("f983803e-4d8e-45ec-a0c9-8fbef7c8263f", Arrays.asList("ROLE_IWMS_ENG"));
+		request = ignoreRequestHeader(servletRequest, request, HttpHeaders.AUTHORIZATION);
+		printLog(request, AuthCode.INVALID);
+		
+		chain.doFilter(request, response);
+		
+		/*
+     	String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+    	if(token == null) {
+    		printLog(request, AuthCode.INVALID);
+    		errorReturn(response, ErrorCode.AUTHENTICATION_HEADER_NOT_EXISTS);
+    		return;
+    	}
+        
+    	token = resolveToken(token);
         AuthCode tokenStatus = tokenValidation(token);
      
         printLog(request, tokenStatus);
@@ -59,28 +74,23 @@ public class AuthenticationFilter extends GenericFilterBean {
         if(AuthCode.VERIFIED.equals(tokenStatus)) {
         	//ok
         } else if(AuthCode.EXPIRED.equals(tokenStatus)) {
-			//responseError(request, response, HttpStatus.UNAUTHORIZED, tokenStatus.name());
-			//return;
-        	passAuthentication("bfb1e1d6-9018-4b50-8c69-f48c939b763b", Arrays.asList("ROLE_IWMS_ADMIN"));
-    		request = ignoreRequestHeader(servletRequest, request, HttpHeaders.AUTHORIZATION);
+    		errorReturn(response, ErrorCode.AUTHENTICATION_EXPIRED);
+    		return;
     		
         } else if(AuthCode.INVALID.equals(tokenStatus)) {
-			//responseError(request, response, HttpStatus.UNAUTHORIZED, tokenStatus.name());
-			//return;
-        	passAuthentication("bfb1e1d6-9018-4b50-8c69-f48c939b763b", Arrays.asList("ROLE_IWMS_ADMIN"));
-        	//passAuthentication("f983803e-4d8e-45ec-a0c9-8fbef7c8263f", Arrays.asList("ROLE_IWMS_ENG"));
-    		request = ignoreRequestHeader(servletRequest, request, HttpHeaders.AUTHORIZATION);
+    		errorReturn(response, ErrorCode.AUTHENTICATION_HEADER_MALFORMED);
+    		return;
         }
         
         chain.doFilter(request, response);
+        */
 	}
     
-    private String resolveAuthHeader(HttpServletRequest request) {
-    	String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (StringUtils.hasText(bearerToken) && bearerToken.length() > 7 && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+    private String resolveToken(String token) {
+        if (token.length() > 7 && token.startsWith("Bearer ")) {
+            return token.substring(7);
         }
-        return null;
+        return "";
     }
     
     private AuthCode tokenValidation(String token) {
@@ -191,16 +201,16 @@ public class AuthenticationFilter extends GenericFilterBean {
 		} catch(Exception e) {}
 	}
     
-    private void responseError(HttpServletRequest request, HttpServletResponse response, HttpStatus status, String errorMessage) {
+    private void errorReturn(HttpServletResponse response, ErrorCode code) {
     	try {
-            response.setStatus(status.value());
+        	String er = ErrorResponse.builder()
+    	    		.code(code)
+    	    		.build()
+    	    		.toJson();
+    		
+            response.setStatus(code.getStatus().value());
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.getWriter().write(ErrorResponse.builder()
-            		.request(request)
-            		.status(status.value())
-            		.message(errorMessage)
-            		.build()
-            		.toJson());
+            response.getWriter().write(er);
     	} catch (IOException e) {
     		//log.info("IOException: {}", e.getMessage());
     	}

@@ -5,17 +5,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.web.server.ResponseStatusException;
 
 import com.iwi.iwms.api.auth.domain.Auth;
 import com.iwi.iwms.api.auth.domain.AuthInfo;
 import com.iwi.iwms.api.auth.domain.AuthMenu;
 import com.iwi.iwms.api.auth.mapper.AuthMapper;
 import com.iwi.iwms.api.auth.service.AuthService;
+import com.iwi.iwms.api.common.errors.CommonException;
+import com.iwi.iwms.api.common.errors.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,13 +44,13 @@ public class AuthServiceImpl implements AuthService {
 		map.put("loginUserSeq", loginUserSeq);
 		
 		return Optional.ofNullable(authMapper.getAuthBySeq(map))
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "권한을 찾을 수 없습니다"));
+				.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "권한을 찾을 수 없습니다."));
 	}
 
 	@Override
 	public AuthInfo getAuthByAuthCd(String authCd) {
 		return Optional.ofNullable(authMapper.getAuthByAuthCd(authCd))
-				.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "권한을 찾을 수 없습니다"));
+				.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "권한을 찾을 수 없습니다."));
 	}
 
 	@Transactional(rollbackFor = {Exception.class})
@@ -59,7 +59,7 @@ public class AuthServiceImpl implements AuthService {
 		AuthInfo authInfo = this.getAuthBySeq(auth.getAuthSeq(), auth.getLoginUserSeq());
 		
 		if(CollectionUtils.isEmpty(auth.getAuthMenuSeq()) || auth.getAuthMenuSeq().size() != authInfo.getAuthMenus().size()) {
-			throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "모든 메뉴의 데이터를를 입력해주세요.");
+			throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "모든 메뉴의 데이터를를 입력해주세요.");
 		}
 		
 		for(int i = 0; i < auth.getAuthMenuSeq().size(); i++) {

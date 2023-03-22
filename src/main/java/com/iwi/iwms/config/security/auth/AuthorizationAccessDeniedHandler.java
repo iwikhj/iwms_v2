@@ -10,6 +10,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 
+import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.common.errors.ErrorResponse;
 
 import lombok.extern.slf4j.Slf4j;
@@ -22,14 +23,16 @@ public class AuthorizationAccessDeniedHandler implements AccessDeniedHandler {
     public void handle(HttpServletRequest request, HttpServletResponse response, AccessDeniedException e) throws IOException {
     	
     	log.error("Forbidden!!! message : " + e.getMessage());
-    	 
-        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+    	
+    	ErrorCode code = ErrorCode.AUTHORIZATION_FAILED;
+    	
+    	String er = ErrorResponse.builder()
+	    		.code(code)
+	    		.build()
+	    		.toJson();
+		
+        response.setStatus(code.getStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.getWriter().write(ErrorResponse.builder()
-        		.request(request)
-        		.status(HttpServletResponse.SC_FORBIDDEN)
-        		.message("호출 권한이 없습니다.")
-        		.build()
-        		.toJson());
+        response.getWriter().write(er);
     }
 }

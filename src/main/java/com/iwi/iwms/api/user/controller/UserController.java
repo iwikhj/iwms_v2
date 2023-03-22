@@ -70,7 +70,6 @@ public class UserController {
 		List<UserInfo> userList = userService.listUser(map);
 		
 		return ResponseEntity.ok(ApiListResponse.<List<UserInfo>>builder()
-				.request(request)
 				.data(userList)
 				.query(map)
 				.build());
@@ -86,7 +85,6 @@ public class UserController {
     	UserInfo userInfo = userService.getUserBySeq(userSeq, loginUserInfo.getUserSeq());
     	
 		return ResponseEntity.ok(ApiResponse.<UserInfo>builder()
-				.request(request)
 				.data(userInfo)
 				.build());
     }
@@ -101,7 +99,6 @@ public class UserController {
     	userService.insertUser(user.of(loginUserInfo));
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(true)
 				.build());
 	}
@@ -117,7 +114,6 @@ public class UserController {
     	boolean result = userService.updateUser(userUpdate.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -133,7 +129,6 @@ public class UserController {
     	boolean result = userService.deleteUser(user.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -147,7 +142,6 @@ public class UserController {
     	boolean result = userService.checkExistsUserId(userId);
     	
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
     }
@@ -160,7 +154,6 @@ public class UserController {
     	UserInfo user = userService.getUserBySeq(loginUserInfo.getUserSeq(), loginUserInfo.getUserSeq());
     	
 		return ResponseEntity.ok(ApiResponse.<UserInfo>builder()
-				.request(request)
 				.data(user)
 				.build());
     }
@@ -176,7 +169,6 @@ public class UserController {
     	boolean result = userService.passwordChange(userPwd.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -192,7 +184,6 @@ public class UserController {
     	boolean result = userService.passwordReset(userPwd.of(loginUserInfo)) > 0 ? true : false;
 
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
-				.request(request)
 				.data(result)
 				.build());
 	}
@@ -205,7 +196,6 @@ public class UserController {
     	List<UserProjInfo> listProj = userService.listProjByUserSeq(userSeq);
 		
 		return ResponseEntity.ok(ApiResponse.<List<UserProjInfo>>builder()
-				.request(request)
 				.data(listProj)
 				.build());
 	}
@@ -218,7 +208,6 @@ public class UserController {
     	List<UserSiteInfo> listSite = userService.listSiteByUserSeq(userSeq);
 		
 		return ResponseEntity.ok(ApiResponse.<List<UserSiteInfo>>builder()
-				.request(request)
 				.data(listSite)
 				.build());
 	}
