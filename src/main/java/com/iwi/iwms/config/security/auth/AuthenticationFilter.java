@@ -176,8 +176,7 @@ public class AuthenticationFilter extends GenericFilterBean {
 			String queryString = StringUtils.hasText(request.getQueryString()) ? request.getQueryString() : "";
 			String referer = StringUtils.hasText(request.getHeader("Referer")) ? request.getHeader("Referer") : "-";
 			String agent = StringUtils.hasText(request.getHeader("User-Agent")) ? request.getHeader("User-Agent") : "-";;
-			String fullUrl = url;
-			fullUrl += StringUtils.hasText(queryString)? "?"+queryString:queryString;
+			String fullUrl = url + (StringUtils.hasText(queryString) ? ("?" + queryString) : "");
 			
 	        StringJoiner sj = new StringJoiner(">, <", "<", ">");
 	        sj.add("Status:" + authCode.name());
@@ -188,7 +187,7 @@ public class AuthenticationFilter extends GenericFilterBean {
 	        sj.add("Referer:" + referer);
 	        sj.add("User-Agent:" + agent);
 
-	        log.info("[FILTER LOG] {}", sj);
+	        log.info("[FILTER] {}", sj);
 		} catch(Exception e) {}
 	}
     

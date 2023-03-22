@@ -76,7 +76,7 @@ public class LoginServiceImpl implements LoginService{
 			
 			// 로그인한 사용자의 접속IP를 저장 및 LOGIN_ERR_CNT 초기화. 
 			userMapper.updateLoginSuccess(User.builder()
-					.lastLoginIp(login.getLoginIp()).userSeq(userInfo.getUserSeq()).build());
+					.loginIp(login.getLoginIp()).userSeq(userInfo.getUserSeq()).build());
 			
 			return accessTokenResponse;
 		} catch(InternalServerErrorException e) {

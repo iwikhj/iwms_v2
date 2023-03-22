@@ -87,7 +87,7 @@ public class ExceptionHandlers {
        		 .message(message)
        		 .build(), status);
         
-        log.warn("[ERROR RESPONSE] {} {}", e.getClass().getName(), response.toString());
+        log.warn("[ERROR] {} {}", e.getClass().getName(), response.toString());
         
         return response;
     }

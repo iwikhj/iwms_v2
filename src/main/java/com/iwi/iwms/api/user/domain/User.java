@@ -85,7 +85,7 @@ public class User {
 	private String verifyYn;
 	
 	@Schema(hidden = true, description = "마지막 로그인 IP") 
-	private String lastLoginIp;
+	private String loginIp;
 	
 	@Schema(description = "사용 여부", allowableValues = {"Y", "N"}) 
 	private String useYn;

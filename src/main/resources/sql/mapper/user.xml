@@ -191,7 +191,7 @@
 		UPDATE TB_USER 
 		SET
 		    LOGIN_ERR_CNT = 0
-			, LAST_LOGIN_IP = #{lastLoginIp}
+			, LAST_LOGIN_IP = #{loginIp}
 			, LAST_LOGIN_DT = CURRENT_TIMESTAMP
 		WHERE USER_SEQ = #{userSeq}	
 	</update>	

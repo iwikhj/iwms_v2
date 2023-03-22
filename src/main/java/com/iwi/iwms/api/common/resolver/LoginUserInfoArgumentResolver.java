@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
+import com.iwi.iwms.api.user.service.UserService;
 import com.iwi.iwms.config.redis.RedisProvider;
 
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,8 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
     private final RedisProvider redis;
     
     private final ObjectMapper objectMapper;
+    
+    private final UserService userService;
 	
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
@@ -47,10 +50,10 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
 		
 		String ssoKey = authentication.getName();
 		
-		if(request.getRequestURI().indexOf("logout") != -1) {
-			redis.delete(ssoKey);
-			return null;
-		}
+		//if(request.getRequestURI().indexOf("logout") != -1) {
+		//	redis.delete(ssoKey);
+		//	return null;
+		//}
 		
 		/*
 		LoginUserInfo loginUserInfo = objectMapper.convertValue(redis.getHash(ssoKey, "user"), LoginUserInfo.class);
@@ -60,8 +63,10 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
 		return loginUserInfo;
 		*/
 		
-		return Optional.ofNullable(objectMapper.convertValue(redis.getHash(ssoKey, "user"), LoginUserInfo.class))
-					.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인 정보를 찾을 수 없습니다."));
+		//return Optional.ofNullable(objectMapper.convertValue(redis.getHash(ssoKey, "user"), LoginUserInfo.class))
+		//			.orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "로그인 정보를 찾을 수 없습니다."));
+		
+		return userService.getLoginUser(ssoKey);
 	}
 
 }
