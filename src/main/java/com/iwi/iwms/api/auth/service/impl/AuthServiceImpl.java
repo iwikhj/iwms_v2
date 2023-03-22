@@ -58,7 +58,11 @@ public class AuthServiceImpl implements AuthService {
 	public int updateAuth(Auth auth) {
 		AuthInfo authInfo = this.getAuthBySeq(auth.getAuthSeq(), auth.getLoginUserSeq());
 		
-		if(CollectionUtils.isEmpty(auth.getAuthMenuSeq()) || auth.getAuthMenuSeq().size() != authInfo.getAuthMenus().size()) {
+		int menuSize = authInfo.getAuthMenus().stream()
+				.map(v -> 1 + v.getSubMenus().size())
+				.reduce((x, y) -> x + y).get();
+		
+		if(CollectionUtils.isEmpty(auth.getAuthMenuSeq()) || auth.getAuthMenuSeq().size() != menuSize) {
 			throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "모든 메뉴의 데이터를를 입력해주세요.");
 		}
 		
