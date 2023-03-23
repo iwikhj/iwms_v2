@@ -29,7 +29,7 @@
 		<if test='useYn != null and useYn != ""'>
 			AND COMP.USE_YN = UPPER(#{useYn})
 		</if>			
-		ORDER BY COMP.COMP_SEQ DESC
+		ORDER BY COMP.COMP_SEQ
 		<if test='pagination != null and pagination != ""'>
 			LIMIT #{pagination.limitPerPage} OFFSET #{pagination.offset}
 		</if>
@@ -183,9 +183,7 @@
 		INNER JOIN TB_COMPANY COMP ON DEPT.COMP_SEQ = COMP.COMP_SEQ
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE DEPT.USE_YN = 'Y' END)
-		<if test='compSeq != null and compSeq != ""'>
 			AND DEPT.COMP_SEQ = #{compSeq}
-		</if>	
 		<if test='useYn != null and useYn != ""'>
 			AND DEPT.USE_YN = UPPER(#{useYn})
 		</if>		

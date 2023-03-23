@@ -126,11 +126,10 @@ public class CompController {
 		
 		Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
 		map.put("compSeq", compSeq);
-		
-		List<DeptInfo> positionList = compService.listDept(map);
+		List<DeptInfo> deptList = compService.listDept(map);
     	
 		return ResponseEntity.ok(ApiResponse.<List<DeptInfo>>builder()
-				.data(positionList)
+				.data(deptList)
 				.build());
 	}
 	

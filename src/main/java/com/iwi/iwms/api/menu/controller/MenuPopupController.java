@@ -1,11 +1,14 @@
 package com.iwi.iwms.api.menu.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,12 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.iwi.iwms.api.auth.service.AuthService;
 import com.iwi.iwms.api.common.response.ApiResponse;
+import com.iwi.iwms.api.comp.domain.CompInfo;
+import com.iwi.iwms.api.comp.domain.DeptInfo;
 import com.iwi.iwms.api.comp.service.CompService;
 import com.iwi.iwms.api.comp.service.ProjService;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.notice.service.NoticeService;
 import com.iwi.iwms.api.req.service.ReqDtlService;
 import com.iwi.iwms.api.req.service.ReqService;
+import com.iwi.iwms.api.user.domain.UserInfo;
 import com.iwi.iwms.api.user.service.UserService;
 import com.iwi.iwms.utils.PredicateMap;
 
@@ -63,12 +69,21 @@ public class MenuPopupController {
     	Map<String, Object> resultData = new HashMap<>();
     	
     	if(userSeq != null) {
-    		resultData.put("userInfo", userService.getUserBySeq(userSeq, loginUserInfo.getUserSeq()));
+    		UserInfo userInfo = userService.getUserBySeq(userSeq, loginUserInfo.getUserSeq());
+    		resultData.put("userInfo", userInfo);
     	}
 		
     	Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
     	map.put("useYn", "Y");
-    	resultData.put("compList", compService.listComp(map));
+    	
+		List<CompInfo> compList = compService.listComp(map);
+    	resultData.put("compList", compList);
+    	
+    	if(!CollectionUtils.isEmpty(compList) && compList.size() > 0) {
+    		map.put("compSeq", compList.get(0).getCompSeq());
+    		List<DeptInfo> deptList = compService.listDept(map);
+        	resultData.put("deptList", deptList);
+    	}
     	
 		return ResponseEntity.ok(ApiResponse.<Map<String, Object>>builder()
 				.data(resultData)
@@ -84,7 +99,8 @@ public class MenuPopupController {
     	Map<String, Object> resultData = new HashMap<>();
     	
     	if(compSeq != null) {
-    		resultData.put("compInfo", compService.getCompBySeq(compSeq, loginUserInfo.getUserSeq()));
+    		CompInfo compInfo = compService.getCompBySeq(compSeq, loginUserInfo.getUserSeq());
+    		resultData.put("compInfo", compInfo);
     	}
     	
 		return ResponseEntity.ok(ApiResponse.<Map<String, Object>>builder()
