@@ -87,7 +87,7 @@ public class FileServiceImpl implements FileService {
 	@Override
 	public UploadFileInfo getFileBySeq(long fileSeq) {
 		return Optional.ofNullable(fileMapper.getFileBySeq(fileSeq))
-					.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "파일을 찾을 수 없습니다."));
+					.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "파일을 찾을 수 없습니다."));
 	}
 
 	@Override

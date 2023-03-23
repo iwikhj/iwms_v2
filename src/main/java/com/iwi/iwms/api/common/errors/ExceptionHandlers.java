@@ -67,11 +67,11 @@ public class ExceptionHandlers {
     
     @ExceptionHandler({Exception.class})
     public ResponseEntity<?> handleException(Exception e) {
+    	e.printStackTrace();
     	return errorReturn(ErrorCode.INTERNAL_SERVER_ERROR, e.getMessage(), e);
     }
     
     private ResponseEntity<ErrorResponse> errorReturn(ErrorCode code, String message, Exception e) {
-    	//e.printStackTrace();
     	ErrorResponse er = ErrorResponse.builder()
 	    		.code(code)
 	    		.message(message)

@@ -24,13 +24,16 @@ public enum ErrorCode {
 	(HttpStatus.UNAUTHORIZED, "024", "토큰 재발급 실패."),
 	
 	AUTHORIZATION_FAILED
-	(HttpStatus.FORBIDDEN, "030", "권한 없음."),
+	(HttpStatus.FORBIDDEN, "030", "허가되지 않은 요청."),
 
 	PARAMETER_MALFORMED
-	(HttpStatus.BAD_REQUEST, "040", "파라미터 형식이 잘못됨."),	
+	(HttpStatus.BAD_REQUEST, "040", "파라미터 오류."),	
 	
-	TARGET_DATA_NOT_EXISTS
-	(HttpStatus.NOT_FOUND, "044", "대상 데이터 없음."),
+	RESOURCES_NOT_EXISTS
+	(HttpStatus.NOT_FOUND, "044", "리소스 없음."),
+	
+	DUPLICATE_ERROR
+	(HttpStatus.CONFLICT, "049", "중복 오류"),
 	
 	LOGIN_FAILED_INCORRECT_ID_PW
 	(HttpStatus.UNAUTHORIZED, "050", "로그인 실패. 등록되지 않은 아이디 또는 잘못된 비밀번호."),

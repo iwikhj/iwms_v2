@@ -49,7 +49,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 		map.put("loginUserSeq", loginUserSeq);
 		
 		return Optional.ofNullable(reqDtlMapper.getReqDtlBySeq(map))
-				.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "요청사항 상세를 찾을 수 없습니다."));				
+				.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "요청사항 상세를 찾을 수 없습니다."));				
 	}
 	
 	@Transactional(rollbackFor = {Exception.class})
@@ -60,7 +60,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 		map.put("loginUserSeq", reqDtl.getLoginUserSeq());
 		
 		Optional.ofNullable(reqMapper.getReqBySeq(map))
-			.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "요청사항을 찾을 수 없습니다."));				
+			.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "요청사항을 찾을 수 없습니다."));				
 		
 		if(CollectionUtils.isEmpty(reqDtl.getReqDtlUserSeqs())) {
         	throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "담당자는 필수 입력 사항입니다");

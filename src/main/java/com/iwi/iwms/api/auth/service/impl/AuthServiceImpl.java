@@ -44,13 +44,13 @@ public class AuthServiceImpl implements AuthService {
 		map.put("loginUserSeq", loginUserSeq);
 		
 		return Optional.ofNullable(authMapper.getAuthBySeq(map))
-				.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "권한을 찾을 수 없습니다."));
+				.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "권한을 찾을 수 없습니다."));
 	}
 
 	@Override
 	public AuthInfo getAuthByAuthCd(String authCd) {
 		return Optional.ofNullable(authMapper.getAuthByAuthCd(authCd))
-				.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "권한을 찾을 수 없습니다."));
+				.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "권한을 찾을 수 없습니다."));
 	}
 
 	@Transactional(rollbackFor = {Exception.class})

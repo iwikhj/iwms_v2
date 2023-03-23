@@ -86,7 +86,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 		try {
         	source = rootPath.resolve(source).normalize();
         	if (!Files.exists(source)) {
-            	throw new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "원본 파일이 존재하지 않거나 확인할 수 없습니다.");
+            	throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "원본 파일이 존재하지 않거나 확인할 수 없습니다.");
         	}
         	
         	target = rootPath.resolve(target).normalize();
@@ -114,7 +114,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 	public Resource loadAsResource(final Path path) {
 		Path target = rootPath.resolve(path).normalize();
     	if (!Files.exists(target)) {
-    		throw new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "파일이 존재하지 않거나 확인할 수 없습니다.");
+    		throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "파일이 존재하지 않거나 확인할 수 없습니다.");
     	}
     	
     	try {
@@ -122,7 +122,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 	        if(resource.exists() || resource.isReadable()) {
 	            return resource;
 	        } else {
-            	throw new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "파일을 읽을 수 없습니다.");
+            	throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "파일을 읽을 수 없습니다.");
 	        }
 		} catch (MalformedURLException e) {
         	throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "File storage");

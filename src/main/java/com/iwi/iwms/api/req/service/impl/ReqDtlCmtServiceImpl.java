@@ -44,7 +44,7 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 		map.put("loginUserSeq", loginUserSeq);
 		
 		return Optional.ofNullable(reqDtlCmtMapper.getReqDtlCmtBySeq(map))
-					.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "요청사항 상세 코멘트를 찾을 수 없습니다."));				
+					.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "요청사항 상세 코멘트를 찾을 수 없습니다."));				
 	}
 	
 	@Transactional(rollbackFor = {Exception.class})
@@ -55,7 +55,7 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 		map.put("loginUserSeq", reqDtlCmt.getLoginUserSeq());
 		
 		ReqDtlInfo reqDtlInfo = Optional.ofNullable(reqDtlMapper.getReqDtlBySeq(map))
-			.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "요청사항 상세를 찾을 수 없습니다."));				
+			.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "요청사항 상세를 찾을 수 없습니다."));				
 
 		reqDtlCmtMapper.insertReqDtlCmt(reqDtlCmt);
 		

@@ -21,7 +21,7 @@ public class RetrofitProvider {
     			if(response.code() == 400) {
     				throw new CommonException(ErrorCode.PARAMETER_MALFORMED, errorBody);
     			} else if(response.code() == 404) {
-    				throw new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, errorBody);
+    				throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, errorBody);
     			} else {
     				throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, errorBody);
     			}

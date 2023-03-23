@@ -43,7 +43,7 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 		map.put("loginUserSeq", loginUserSeq);
 		
 		return Optional.ofNullable(reqCmtMapper.getReqCmtBySeq(map))
-					.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "요청사항 코멘트를 찾을 수 없습니다."));				
+					.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "요청사항 코멘트를 찾을 수 없습니다."));				
 	}
 	
 	@Transactional(rollbackFor = {Exception.class})
@@ -54,7 +54,7 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 		map.put("loginUserSeq", reqCmt.getLoginUserSeq());
 		
 		Optional.ofNullable(reqMapper.getReqBySeq(map))
-			.orElseThrow(() -> new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "요청사항을 찾을 수 없습니다."));				
+			.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "요청사항을 찾을 수 없습니다."));				
 	
 		reqCmtMapper.insertReqCmt(reqCmt);
 		
