@@ -15,7 +15,7 @@ public enum ErrorCode {
 	(HttpStatus.UNAUTHORIZED, "021", "인증 실패. 헤더에 토큰이 없음."),
 	
 	AUTHENTICATION_HEADER_MALFORMED
-	(HttpStatus.UNAUTHORIZED, "022", "인증 실패. 토큰 형식이 잘못됨."),
+	(HttpStatus.UNAUTHORIZED, "022", "인증 실패. 토큰 형식 오류."),
 	
 	AUTHENTICATION_EXPIRED
 	(HttpStatus.UNAUTHORIZED, "023", "인증 실패. 만료된 토큰."),

@@ -1,6 +1,5 @@
 package com.iwi.iwms.api.user.controller;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +32,7 @@ import com.iwi.iwms.api.user.domain.UserSiteInfo;
 import com.iwi.iwms.api.user.domain.UserUpdate;
 import com.iwi.iwms.api.user.service.UserService;
 import com.iwi.iwms.utils.Pagination;
+import com.iwi.iwms.utils.PredicateMap;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -56,17 +56,13 @@ public class UserController {
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
-			, @RequestParam(value = "search", required = false) String search
-			, @RequestParam(value = "startDate", required = false) String startDate
-			, @RequestParam(value = "endDate", required = false) String endDate) {
+			, @RequestParam(value = "userNm", required = false) String userNm
+			, @RequestParam(value = "compNm", required = false) String compNm
+			, @RequestParam(value = "busiRollCd", required = false) String busiRollCd
+			, @RequestParam(value = "useYn", required = false) String useYn) {
 		
-		Map<String, Object> map = new HashMap<>();
-		map.put("loginUserSeq", loginUserInfo.getUserSeq());
-		map.put("search", search);
-		map.put("startDate", startDate);
-		map.put("endDate", endDate);
+		Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
 		map.put("pagination", new Pagination(page, limit, userService.countUser(map)));
-		
 		List<UserInfo> userList = userService.listUser(map);
 		
 		return ResponseEntity.ok(ApiListResponse.<List<UserInfo>>builder()

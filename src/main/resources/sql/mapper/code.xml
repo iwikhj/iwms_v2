@@ -27,10 +27,6 @@
 		resultMap="resultCodeMap">
 		<include refid="selectCode"></include>
 			AND CODE.UP_CODE_CD IS NULL
-		<if test='search != null and search != ""'>
-			AND CODE.CODE_CD LIKE CONCAT('%', #{search}, '%') 
-			OR CODE.CODE_NM LIKE CONCAT('%', #{search}, '%') 
-		</if>		
         ORDER BY CODE.CODE_SEQ DESC
 	</select>
 

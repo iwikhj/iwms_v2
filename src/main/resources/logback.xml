@@ -59,7 +59,7 @@
         -->
     </root>
     
-	<logger name="jdbc.sqltiming" level="off"/>
+	<logger name="jdbc.sqltiming" level="${LOG_LEVEL}"/>
 	<logger name="jdbc.resultsettable" level="off"/>
 	
 	<logger name="jdbc.sqlonly" level="off"/>	

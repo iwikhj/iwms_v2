@@ -18,9 +18,8 @@
 		FROM TB_AUTH AUTH
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE AUTH.USE_YN = 'Y' END)	
-		<if test='search != null and search != ""'>
-			AND AUTH.AUTH_CD LIKE CONCAT('%', #{search}, '%') 
-			OR AUTH.AUTH_NM LIKE CONCAT('%', #{search}, '%')
+		<if test='useYn != null and useYn != ""'>
+			AND AUTH.USE_YN = UPPER(#{useYn})
 		</if>			
 		ORDER BY AUTH.AUTH_SEQ
 		<if test='pagination != null and pagination != ""'>
@@ -36,9 +35,8 @@
 		FROM TB_AUTH AUTH
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE AUTH.USE_YN = 'Y' END)
-		<if test='search != null and search != ""'>
-			AND AUTH.AUTH_CD LIKE CONCAT('%', #{search}, '%') 
-			OR AUTH.AUTH_NM LIKE CONCAT('%', #{search}, '%')
+		<if test='useYn != null and useYn != ""'>
+			AND AUTH.USE_YN = UPPER(#{useYn})
 		</if>			
 	</select>	
 

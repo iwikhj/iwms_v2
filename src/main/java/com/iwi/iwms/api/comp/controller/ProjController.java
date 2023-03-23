@@ -1,9 +1,7 @@
 package com.iwi.iwms.api.comp.controller;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -31,6 +29,7 @@ import com.iwi.iwms.api.comp.domain.SiteInfo;
 import com.iwi.iwms.api.comp.service.ProjService;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.utils.Pagination;
+import com.iwi.iwms.utils.PredicateMap;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -51,23 +50,13 @@ public class ProjController {
 	@GetMapping(value = "")
 	public ResponseEntity<ApiListResponse<List<ProjInfo>>> listProj(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
-			, @RequestParam(value = "compSeq", required = false) Optional<String> compSeq
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
-			, @RequestParam(value = "search", required = false) String search
-			, @RequestParam(value = "startDate", required = false) String startDate
-			, @RequestParam(value = "endDate", required = false) String endDate) {
+			, @RequestParam(value = "compSeq", required = false) Long compSeq
+			, @RequestParam(value = "useYn", required = false) String useYn) {
 		
-		Map<String, Object> map = new HashMap<>();
-		map.put("loginUserSeq", loginUserInfo.getUserSeq());
-		if(compSeq.isPresent()) {
-			map.put("compSeq", compSeq.get());
-		}
-		map.put("search", search);
-		map.put("startDate", startDate);
-		map.put("endDate", endDate);
+		Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
 		map.put("pagination", new Pagination(page, limit, projService.countProj(map)));
-		
 		List<ProjInfo> projList = projService.listProj(map);
 		
 		return ResponseEntity.ok(ApiListResponse.<List<ProjInfo>>builder()
@@ -171,18 +160,11 @@ public class ProjController {
 			, @PathVariable long projSeq
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
-			, @RequestParam(value = "search", required = false) String search
-			, @RequestParam(value = "startDate", required = false) String startDate
-			, @RequestParam(value = "endDate", required = false) String endDate) {
+			, @RequestParam(value = "useYn", required = false) String useYn) {
 		
-		Map<String, Object> map = new HashMap<>();
-		map.put("loginUserSeq", loginUserInfo.getUserSeq());
+		Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
 		map.put("projSeq", projSeq);
-		map.put("search", search);
-		map.put("startDate", startDate);
-		map.put("endDate", endDate);
 		map.put("pagination", new Pagination(page, limit, projService.countSite(map)));
-		
 		List<SiteInfo> SiteList = projService.listSite(map);
 		
 		return ResponseEntity.ok(ApiListResponse.<List<SiteInfo>>builder()

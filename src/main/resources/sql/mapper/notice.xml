@@ -26,9 +26,14 @@
 		LEFT JOIN TB_COMPANY COMP ON NOTI.COMP_SEQ = COMP.COMP_SEQ 
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE NOTI.USE_YN = 'Y' AND (LOGIN.COMP_SEQ = NOTI.COMP_SEQ OR NOTI.COMP_SEQ IS NULL) END)		
-		<if test='search != null and search != ""'>
-			AND NOTI.TITLE LIKE CONCAT('%', #{search}, '%') 
-			OR COMP.COMP_NM LIKE CONCAT('%', #{search}, '%') 
+		<if test='compNm != null and compNm != ""'>
+			AND COMP.COMP_NM LIKE CONCAT('%', #{compNm}, '%') 
+		</if>		
+		<if test='title != null and title != ""'>
+			AND NOTI.TITLE LIKE CONCAT('%', #{title}, '%') 
+		</if>		
+		<if test='useYn != null and useYn != ""'>
+			AND NOTI.USE_YN = UPPER(#{useYn})
 		</if>			
 		ORDER BY NOTI.NOTICE_SEQ DESC
 		<if test='pagination != null and pagination != ""'>
@@ -45,10 +50,15 @@
 		LEFT JOIN TB_COMPANY COMP ON NOTI.COMP_SEQ = COMP.COMP_SEQ 
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE NOTI.USE_YN = 'Y' AND (LOGIN.COMP_SEQ = NOTI.COMP_SEQ OR NOTI.COMP_SEQ IS NULL) END)		
-		<if test='search != null and search != ""'>
-			AND NOTI.TITLE LIKE CONCAT('%', #{search}, '%') 
-			OR COMP.COMP_NM LIKE CONCAT('%', #{search}, '%') 
-		</if>				
+		<if test='compNm != null and compNm != ""'>
+			AND COMP.COMP_NM LIKE CONCAT('%', #{compNm}, '%') 
+		</if>		
+		<if test='title != null and title != ""'>
+			AND NOTI.TITLE LIKE CONCAT('%', #{title}, '%') 
+		</if>	
+		<if test='useYn != null and useYn != ""'>
+			AND NOTI.USE_YN = UPPER(#{useYn})
+		</if>					
 	</select>		
 	
 	<resultMap id="resultNoticeMap" type="com.iwi.iwms.api.notice.domain.NoticeInfo">

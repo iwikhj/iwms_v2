@@ -51,9 +51,17 @@
 	<select id="listUser" parameterType="hashMap"
 		resultType="com.iwi.iwms.api.user.domain.UserInfo">
 		<include refid="selectUser"></include>
-		<if test='search != null and search != ""'>
-			AND USER.USER_NM LIKE CONCAT('%', #{search}, '%') 
-			OR COMP.COMP_NM LIKE CONCAT('%', #{search}, '%')
+		<if test='userNm != null and userNm != ""'>
+			AND LOWER(USER.USER_NM) LIKE CONCAT('%', LOWER(#{userNm}), '%') 
+		</if>	
+		<if test='compNm != null and compNm != ""'>
+			AND LOWER(COMP.COMP_NM) LIKE CONCAT('%', LOWER(#{compNm}), '%') 
+		</if>	
+		<if test='busiRollCd != null and busiRollCd != ""'>
+			AND USER.BUSI_ROLL_CD = UPPER(#{busiRollCd})
+		</if>	
+		<if test='useYn != null and useYn != ""'>
+			AND USER.USE_YN = UPPER(#{useYn})
 		</if>			
 		ORDER BY USER.USER_SEQ DESC
 		<if test='pagination != null and pagination != ""'>
@@ -72,9 +80,17 @@
 		LEFT JOIN TB_DEPT DEPT ON USER.DEPT_SEQ = DEPT.DEPT_SEQ  
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE USER.DEL_YN = 'N' AND USER.USE_YN = 'Y' END)	
-		<if test='search != null and search != ""'>
-			AND USER.USER_NM LIKE CONCAT('%', #{search}, '%') 
-			OR COMP.COMP_NM LIKE CONCAT('%', #{search}, '%')
+		<if test='userNm != null and userNm != ""'>
+			AND LOWER(USER.USER_NM) LIKE CONCAT('%', LOWER(#{userNm}), '%') 
+		</if>	
+		<if test='compNm != null and compNm != ""'>
+			AND LOWER(COMP.COMP_NM) LIKE CONCAT('%', LOWER(#{compNm}), '%') 
+		</if>	
+		<if test='busiRollCd != null and busiRollCd != ""'>
+			AND USER.BUSI_ROLL_CD = UPPER(#{busiRollCd})
+		</if>	
+		<if test='useYn != null and useYn != ""'>
+			AND USER.USE_YN = UPPER(#{useYn})
 		</if>			
 	</select>	
 	

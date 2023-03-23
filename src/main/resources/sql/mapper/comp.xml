@@ -23,9 +23,11 @@
 		FROM TB_COMPANY COMP
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE COMP.DEL_YN = 'N' AND COMP.USE_YN = 'Y' END)	
-		<if test='search != null and search != ""'>
-			AND COMP.COMP_NM LIKE CONCAT('%', #{search}, '%') 
-			OR COMP.COMP_TEL LIKE CONCAT('%', #{search}, '%') 
+		<if test='compNm != null and compNm != ""'>
+			AND LOWER(COMP.COMP_NM) LIKE CONCAT('%', LOWER(#{compNm}), '%') 
+		</if>	
+		<if test='useYn != null and useYn != ""'>
+			AND COMP.USE_YN = UPPER(#{useYn})
 		</if>			
 		ORDER BY COMP.COMP_SEQ DESC
 		<if test='pagination != null and pagination != ""'>
@@ -41,10 +43,12 @@
 		FROM TB_COMPANY COMP
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE COMP.DEL_YN = 'N' AND COMP.USE_YN = 'Y' END)		
-		<if test='search != null and search != ""'>
-			AND COMP.COMP_NM LIKE CONCAT('%', #{search}, '%') 
-			OR COMP.COMP_TEL LIKE CONCAT('%', #{search}, '%') 
-		</if>			
+		<if test='compNm != null and compNm != ""'>
+			AND LOWER(COMP.COMP_NM) LIKE CONCAT('%', LOWER(#{compNm}), '%') 
+		</if>	
+		<if test='useYn != null and useYn != ""'>
+			AND COMP.USE_YN = UPPER(#{useYn})
+		</if>						
 	</select>	
 
 	<resultMap id="resultCompMap" type="com.iwi.iwms.api.comp.domain.CompInfo">
@@ -182,6 +186,9 @@
 		<if test='compSeq != null and compSeq != ""'>
 			AND DEPT.COMP_SEQ = #{compSeq}
 		</if>	
+		<if test='useYn != null and useYn != ""'>
+			AND DEPT.USE_YN = UPPER(#{useYn})
+		</if>		
 		ORDER BY DEPT.DEPT_ORDER_NO		
 	</select>		
 	

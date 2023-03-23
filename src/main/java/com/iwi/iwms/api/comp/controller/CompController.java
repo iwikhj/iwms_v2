@@ -20,8 +20,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.common.response.ApiListResponse;
+import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.comp.domain.Comp;
 import com.iwi.iwms.api.comp.domain.CompInfo;
 import com.iwi.iwms.api.comp.domain.Dept;
@@ -29,6 +29,7 @@ import com.iwi.iwms.api.comp.domain.DeptInfo;
 import com.iwi.iwms.api.comp.service.CompService;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.utils.Pagination;
+import com.iwi.iwms.utils.PredicateMap;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -50,17 +51,11 @@ public class CompController {
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
-			, @RequestParam(value = "search", required = false) String search
-			, @RequestParam(value = "startDate", required = false) String startDate
-			, @RequestParam(value = "endDate", required = false) String endDate) {
+			, @RequestParam(value = "compNm", required = false) String compNm
+			, @RequestParam(value = "useYn", required = false) String useYn) {
 		
-		Map<String, Object> map = new HashMap<>();
-		map.put("loginUserSeq", loginUserInfo.getUserSeq());
-		map.put("search", search);
-		map.put("startDate", startDate);
-		map.put("endDate", endDate);
+		Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
 		map.put("pagination", new Pagination(page, limit, compService.countComp(map)));
-		
 		List<CompInfo> compList = compService.listComp(map);
 		
 		return ResponseEntity.ok(ApiListResponse.<List<CompInfo>>builder()
@@ -125,17 +120,16 @@ public class CompController {
     
 	@Operation(summary = "소속 부서 목록", description = "소속 부서 목록")
 	@GetMapping(value = "/{compSeq}/depts")
-	public ResponseEntity<ApiListResponse<List<DeptInfo>>> listDept(HttpServletRequest request
+	public ResponseEntity<ApiResponse<List<DeptInfo>>> listDept(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
 			, @PathVariable long compSeq) {
 		
-		Map<String, Object> map = new HashMap<>();
-		map.put("loginUserSeq", loginUserInfo.getUserSeq());
+		Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
 		map.put("compSeq", compSeq);
 		
 		List<DeptInfo> positionList = compService.listDept(map);
-
-		return ResponseEntity.ok(ApiListResponse.<List<DeptInfo>>builder()
+    	
+		return ResponseEntity.ok(ApiResponse.<List<DeptInfo>>builder()
 				.data(positionList)
 				.build());
 	}

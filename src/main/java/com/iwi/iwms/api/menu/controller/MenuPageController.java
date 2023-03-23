@@ -1,6 +1,5 @@
 package com.iwi.iwms.api.menu.controller;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,6 +30,7 @@ import com.iwi.iwms.api.req.service.ReqService;
 import com.iwi.iwms.api.user.domain.UserInfo;
 import com.iwi.iwms.api.user.service.UserService;
 import com.iwi.iwms.utils.Pagination;
+import com.iwi.iwms.utils.PredicateMap;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -39,7 +39,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Tag(name = "Menu page", description = "IWMS 메뉴별 페이지 정보")
+@Tag(name = "Page", description = "IWMS 메뉴별 페이지 정보")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("${app.root}/${app.version}/pages")
@@ -86,8 +86,7 @@ public class MenuPageController {
     public ResponseEntity<ListResponse<List<NoticeInfo>>> notice(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
-		Map<String, Object> map = new HashMap<>();
-		map.put("loginUserSeq", loginUserInfo.getUserSeq());
+    	Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
 		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, noticeService.countNotice(map)));
     	List<NoticeInfo> listNotice = noticeService.listNotice(map);
     	
@@ -120,8 +119,7 @@ public class MenuPageController {
     public ResponseEntity<ListResponse<List<ReqInfo>>> maintainRequest(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
-		Map<String, Object> map = new HashMap<>();
-		map.put("loginUserSeq", loginUserInfo.getUserSeq());
+    	Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
 		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, reqService.countReq(map)));
     	
     	List<ReqInfo> listReq = reqService.listReq(map);
@@ -140,13 +138,11 @@ public class MenuPageController {
     		, @RequestParam(value = "rSeq", required = true) Long reqSeq
     		, @RequestParam(value = "dSeq", required = false) Long reqDtlSeq) {
     	
-    	Map<String, Object> map = new HashMap<>();
-    	map.put("loginUserSeq", loginUserInfo.getUserSeq());
+    	Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
 		map.put("reqSeq", reqSeq);
 		if(reqDtlSeq != null && reqDtlSeq != 0) {
 			map.put("reqDtlSeq", reqDtlSeq);
 		}
-		
     	ReqDtlInfo reqDtl = reqDtlService.getReqDtlByReqAndDtlSeq(map);
     	
 		return ResponseEntity.ok(Response.<ReqDtlInfo>builder()
@@ -199,10 +195,8 @@ public class MenuPageController {
     public ResponseEntity<ListResponse<List<ProjInfo>>> project(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
-		Map<String, Object> map = new HashMap<>();
-		map.put("loginUserSeq", loginUserInfo.getUserSeq());
+    	Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
 		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, projService.countProj(map)));
-		
 		List<ProjInfo> listProj = projService.listProj(map);
     	
 		return ResponseEntity.ok(ListResponse.<List<ProjInfo>>builder()
@@ -253,8 +247,7 @@ public class MenuPageController {
     public ResponseEntity<ListResponse<List<UserInfo>>> systemUser(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
-		Map<String, Object> map = new HashMap<>();
-		map.put("loginUserSeq", loginUserInfo.getUserSeq());
+		Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
 		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, userService.countUser(map)));
     	
     	List<UserInfo> listUser = userService.listUser(map);
@@ -272,8 +265,7 @@ public class MenuPageController {
     public ResponseEntity<ListResponse<List<CompInfo>>> systemCompany(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
-		Map<String, Object> map = new HashMap<>();
-		map.put("loginUserSeq", loginUserInfo.getUserSeq());
+    	Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
 		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, compService.countComp(map)));
     	
 		List<CompInfo> listComp = compService.listComp(map);
@@ -291,8 +283,7 @@ public class MenuPageController {
     public ResponseEntity<ListResponse<List<ProjInfo>>> systemProject(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
-		Map<String, Object> map = new HashMap<>();
-		map.put("loginUserSeq", loginUserInfo.getUserSeq());
+    	Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
 		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, projService.countProj(map)));
 		
 		List<ProjInfo> listProj = projService.listProj(map);
@@ -310,8 +301,7 @@ public class MenuPageController {
     public ResponseEntity<ListResponse<List<AuthInfo>>> systemAuth(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
-		Map<String, Object> map = new HashMap<>();
-		map.put("loginUserSeq", loginUserInfo.getUserSeq());
+    	Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
 		map.put("pagination", new Pagination(DEFAULT_PAGE, DEFAULT_LIMIT, authService.countAuth(map)));
 		
 		List<AuthInfo> listAuth = authService.listAuth(map);

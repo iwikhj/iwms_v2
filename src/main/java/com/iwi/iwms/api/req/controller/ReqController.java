@@ -35,6 +35,7 @@ import com.iwi.iwms.api.req.service.ReqDtlCmtService;
 import com.iwi.iwms.api.req.service.ReqDtlService;
 import com.iwi.iwms.api.req.service.ReqService;
 import com.iwi.iwms.utils.Pagination;
+import com.iwi.iwms.utils.PredicateMap;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -61,17 +62,10 @@ public class ReqController {
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
-			, @RequestParam(value = "search", required = false) String search
-			, @RequestParam(value = "startDate", required = false) String startDate
-			, @RequestParam(value = "endDate", required = false) String endDate) {
+			, @RequestParam(value = "useYn", required = false) String useYn) {
 		
-		Map<String, Object> map = new HashMap<>();
-		map.put("loginUserSeq", loginUserInfo.getUserSeq());
-		map.put("search", search);
-		map.put("startDate", startDate);
-		map.put("endDate", endDate);
+		Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
 		map.put("pagination", new Pagination(page, limit, reqService.countReq(map)));
-		
 		List<ReqInfo> reqList = reqService.listReq(map);
 		
 		return ResponseEntity.ok(ApiListResponse.<List<ReqInfo>>builder()

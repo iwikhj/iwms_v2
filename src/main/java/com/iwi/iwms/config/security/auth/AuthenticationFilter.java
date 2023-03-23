@@ -87,7 +87,7 @@ public class AuthenticationFilter extends GenericFilterBean {
 	}
     
     private String resolveToken(String token) {
-        if (token.length() > 7 && token.startsWith("Bearer ")) {
+    	if(token != null && token.length() > 7 && token.startsWith("Bearer ")) {
             return token.substring(7);
         }
         return "";

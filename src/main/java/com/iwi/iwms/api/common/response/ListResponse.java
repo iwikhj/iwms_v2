@@ -23,4 +23,14 @@ public class ListResponse<T> {
 	
 	@Schema(description = "로그인 사용자 정보")
 	private LoginUserInfo loginUserInfo;
+	
+	@Builder
+	private ListResponse(Map<String, Object> query, LoginUserInfo loginUserInfo, T data) {
+		this.data = data;
+		if(query != null && query.containsKey("loginUserSeq")) {
+			query.remove("loginUserSeq");
+		}
+		this.query = query;
+		this.loginUserInfo = loginUserInfo;
+	}
 }

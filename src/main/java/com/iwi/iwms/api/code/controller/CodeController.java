@@ -1,6 +1,5 @@
 package com.iwi.iwms.api.code.controller;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,7 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iwi.iwms.api.code.domain.Code;
@@ -25,6 +23,7 @@ import com.iwi.iwms.api.code.domain.CodeInfo;
 import com.iwi.iwms.api.code.service.CodeService;
 import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
+import com.iwi.iwms.utils.PredicateMap;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -43,13 +42,9 @@ public class CodeController {
     @Operation(summary = "코드 목록", description = "전체 코드 목록")
     @GetMapping(value = "")
     public ResponseEntity<ApiResponse<List<CodeInfo>>> listAllCode(HttpServletRequest request
-    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
-    		, @Parameter(description = "코드 또는 코드 이름으로 검색") @RequestParam(value = "search", required = false) String search) {
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
     	
-    	Map<String, Object> map = new HashMap<>();
-    	map.put("loginUserSeq", loginUserInfo.getUserSeq());
-    	map.put("search", search);
-    	
+    	Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
     	List<CodeInfo> codeList = codeService.listCode(map);
     	
 		return ResponseEntity.ok(ApiResponse.<List<CodeInfo>>builder()

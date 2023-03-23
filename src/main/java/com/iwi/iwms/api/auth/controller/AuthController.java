@@ -1,6 +1,5 @@
 package com.iwi.iwms.api.auth.controller;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -25,6 +24,7 @@ import com.iwi.iwms.api.common.response.ApiListResponse;
 import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.utils.Pagination;
+import com.iwi.iwms.utils.PredicateMap;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -48,17 +48,10 @@ public class AuthController {
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
-			, @RequestParam(value = "search", required = false) String search
-			, @RequestParam(value = "startDate", required = false) String startDate
-			, @RequestParam(value = "endDate", required = false) String endDate) {
+			, @RequestParam(value = "useYn", required = false) String useYn) {
 		
-		Map<String, Object> map = new HashMap<>();
-		map.put("loginUserSeq", loginUserInfo.getUserSeq());
-		map.put("search", search);
-		map.put("startDate", startDate);
-		map.put("endDate", endDate);
+		Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
 		map.put("pagination", new Pagination(page, limit, authService.countAuth(map)));
-		
 		List<AuthInfo> authList = authService.listAuth(map);
 		
 		return ResponseEntity.ok(ApiListResponse.<List<AuthInfo>>builder()

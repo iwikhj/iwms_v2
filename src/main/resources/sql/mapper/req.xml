@@ -46,10 +46,9 @@
 	<select id="listReq" parameterType="hashMap"
 		resultMap="resultReqMap">
 		<include refid="selectReq"></include>
-		<if test='search != null and search != ""'>
-			AND SITE.SITE_NM LIKE CONCAT('%', #{search}, '%') 
-			OR REQ.REQ_TITLE LIKE CONCAT('%', #{search}, '%')
-		</if>			
+		<if test='useYn != null and useYn != ""'>
+			AND REQ.USE_YN = UPPER(#{useYn})
+		</if>		
 		GROUP BY REQ.REQ_SEQ	
 		ORDER BY REQ.REQ_SEQ DESC
 		<if test='pagination != null and pagination != ""'>
@@ -75,10 +74,8 @@
 			INNER JOIN TB_PROJ_USER PU ON SITE.PROJ_SEQ = PU.PROJ_SEQ
 				AND (PU.USER_SEQ = LOGIN.USER_SEQ OR LOGIN.AUTH_SEQ = 1 )
 			WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE REQ.DEL_YN = 'N' AND REQ.USE_YN = 'Y' END)		
-			<if test='search != null and search != ""'>
-				AND SITE.SITE_NM LIKE CONCAT('%', #{search}, '%') 
-				OR REQ.REQ_TITLE LIKE CONCAT('%', #{search}, '%') 
-				OR REQ.REQ_CONTENT LIKE CONCAT('%', #{search}, '%') 
+			<if test='useYn != null and useYn != ""'>
+				AND REQ.USE_YN = UPPER(#{useYn})
 			</if>				
 			GROUP BY REQ.REQ_SEQ			
 		) A
