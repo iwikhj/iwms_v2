@@ -19,8 +19,6 @@
 	<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 	
 	<script>
-	
-	
 	var conf = {
 		rootPath: "/iwms/v1"
 	}
@@ -77,15 +75,12 @@
 		
 			$.ajax(options)
 			.done(function(resp) {
-				console.log("success: ", resp);
 				resolve(resp);
 
 			})
 			.fail(function(xhr, status, errorThrown) {
-				var err = xhr.responseJSON;
-				console.log("error: ", err);
-				if(err && err.status == 401) {
-					if(err.message == "EXPIRED") {
+				if(xhr.status == 401) {
+					if(xhr.responseJSON.code == "023") {
 						//토큰 재발급
 						tokenReissue();
 					} else {
@@ -93,19 +88,11 @@
 						logout();
 					}
 				} else {
-					//에러
-					reject(err)
+					reject(xhr.responseJSON);
 				}
 			})
 			.always(function(xhr, status) {
-				var isHide = true;
-				if(status == 'error') {
-					var err = xhr.responseJSON;
-					if(!err || err.status != 401 || err.message != "EXPIRED") {
-						isHide = false;
-					} 
-				}
-				if(isHide) {
+				if(!(status == 'error' && xhr.status == 401 && xhr.responseJSON.code == "023")) {
 					console.log("loader [hide]");
 				}
 			});
@@ -141,6 +128,8 @@
 		var formData = new FormData();
 		formData.append("title", "공지사항 제목");
 		formData.append("content", "<p>공지사항 내용</p>");
+		formData.append("useYn", "Y");
+		
 		
 		var files = document.getElementsByName("files")[0].files;
 		

@@ -42,7 +42,7 @@ public class Auth {
 	@Schema(description = "메뉴 사용 여부") 
 	private List<String> menuUseYn;
 	
-	@Schema(description = "사용 여부", allowableValues = {"Y", "N"}) 
+	@Schema(description = "사용 여부", defaultValue = "Y", allowableValues = {"Y", "N"}) 
 	private String useYn;
 
 	@Schema(hidden = true, description = "로그인 사용자 SEQ") 

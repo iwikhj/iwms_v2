@@ -48,7 +48,7 @@ public class ReqDtl {
 	@Schema(description = "평가 코멘트: 검수 완료일때만 입력")
 	private String reqDtlEvalCmt;
 	
-	@Schema(description = "사용 여부", allowableValues = {"Y", "N"}) 
+	@Schema(description = "사용 여부", defaultValue = "Y", allowableValues = {"Y", "N"}) 
 	private String useYn;
 	
 	@Schema(hidden = true, description = "로그인 사용자 SEQ") 

@@ -42,7 +42,7 @@ public class Proj {
 	private String projEndYmd;
 	
 	@NotNull
-	@Schema(description = "사용 여부", allowableValues = {"Y", "N"}) 
+	@Schema(description = "사용 여부", defaultValue = "Y", allowableValues = {"Y", "N"}) 
 	private String useYn;
 	
 	@Schema(hidden = true, description = "로그인 사용자 SEQ") 

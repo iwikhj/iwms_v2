@@ -87,7 +87,7 @@ public class LoginServiceImpl implements LoginService{
 			userMapper.updateLoginFailure(User.builder().userId(userInfo.getUserId()).build());
 			throw new CommonException(ErrorCode.LOGIN_FAILED_INCORRECT_ID_PW);
 		} catch(Exception e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, e.getMessage());
 		} 
 	}
@@ -95,13 +95,13 @@ public class LoginServiceImpl implements LoginService{
 	@Override
 	public ReissueResponse reissue(Reissue reissue) {
         IntrospectResponse introspect = authProvider.tokenIntrospect(reissue.getRefreshToken());
-        log.info("[Introspect Response] <{}>", introspect);
+        log.info("[INTROSPECT RESULT] <{}>", introspect);
         
         if(introspect == null || !introspect.isActive()) {
 			throw new CommonException(ErrorCode.AUTHENTICATION_REISSUE_FAILED, "리플레시 토큰 검증 실패.");
         }
 		
-		        LoginUserInfo loginUserInfo = objectMapper.convertValue(redis.getHash(introspect.getSub(), "user"), LoginUserInfo.class);
+        LoginUserInfo loginUserInfo = objectMapper.convertValue(redis.getHash(introspect.getSub(), "user"), LoginUserInfo.class);
         if(loginUserInfo == null || !loginUserInfo.getLoginIp().equals(reissue.getLoginIp())) {
         	throw new CommonException(ErrorCode.AUTHENTICATION_REISSUE_FAILED, "로그인 아이피와 요청 아이피가 일치하지 않음.");
         }
@@ -110,7 +110,6 @@ public class LoginServiceImpl implements LoginService{
 		if(storedRefreshtoken == null || !storedRefreshtoken.equals(reissue.getRefreshToken())) {
         	throw new CommonException(ErrorCode.AUTHENTICATION_REISSUE_FAILED, "요청한 리프레시 토큰과 서버에 저장된 리프레시 토큰이 일치하지 않습니다.");
 		}
-    	
     	return authProvider.reissue(reissue.getRefreshToken()).of();
 	}
 

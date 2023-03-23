@@ -60,7 +60,8 @@ public class AuthServiceImpl implements AuthService {
 		
 		int menuSize = authInfo.getAuthMenus().stream()
 				.map(v -> 1 + v.getSubMenus().size())
-				.reduce((x, y) -> x + y).get();
+				.reduce((x, y) -> x + y)
+				.get();
 		
 		if(CollectionUtils.isEmpty(auth.getAuthMenuSeq()) || auth.getAuthMenuSeq().size() != menuSize) {
 			throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "모든 메뉴의 데이터를를 입력해주세요.");
@@ -68,7 +69,7 @@ public class AuthServiceImpl implements AuthService {
 		
 		for(int i = 0; i < auth.getAuthMenuSeq().size(); i++) {
 			AuthMenu authMenu = AuthMenu.builder()
-				.authMenuSeq(auth.getAuthMenuSeq().get(i))
+				.authMenuSeq(auth.getAuthMenuSeq().get(i))	
 				.readYn(auth.getMenuReadYn().get(i))
 				.writeYn(auth.getMenuWriteYn().get(i))
 				.execYn(auth.getMenuExecYn().get(i))

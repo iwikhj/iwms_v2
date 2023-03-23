@@ -72,10 +72,10 @@ public class UserUpdate {
 	@Schema(description = "상세 주소") 
 	private String userDtlAddr;
 	
-	@Schema(description = "검증 여부", allowableValues = {"Y", "N"}) 
+	@Schema(description = "검증 여부", defaultValue = "N",  allowableValues = {"Y", "N"}) 
 	private String verifyYn;
 	
-	@Schema(description = "사용 여부", allowableValues = {"Y", "N"}) 
+	@Schema(description = "사용 여부", defaultValue = "Y", allowableValues = {"Y", "N"}) 
 	private String useYn;
 	
 	@Schema(hidden = true, description = "로그인 사용자 SEQ") 

@@ -36,10 +36,10 @@ public class Notice {
 	@Schema(description = "공지사항 구분 코드") 
 	private String noticeGbCd;
 	
-	@Schema(description = "최상단 고정 여부", allowableValues = {"Y", "N"}) 
+	@Schema(description = "최상단 고정 여부", defaultValue = "N", allowableValues = {"Y", "N"}) 
 	private String fixedTopYn;
 	
-	@Schema(description = "메인상단 노출 여부", allowableValues = {"Y", "N"}) 
+	@Schema(description = "메인상단 노출 여부", defaultValue = "N", allowableValues = {"Y", "N"}) 
 	private String mainTopYn;
 	
 	@Schema(hidden = true, description = "조회수") 
@@ -54,7 +54,7 @@ public class Notice {
 	@Schema(description = "첨부된 파일 SEQ")
 	private List<Long> attachedFilesSeq;
 	
-	@Schema(description = "사용 여부", allowableValues = {"Y", "N"}) 
+	@Schema(description = "사용 여부", defaultValue = "Y", allowableValues = {"Y", "N"}) 
 	private String useYn;
 	
 	@Schema(hidden = true, description = "로그인 사용자 SEQ") 

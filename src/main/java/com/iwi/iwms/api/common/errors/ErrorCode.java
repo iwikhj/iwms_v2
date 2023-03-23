@@ -1,6 +1,7 @@
 package com.iwi.iwms.api.common.errors;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.util.StringUtils;
 
 import lombok.Getter;
 
@@ -47,7 +48,7 @@ public enum ErrorCode {
 	(HttpStatus.SERVICE_UNAVAILABLE, "091", "내부 서비스 오류.")
 	;
 	
-	HttpStatus status; 
+	private HttpStatus status; 
 	
 	private String code;
 	
@@ -60,6 +61,6 @@ public enum ErrorCode {
 	}
 	
 	public String getMessage(ErrorCode code, String message) {
-		return message == null ? code.getDesc() : code.getDesc() + " " + message;
+		return StringUtils.hasText(message) ? code.getDesc() + " " + message : code.getDesc();
 	}
 }

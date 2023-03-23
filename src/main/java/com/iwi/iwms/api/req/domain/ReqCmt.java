@@ -44,7 +44,7 @@ public class ReqCmt {
 	@Schema(description = "첨부된 파일 SEQ")
 	private List<Long> attachedFilesSeq;
 	
-	@Schema(description = "사용 여부", allowableValues = {"Y", "N"}) 
+	@Schema(description = "사용 여부", defaultValue = "Y", allowableValues = {"Y", "N"}) 
 	private String useYn;
 	
 	@Schema(hidden = true, description = "로그인 사용자 SEQ") 

@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 
@@ -60,6 +61,8 @@ public class AuthProvider {
 	 * @param String username
 	 * @param String password
 	 * @return AccessTokenResponse
+	 * @exception ProcessingException | InternalServerErrorException: 인증 서버 접속 오류
+	 * @exception NotAuthorizedException: 인증 실패
 	 */
 	public AccessTokenResponse grantToken(@NotNull String username, @NotNull String password) {
 		try (Keycloak keycloak = KeycloakBuilder.builder()
@@ -77,6 +80,8 @@ public class AuthProvider {
 	        return accessTokenResponse;
 		} catch(ProcessingException | InternalServerErrorException e) {
 			throw new InternalServerErrorException(e.getMessage());
+		} catch(NotAuthorizedException e) {
+			throw new NotAuthorizedException(e.getMessage());
 		} catch(Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
 		}

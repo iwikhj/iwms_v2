@@ -2,7 +2,6 @@ package com.iwi.iwms.api.common.errors;
 
 import org.springframework.core.NestedExceptionUtils;
 import org.springframework.core.NestedRuntimeException;
-import org.springframework.http.HttpStatus;
 import org.springframework.lang.Nullable;
 
 import lombok.Getter;
