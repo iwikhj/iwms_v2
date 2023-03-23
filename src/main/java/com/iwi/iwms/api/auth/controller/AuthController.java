@@ -67,7 +67,7 @@ public class AuthController {
 				.build());
 	}
 	
-    @Operation(summary = "권한 정보", description = "권한 정보")
+    @Operation(summary = "권한 상세 정보", description = "권한 상세 정보")
     @GetMapping(value = "/{authSeq}")
     public ResponseEntity<ApiResponse<AuthInfo>> getAuthBySeq(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo

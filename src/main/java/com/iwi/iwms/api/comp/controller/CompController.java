@@ -69,7 +69,7 @@ public class CompController {
 				.build());
 	}
 	
-    @Operation(summary = "소속 정보", description = "소속 정보")
+    @Operation(summary = "소속 상세 정보", description = "소속 상세 정보")
     @GetMapping(value = "/{compSeq}")
     public ResponseEntity<ApiResponse<CompInfo>> getCompBySeq(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
@@ -140,7 +140,7 @@ public class CompController {
 				.build());
 	}
 	
-    @Operation(summary = "소속 부서 정보", description = "소속 부서 정보")
+    @Operation(summary = "소속 부서 상세 정보", description = "소속 부서 상세 정보")
     @GetMapping(value = "/{compSeq}/depts/{deptSeq}")
     public ResponseEntity<ApiResponse<DeptInfo>> getDeptBySeq(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo

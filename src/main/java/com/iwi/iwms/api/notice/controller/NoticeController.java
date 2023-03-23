@@ -67,7 +67,7 @@ public class NoticeController {
 				.build());
 	}
 	
-    @Operation(summary = "공지사항 상세", description = "공지사항 상세")
+    @Operation(summary = "공지사항 상세 정보", description = "공지사항 상세 정보")
     @GetMapping(value = "/{noticeSeq}")
     public ResponseEntity<ApiResponse<NoticeInfo>> getNoticeBySeq(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo

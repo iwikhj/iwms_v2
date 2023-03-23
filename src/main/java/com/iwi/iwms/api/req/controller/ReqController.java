@@ -178,7 +178,7 @@ public class ReqController {
 				.build());
 	}    
     
-    @Operation(summary = "요청사항 상세", description = "요청사항 상세")
+    @Operation(summary = "요청사항 상세 정보", description = "요청사항 상세 정보")
     @GetMapping(value = "/{reqSeq}/details")
     public ResponseEntity<ApiResponse<ReqDtlInfo>> getReqDtlByReqAndDtlSeq(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo		

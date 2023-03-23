@@ -76,7 +76,7 @@ public class UserController {
 	}
 	
 	@PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
-    @Operation(summary = "사용자 정보", description = "사용자 정보")
+    @Operation(summary = "사용자 상세 정보", description = "사용자 상세 정보")
     @GetMapping(value = "/{userSeq}")
     public ResponseEntity<ApiResponse<UserInfo>> getUserBySeq(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo

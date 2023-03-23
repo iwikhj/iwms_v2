@@ -76,7 +76,7 @@ public class ProjController {
 				.build());
 	}
 	
-    @Operation(summary = "프로젝트 정보", description = "프로젝트 정보")
+    @Operation(summary = "프로젝트 상세 정보", description = "프로젝트 상세 정보")
     @GetMapping(value = "/{projSeq}")
     public ResponseEntity<ApiResponse<ProjInfo>> getProjBySeq(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
@@ -191,7 +191,7 @@ public class ProjController {
 				.build());
 	}
 	
-    @Operation(summary = "사이트 정보", description = "사이트 정보")
+    @Operation(summary = "사이트 상세 정보", description = "사이트 상세 정보")
     @GetMapping(value = "/{projSeq}/sites/{siteSeq}")
     public ResponseEntity<ApiResponse<SiteInfo>> getSiteBySeq(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
