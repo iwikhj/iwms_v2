@@ -94,7 +94,6 @@ public class User {
 	private long loginUserSeq;
 	
 	public User of(final LoginUserInfo loginUserInfo) {
-		this.authCd = "ROLE_IWMS_" + this.authCd;
 		this.loginUserSeq = loginUserInfo.getUserSeq();
 		return this;
 	}

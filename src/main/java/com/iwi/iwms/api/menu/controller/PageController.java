@@ -1,5 +1,6 @@
 package com.iwi.iwms.api.menu.controller;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ import com.iwi.iwms.api.req.domain.ReqInfo;
 import com.iwi.iwms.api.req.service.ReqDtlService;
 import com.iwi.iwms.api.req.service.ReqService;
 import com.iwi.iwms.api.user.domain.UserInfo;
+import com.iwi.iwms.api.user.domain.UserSiteInfo;
 import com.iwi.iwms.api.user.service.UserService;
 import com.iwi.iwms.utils.Pagination;
 import com.iwi.iwms.utils.PredicateMap;
@@ -124,8 +126,16 @@ public class PageController {
     	
     	List<ReqInfo> listReq = reqService.listReq(map);
     	
+    	//참조 데이터
+    	Map<String, Object> ref = new HashMap<>();
+    	
+    	List<UserSiteInfo> siteList = userService.listSiteByUserSeq(loginUserInfo.getUserSeq());
+    	
+    	ref.put("siteList", siteList);
+    	
 		return ResponseEntity.ok(ListResponse.<List<ReqInfo>>builder()
 				.data(listReq)
+				.ref(ref)
 				.query(map)
 				.loginUserInfo(loginUserInfo)
 				.build());
@@ -135,7 +145,7 @@ public class PageController {
     @GetMapping(value = "/maintain/request/detail")
     public ResponseEntity<Response<ReqDtlInfo>> maintainRequestDetail(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
-    		, @RequestParam(value = "rSeq", required = true) Long reqSeq
+    		, @RequestParam(value = "rSeq", required = false) Long reqSeq
     		, @RequestParam(value = "dSeq", required = false) Long reqDtlSeq) {
     	
     	Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
@@ -145,8 +155,16 @@ public class PageController {
 		}
     	ReqDtlInfo reqDtl = reqDtlService.getReqDtlByReqAndDtlSeq(map);
     	
+    	//참조 데이터
+    	Map<String, Object> ref = new HashMap<>();
+    	
+    	List<UserSiteInfo> siteList = userService.listSiteByUserSeq(loginUserInfo.getUserSeq());
+    	
+    	ref.put("siteList", siteList);
+    	
 		return ResponseEntity.ok(Response.<ReqDtlInfo>builder()
 				.data(reqDtl)
+				.ref(ref)
 				.loginUserInfo(loginUserInfo)
 				.build());
     }

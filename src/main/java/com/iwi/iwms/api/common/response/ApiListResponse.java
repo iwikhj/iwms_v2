@@ -15,6 +15,9 @@ public class ApiListResponse<T> {
 	@Schema(description = "데이터")
     private T data;
 	
+	@Schema(description = "참조")
+	private Map<String, Object> ref;
+	
 	@Schema(description = "검색 조건")
 	private Map<String, Object> query;
 	

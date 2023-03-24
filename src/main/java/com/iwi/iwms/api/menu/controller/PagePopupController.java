@@ -89,13 +89,13 @@ public class PagePopupController {
     		deptList = compService.listDept(map);
     	}
     	
-    	List<AuthInfo> authList = authService.listAuth(map);
+    	List<CodeInfo> authCdList = codeService.listCodeByUpCode("USER_ROLE_CD");
     	List<CodeInfo> userGbCdList =  codeService.listCodeByUpCode("USER_GB_CD");
     	List<CodeInfo> busiRollCdList =  codeService.listCodeByUpCode("BUSI_ROLL_CD");
     	
     	ref.put("compList", compList);
     	ref.put("deptList", deptList);
-    	ref.put("authList", authList);
+    	ref.put("authCdList", authCdList);
     	ref.put("userGbCdList", userGbCdList);
     	ref.put("busiRollCdList", busiRollCdList);
     	
