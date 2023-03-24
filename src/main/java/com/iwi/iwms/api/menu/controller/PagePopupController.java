@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.iwi.iwms.api.auth.domain.AuthInfo;
 import com.iwi.iwms.api.auth.service.AuthService;
 import com.iwi.iwms.api.code.domain.CodeInfo;
 import com.iwi.iwms.api.code.service.CodeService;
@@ -88,13 +89,13 @@ public class PagePopupController {
     		deptList = compService.listDept(map);
     	}
     	
-    	List<CodeInfo> authCdList =  codeService.listCodeByUpCode("USER_ROLE_CD");
+    	List<AuthInfo> authList = authService.listAuth(map);
     	List<CodeInfo> userGbCdList =  codeService.listCodeByUpCode("USER_GB_CD");
     	List<CodeInfo> busiRollCdList =  codeService.listCodeByUpCode("BUSI_ROLL_CD");
     	
     	ref.put("compList", compList);
     	ref.put("deptList", deptList);
-    	ref.put("authCdList", authCdList);
+    	ref.put("authList", authList);
     	ref.put("userGbCdList", userGbCdList);
     	ref.put("busiRollCdList", busiRollCdList);
     	
