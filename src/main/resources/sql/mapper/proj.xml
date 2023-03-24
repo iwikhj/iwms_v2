@@ -37,7 +37,7 @@
 			AND PROJ.PROJ_END_YMD &lt;= #{projEndYmd}
 		</if>			
 		<if test='useYn != null and useYn != ""'>
-			AND PROJ.USE_YN = UPPER(#{useYn})
+			AND PROJ.USE_YN = #{useYn}
 		</if>		
 		ORDER BY PROJ.PROJ_SEQ DESC
 		<if test='pagination != null and pagination != ""'>

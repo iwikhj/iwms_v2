@@ -8,6 +8,7 @@
 			, REQ.REQ_NO AS reqNo
 			, DTL.REQ_DTL_SEQ AS reqDtlSeq
 			, DTL.REQ_DTL_NO AS reqDtlNo
+			, SITE.SITE_SEQ AS siteSeq	
             , SITE.SITE_NM AS siteNm	
 			, REQ.REQ_TITLE AS reqTitle
             , REQ.REQ_CONTENT AS reqContent
@@ -30,6 +31,8 @@
 			, DTL.USE_YN AS useYn
 			, DATE_FORMAT(DTL.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 			, FN_GET_USER_NM(DTL.REG_SEQ) AS regNm	
+			, 'TB_REQ' AS fileRefTb
+			, 'REQ_SEQ' AS fileRefCol				
 			, LOGIN.USER_SEQ AS loginUserSeq
 		FROM TB_REQ REQ
 		INNER JOIN TB_SITE SITE ON REQ.SITE_SEQ = SITE.SITE_SEQ
@@ -45,6 +48,8 @@
 	<resultMap id="resultReqDtlMap" type="com.iwi.iwms.api.req.domain.ReqDtlInfo">
 		<result property="reqSeq" column="reqSeq"/>
 		<result property="reqDtlSeq" column="reqDtlSeq"/>
+	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=reqSeq" 
+			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>		
 	   	<collection property="histories" column="reqSeq=reqSeq,reqDtlSeq=reqDtlSeq,loginUserSeq=loginUserSeq" 
 			ofType="com.iwi.iwms.api.req.domain.ReqDtlHisInfo" select="listHisByReqAndDtlSeq"/>
 	   	<collection property="comments" column="reqSeq=reqSeq,reqDtlSeq=reqDtlSeq,loginUserSeq=loginUserSeq" 
@@ -88,10 +93,9 @@
 				SELECT
 					CONCAT(REQ.REQ_NO, '-', LPAD(COALESCE(MAX(SUBSTR(DTL.REQ_DTL_NO, 12)), 0) + 1, 2, 0))
 				FROM TB_REQ REQ
-				INNER JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ
+				LEFT JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ
 				WHERE REQ.REQ_SEQ = #{reqSeq}
 				LIMIT 1					
-				 
 		    )
 			, #{reqSeq}
 			, #{reqDtlUserSeq}

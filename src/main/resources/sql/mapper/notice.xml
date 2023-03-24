@@ -34,7 +34,7 @@
 			AND NOTI.TITLE LIKE CONCAT('%', #{title}, '%') 
 		</if>			
 		<if test='noticeGbCd != null and noticeGbCd != ""'>
-			AND NOTI.NOTICE_GB_CD = UPPER(#{noticeGbCd})
+			AND NOTI.NOTICE_GB_CD = #{noticeGbCd}
 		</if>		
 		<if test='regNm != null and regNm != ""'>
 			AND REG.USER_NM LIKE CONCAT('%', #{regNm}, '%') 

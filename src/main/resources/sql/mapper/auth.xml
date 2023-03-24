@@ -19,7 +19,7 @@
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE AUTH.USE_YN = 'Y' END)	
 		<if test='useYn != null and useYn != ""'>
-			AND AUTH.USE_YN = UPPER(#{useYn})
+			AND AUTH.USE_YN = #{useYn}
 		</if>			
 		ORDER BY AUTH.AUTH_SEQ
 		<if test='pagination != null and pagination != ""'>

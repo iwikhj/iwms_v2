@@ -32,8 +32,11 @@ public enum ErrorCode {
 	RESOURCES_NOT_EXISTS
 	(HttpStatus.NOT_FOUND, "044", "리소스 없음."),
 	
+	STATUS_ERROR
+	(HttpStatus.CONFLICT, "048", "상태 오류."),
+	
 	DUPLICATE_ERROR
-	(HttpStatus.CONFLICT, "049", "중복 오류"),
+	(HttpStatus.CONFLICT, "049", "중복 오류."),
 	
 	LOGIN_FAILED_INCORRECT_ID_PW
 	(HttpStatus.UNAUTHORIZED, "050", "로그인 실패. 등록되지 않은 아이디 또는 잘못된 비밀번호."),

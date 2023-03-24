@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.iwi.iwms.api.auth.domain.AuthInfo;
 import com.iwi.iwms.api.auth.service.AuthService;
 import com.iwi.iwms.api.code.domain.CodeInfo;
 import com.iwi.iwms.api.code.service.CodeService;
@@ -25,9 +24,12 @@ import com.iwi.iwms.api.comp.service.CompService;
 import com.iwi.iwms.api.comp.service.ProjService;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.notice.service.NoticeService;
+import com.iwi.iwms.api.req.domain.ReqDtlInfo;
+import com.iwi.iwms.api.req.domain.ReqInfo;
 import com.iwi.iwms.api.req.service.ReqDtlService;
 import com.iwi.iwms.api.req.service.ReqService;
 import com.iwi.iwms.api.user.domain.UserInfo;
+import com.iwi.iwms.api.user.domain.UserSiteInfo;
 import com.iwi.iwms.api.user.service.UserService;
 import com.iwi.iwms.utils.PredicateMap;
 
@@ -63,6 +65,31 @@ public class PagePopupController {
 	private final CompService compService;
 	
 	private final AuthService authService;
+	
+    @Operation(summary = "유지보수 - 유지보수 등록 및 수정 팝업", description = "유지보수 등록 및 수정 팝업")
+    @GetMapping(value = "/maintain/request")
+    public ResponseEntity<ApiResponse<ReqInfo>> maintainRequestPopup(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
+    		, @RequestParam(value = "seq", required = false) Long reqSeq) {
+    	
+    	ReqInfo reqInfo = null;
+    	
+    	if(reqSeq != null) {
+    		reqInfo = reqService.getReqBySeq(reqSeq, loginUserInfo.getUserSeq());
+    	}
+    	
+    	//참조 데이터
+    	Map<String, Object> ref = new HashMap<>();
+    	
+    	List<UserSiteInfo> siteList = userService.listSiteByUserSeq(3);
+    	
+    	ref.put("siteList", siteList);
+
+		return ResponseEntity.ok(ApiResponse.<ReqInfo>builder()
+				.data(reqInfo)
+				.ref(ref)
+				.build());
+    }
   
     
     @Operation(summary = "시스템관리 - 사용자 등록 및 수정 팝업", description = "사용자 등록 및 수정 팝업")
@@ -139,7 +166,7 @@ public class PagePopupController {
     	
     	ProjInfo projInfo = null;
     	
-    	if( projSeq != null) {
+    	if(projSeq != null) {
     		projInfo = projService.getProjBySeq(projSeq, loginUserInfo.getUserSeq());
     	}
     	

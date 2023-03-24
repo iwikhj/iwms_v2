@@ -1,7 +1,5 @@
 package com.iwi.iwms.api.req.enums;
 
-import java.util.Arrays;
-
 import lombok.Getter;
 
 @Getter
@@ -22,8 +20,4 @@ public enum ReqDtlStatCode {
 		this.code = code;
 		this.message = message;
 	}
-	
-	public static String toMessage(String reqDtlStatCd) {
-        return Arrays.stream(values()).filter(v -> v.getCode().equals(reqDtlStatCd)).findAny().get().getMessage();
-    }
 }

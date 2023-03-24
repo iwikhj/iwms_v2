@@ -27,7 +27,7 @@
 			AND LOWER(COMP.COMP_NM) LIKE CONCAT('%', LOWER(#{compNm}), '%') 
 		</if>	
 		<if test='useYn != null and useYn != ""'>
-			AND COMP.USE_YN = UPPER(#{useYn})
+			AND COMP.USE_YN = #{useYn}
 		</if>			
 		ORDER BY COMP.COMP_SEQ
 		<if test='pagination != null and pagination != ""'>

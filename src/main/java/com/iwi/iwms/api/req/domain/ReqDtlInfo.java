@@ -2,6 +2,8 @@ package com.iwi.iwms.api.req.domain;
 
 import java.util.List;
 
+import com.iwi.iwms.api.file.domain.UploadFileInfo;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,6 +29,9 @@ public class ReqDtlInfo {
 	
 	@Schema(description = "요청사항 상세 번호") 
 	private String reqDtlNo;
+	
+	@Schema(description = "사이트 SEQ")
+	private long siteSeq;
 	
 	@Schema(description = "사이트 이름")
 	private String siteNm;
@@ -81,6 +86,9 @@ public class ReqDtlInfo {
 
 	@Schema(description = "요청사항 상세 상태") 
 	private String reqDtlStat;
+	
+	@Schema(description = "첨부된 파일 정보")
+	private List<UploadFileInfo> attachedFiles;
 
 	@Schema(description = "처리 내역 목록") 
 	private List<ReqDtlHisInfo> histories;

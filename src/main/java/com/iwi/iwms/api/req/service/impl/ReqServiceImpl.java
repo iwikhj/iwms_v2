@@ -131,8 +131,32 @@ public class ReqServiceImpl implements ReqService {
 	public void insertReqHis(ReqHis reqHis) {
 		this.getReqBySeq(reqHis.getReqSeq(), reqHis.getLoginUserSeq());
 		
+		ReqStatCode oldStatus = ReqStatCode.findByCode(reqMapper.getCurrentReqStatBySeq(reqHis.getReqSeq()));
+		ReqStatCode newStatus = ReqStatCode.findByCode(reqHis.getReqStatCd());
+		log.info("[요청사항 상태 변경] <{} -> {}>", oldStatus.getMessage(), newStatus.getMessage());
+		
+		if(oldStatus == newStatus) {
+        	throw new CommonException(ErrorCode.DUPLICATE_ERROR, "이미 " + newStatus.getMessage() + " 상태입니다.");
+		}
+		
+		if(newStatus == ReqStatCode.REQUEST && oldStatus != ReqStatCode.NEGO) {
+        	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + oldStatus.getMessage() + "중 입니다. " + ReqStatCode.NEGO.getMessage() + " 상태에서만 재요청을 진행할 수 있습니다.");
+		}
+		
+		if(newStatus == ReqStatCode.AGREE && oldStatus != ReqStatCode.REQUEST) {
+        	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + oldStatus.getMessage() + "중 입니다. " + ReqStatCode.REQUEST.getMessage() + " 상태에서만 합의를 진행할 수 있습니다.");
+		}
+		
+		if(newStatus == ReqStatCode.NEGO && oldStatus != ReqStatCode.REQUEST) {
+        	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + oldStatus.getMessage() + "중 입니다. " + ReqStatCode.REQUEST.getMessage() + " 상태에서만 협의요청을 진행할 수 있습니다.");
+		}
+		
+		if(newStatus == ReqStatCode.REJECT && oldStatus != ReqStatCode.REQUEST) {
+        	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + oldStatus.getMessage() + "중 입니다. " + ReqStatCode.REQUEST.getMessage() + " 상태에서만 반려를 진행할 수 있습니다.");
+		}
+		
 		if(!StringUtils.hasText(reqHis.getReqStatCmt())) {
-			reqHis.setReqStatCmt(ReqStatCode.toMessage(reqHis.getReqStatCd()));
+			reqHis.setReqStatCmt(newStatus.getMessage());
 		}
 		
 		reqMapper.insertReqHis(reqHis);

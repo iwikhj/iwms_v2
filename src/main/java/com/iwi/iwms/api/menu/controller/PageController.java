@@ -145,12 +145,12 @@ public class PageController {
     @GetMapping(value = "/maintain/request/detail")
     public ResponseEntity<Response<ReqDtlInfo>> maintainRequestDetail(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
-    		, @RequestParam(value = "rSeq", required = false) Long reqSeq
+    		, @RequestParam(value = "rSeq", required = true) long reqSeq
     		, @RequestParam(value = "dSeq", required = false) Long reqDtlSeq) {
     	
     	Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
 		map.put("reqSeq", reqSeq);
-		if(reqDtlSeq != null && reqDtlSeq != 0) {
+		if(reqDtlSeq != null) {
 			map.put("reqDtlSeq", reqDtlSeq);
 		}
     	ReqDtlInfo reqDtl = reqDtlService.getReqDtlByReqAndDtlSeq(map);

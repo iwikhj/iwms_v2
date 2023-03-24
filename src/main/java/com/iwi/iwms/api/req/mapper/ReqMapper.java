@@ -18,6 +18,8 @@ public interface ReqMapper {
 	
 	ReqInfo getReqBySeq(Map<String, Object> map);
 	
+	String getCurrentReqStatBySeq(long reqSeq);
+	
 	void insertReq(Req req);
 	
 	int updateReq(Req req);

@@ -3,6 +3,7 @@ package com.iwi.iwms.api.req.service.impl;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -16,10 +17,14 @@ import com.iwi.iwms.api.file.service.FileService;
 import com.iwi.iwms.api.req.domain.ReqDtl;
 import com.iwi.iwms.api.req.domain.ReqDtlHis;
 import com.iwi.iwms.api.req.domain.ReqDtlInfo;
+import com.iwi.iwms.api.req.domain.ReqInfo;
 import com.iwi.iwms.api.req.enums.ReqDtlStatCode;
+import com.iwi.iwms.api.req.enums.ReqStatCode;
 import com.iwi.iwms.api.req.mapper.ReqDtlMapper;
 import com.iwi.iwms.api.req.mapper.ReqMapper;
 import com.iwi.iwms.api.req.service.ReqDtlService;
+import com.iwi.iwms.api.user.domain.UserSiteInfo;
+import com.iwi.iwms.api.user.service.UserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,8 +42,13 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 
 	private final FileService fileService;
 	
+	private final UserService userService;
+	
 	@Override
 	public ReqDtlInfo getReqDtlByReqAndDtlSeq(Map<String, Object> map) {
+		Optional.ofNullable(reqMapper.getReqBySeq(map))
+				.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "요청사항을 찾을 수 없습니다."));	
+		
 		return reqDtlMapper.getReqDtlByReqAndDtlSeq(map);
 	}
 	
@@ -59,28 +69,45 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 		map.put("reqSeq", reqDtl.getReqSeq());
 		map.put("loginUserSeq", reqDtl.getLoginUserSeq());
 		
-		Optional.ofNullable(reqMapper.getReqBySeq(map))
+		ReqInfo reqInfo = Optional.ofNullable(reqMapper.getReqBySeq(map))
 			.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "요청사항을 찾을 수 없습니다."));				
 		
-		if(CollectionUtils.isEmpty(reqDtl.getReqDtlUserSeqs())) {
-        	throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "담당자는 필수 입력 사항입니다");
+		ReqStatCode status = ReqStatCode.findByCode(reqInfo.getReqStatCd());
+		
+		if(status != ReqStatCode.AGREE) {
+        	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + status.getMessage() + "중 입니다. " + ReqStatCode.AGREE.getMessage() + " 상태에서만 담당자 배정을 진행할 수 있습니다.");
 		}
 		
-		ReqDtlStatCode status = ReqDtlStatCode.RECEIPT;	//RECEIPT
+		if(CollectionUtils.isEmpty(reqDtl.getReqDtlUserSeqs())) {
+        	throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "담당자는 필수 입력 사항입니다.");
+		} else if(CollectionUtils.isEmpty(reqDtl.getTgtMms())) {
+        	throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "작업 공수는 필수 입력 사항입니다.");
+		} else if(reqDtl.getReqDtlUserSeqs().size() < reqDtl.getTgtMms().size()) {
+        	throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "담당자보다 작업 공수가 더 많이 입력되었습니다.");
+		}  else if(reqDtl.getReqDtlUserSeqs().size() != reqDtl.getTgtMms().size()) {
+        	throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "작업 공수는 필수 입력 사항입니다.");
+		} 
+		
+		ReqDtlStatCode dtlStatus = ReqDtlStatCode.RECEIPT;	//RECEIPT
 		
 		for(int i = 0; i < reqDtl.getReqDtlUserSeqs().size(); i++) {
 			long reqDtlUserSeq = reqDtl.getReqDtlUserSeqs().get(i);
 			int tgtMm = reqDtl.getTgtMms().get(i);
+			
+			List<UserSiteInfo> siteList = userService.listSiteByUserSeq(reqDtlUserSeq);
+			if(!siteList.stream().anyMatch(v -> v.getSiteSeq() == reqInfo.getSiteSeq())) {
+	        	throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "프로젝트 사이트에 등록된 사용자가 아닙니다.(" + i + ")");
+			}
 					
 			reqDtl.setReqDtlUserSeq(reqDtlUserSeq);
 			reqDtl.setTgtMm(tgtMm);
-			reqDtl.setReqDtlStatCd(status.getCode());
+			reqDtl.setReqDtlStatCd(dtlStatus.getCode());
 			reqDtlMapper.insertReqDtl(reqDtl);
 			
 			ReqDtlHis reqDtlHis = ReqDtlHis.builder()
 					.reqDtlSeq(reqDtl.getReqDtlSeq())
-					.reqDtlStatCd(status.getCode())
-					.reqDtlStatCmt(status.getMessage())
+					.reqDtlStatCd(dtlStatus.getCode())
+					.reqDtlStatCmt(dtlStatus.getMessage())
 					.loginUserSeq(reqDtl.getLoginUserSeq())
 					.build();
 			

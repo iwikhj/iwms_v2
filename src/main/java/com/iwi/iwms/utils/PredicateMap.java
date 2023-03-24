@@ -6,6 +6,8 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.util.StringUtils;
+
 import com.google.common.base.Joiner;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 
@@ -18,8 +20,13 @@ public class PredicateMap {
 		while(e.hasMoreElements()){
 			String name = (String) e.nextElement();
 			String value = Joiner.on(",").join(request.getParameterValues(name));
+			
+			if(!StringUtils.hasText(value))
+				continue;
+			
 			if(name.equals("page") || name.equals("limit"))
 				continue;
+			
 			map.put(name, value);  
 		}
 		

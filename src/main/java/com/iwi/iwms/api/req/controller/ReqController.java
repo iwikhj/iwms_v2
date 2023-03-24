@@ -55,14 +55,30 @@ public class ReqController {
 	private final ReqDtlService reqDtlService;
 	
 	private final ReqDtlCmtService reqDtlCmtService;
-	
+	/*
+	 * 작업 구분: busiRollCd
+	 * 상태: reqStatCd
+	 * 사이트명: siteNm
+	 * 요청날짜: reqYmd
+	 * 
+	 * 요청제목: reqTitle
+	 * 요청자명: regNm
+	 * 작업자명: reqDtlUser
+	 * */
 	@Operation(summary = "요청사항 목록", description = "요청사항 목록")
 	@GetMapping(value = "")
 	public ResponseEntity<ApiListResponse<List<ReqInfo>>> listReq(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
-			, @RequestParam(value = "useYn", required = false) String useYn) {
+			, @RequestParam(value = "busiRollCd", required = false) String busiRollCd
+			, @RequestParam(value = "reqStatCd", required = false) String reqStatCd
+			, @RequestParam(value = "siteSeq", required = false) Long siteSeq
+			, @RequestParam(value = "reqStdYmd", required = false) String reqStdYmd
+			, @RequestParam(value = "reqEndYmd", required = false) String reqEndYmd
+			, @RequestParam(value = "reqTitle", required = false) String reqTitle
+			, @RequestParam(value = "regNm", required = false) String regNm
+			, @RequestParam(value = "reqDtlUser", required = false) String reqDtlUser) {
 		
 		Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
 		map.put("pagination", new Pagination(page, limit, reqService.countReq(map)));
@@ -115,8 +131,8 @@ public class ReqController {
 				.build());
 	}
 
-    @Operation(summary = "요청사항 상태 변경", description = "요청사항 합의/협의요청/반려/취소")
-	@PatchMapping(value = "/{reqSeq}/status", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @Operation(summary = "요청사항 상태 변경 이력 등록", description = "합의/협의요청/반려/취소")
+	@PostMapping(value = "/{reqSeq}/status", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> agreeReq(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
 			, @PathVariable long reqSeq
@@ -125,6 +141,7 @@ public class ReqController {
     	reqService.insertReqHis(reqHis.of(loginUserInfo));
     	
 		return ResponseEntity.ok(ApiResponse.<Boolean>builder()
+				.data(true)
 				.build());
 	}
 
@@ -172,7 +189,7 @@ public class ReqController {
 				.build());
 	}    
     
-    @Operation(summary = "요청사항 상세 정보", description = "요청사항 상세 정보")
+    @Operation(summary = "요청사항 상세 정보", description = "상세 정보")
     @GetMapping(value = "/{reqSeq}/details")
     public ResponseEntity<ApiResponse<ReqDtlInfo>> getReqDtlByReqAndDtlSeq(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
@@ -193,7 +210,7 @@ public class ReqController {
 				.build());
     }
 
-    @Operation(summary = "요청사항 상세 등록", description = "요청사항 담당자 배정")
+    @Operation(summary = "요청사항 상세 작업 담당자 배정", description = "상세 작업 담당자 배정")
 	@PostMapping(value = "/{reqSeq}/details", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> insertReqDtl(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
@@ -207,7 +224,7 @@ public class ReqController {
 				.build());
 	}
     
-    @Operation(summary = "요청사항 상세 수정", description = "요청사항 상세 수정")
+    @Operation(summary = "상세 작업 담당자 수정", description = "상세 작업 담당자 수정")
 	@PutMapping(value = "/{reqSeq}/details/{reqDtlSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> updateReqDtl(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
@@ -222,7 +239,7 @@ public class ReqController {
 				.build());
 	}
     
-    @Operation(summary = "요청사항 상세 삭제", description = "요청사항 상세 삭제")
+    @Operation(summary = "상세 작업 담당자 삭제", description = "상세 작업 담당자 삭제")
 	@DeleteMapping(value = "/{reqSeq}/details/{reqDtlSeq}")
 	public ResponseEntity<ApiResponse<Boolean>> deleteReqDtl(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
@@ -237,7 +254,7 @@ public class ReqController {
 				.build());
 	}
     
-    @Operation(summary = "요청사항 상세 - 담당자 확인", description = "담당자 확인 상태 업데이트")
+    @Operation(summary = "요청사항 담당자별 상세 상태 변경 - 담당자 확인", description = "담당자 확인 상태 업데이트")
 	@PatchMapping(value = "/{reqSeq}/details/{reqDtlSeq}/inprogress")
 	public ResponseEntity<ApiResponse<Boolean>> updateReqDtlStatByInProgress(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
@@ -252,7 +269,7 @@ public class ReqController {
 				.build());
 	}
     
-    @Operation(summary = "요청사항 상세 - 처리 완료", description = "처리 완료 상태 업데이트")
+    @Operation(summary = "요청사항 담당자별 상세 상태 변경 - 처리 완료", description = "처리 완료 상태 업데이트")
     @PatchMapping(value = "/{reqSeq}/details/{reqDtlSeq}/processed", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> updateReqDtlStatByProcessed(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
@@ -267,7 +284,7 @@ public class ReqController {
 				.build());
 	}
     
-    @Operation(summary = "요청사항 상세 - 검수 완료", description = "검수 완료 상태 업데이트")
+    @Operation(summary = "요청사항 담당자별 상세 상태 변경 - 검수 완료", description = "검수 완료 상태 업데이트")
     @PatchMapping(value = "/{reqSeq}/details/{reqDtlSeq}/completed", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> updateReqDtlStatByInspectionCompleted(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
@@ -282,7 +299,7 @@ public class ReqController {
 				.build());
 	}
     
-    @Operation(summary = "요청사항 상세 - 취소", description = "취소 상태 업데이트")
+    @Operation(summary = "요청사항 담당자별 상세 상태 변경 - 취소", description = "취소 상태 업데이트")
     @PatchMapping(value = "/{reqSeq}/details/{reqDtlSeq}/cancel")
 	public ResponseEntity<ApiResponse<Boolean>> updateReqDtlStatByCancel(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
@@ -297,7 +314,7 @@ public class ReqController {
 				.build());
 	}
     
-    @Operation(summary = "요청사항 상세 코멘트 등록", description = "요청사항 상세 코멘트 등록")
+    @Operation(summary = "요청사항 담당자별 상세 코멘트 등록", description = "요청사항 상세 코멘트 등록")
 	@PostMapping(value = "/{reqSeq}/details/{reqDtlSeq}/comments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> insertReqDtlCmt(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
@@ -312,7 +329,7 @@ public class ReqController {
 				.build());
 	}
     
-    @Operation(summary = "요청사항 상세 코멘트 수정", description = "요청사항 상세 코멘트 수정")
+    @Operation(summary = "요청사항 담당자별 상세 코멘트 수정", description = "요청사항 상세 코멘트 수정")
 	@PutMapping(value = "/{reqSeq}/details/{reqDtlSeq}/comments/{reqDtlCmtSeq}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> updateReqDtlCmt(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
@@ -328,7 +345,7 @@ public class ReqController {
 				.build());
 	}
     
-    @Operation(summary = "요청사항 상세 코멘트 삭제", description = "요청사항 상세 코멘트 삭제")
+    @Operation(summary = "요청사항 담당자별 상세 코멘트 삭제", description = "요청사항 상세 코멘트 삭제")
 	@DeleteMapping(value = "/{reqSeq}/details/{reqDtlSeq}/comments/{reqDtlCmtSeq}")
 	public ResponseEntity<ApiResponse<Boolean>> deleteReqDtlCmt(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		
