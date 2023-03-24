@@ -1,6 +1,5 @@
 package com.iwi.iwms.api.menu.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,9 +14,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iwi.iwms.api.auth.service.AuthService;
+import com.iwi.iwms.api.code.domain.CodeInfo;
+import com.iwi.iwms.api.code.service.CodeService;
 import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.comp.domain.CompInfo;
 import com.iwi.iwms.api.comp.domain.DeptInfo;
+import com.iwi.iwms.api.comp.domain.ProjInfo;
 import com.iwi.iwms.api.comp.service.CompService;
 import com.iwi.iwms.api.comp.service.ProjService;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
@@ -39,11 +41,13 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("${app.root}/${app.version}/popup")
-public class MenuPopupController {
+public class PagePopupController {
 	
 	private static final int DEFAULT_PAGE = 1;
 	
 	private static final int DEFAULT_LIMIT = 15;
+	
+	private final CodeService codeService;
 	
 	private final NoticeService noticeService;
 	
@@ -62,49 +66,93 @@ public class MenuPopupController {
     
     @Operation(summary = "시스템관리 - 사용자 등록 및 수정 팝업", description = "사용자 등록 및 수정 팝업")
     @GetMapping(value = "/system/user")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> systemUserPopup(HttpServletRequest request
+    public ResponseEntity<ApiResponse<UserInfo>> systemUserPopup(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
     		, @RequestParam(value = "seq", required = false) Long userSeq) {
     	
-    	Map<String, Object> resultData = new HashMap<>();
+    	UserInfo userInfo = null;
     	
     	if(userSeq != null) {
-    		UserInfo userInfo = userService.getUserBySeq(userSeq, loginUserInfo.getUserSeq());
-    		resultData.put("userInfo", userInfo);
+    		userInfo = userService.getUserBySeq(userSeq, loginUserInfo.getUserSeq());
     	}
 		
+    	//참조 데이터
+    	Map<String, Object> ref = new HashMap<>();
+    	
     	Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
-    	map.put("useYn", "Y");
-    	
 		List<CompInfo> compList = compService.listComp(map);
-    	resultData.put("compList", compList);
-    	
+		List<DeptInfo> deptList = null;
+		
     	if(!CollectionUtils.isEmpty(compList) && compList.size() > 0) {
     		map.put("compSeq", compList.get(0).getCompSeq());
-    		List<DeptInfo> deptList = compService.listDept(map);
-        	resultData.put("deptList", deptList);
+    		deptList = compService.listDept(map);
     	}
     	
-		return ResponseEntity.ok(ApiResponse.<Map<String, Object>>builder()
-				.data(resultData)
+    	List<CodeInfo> authCdList =  codeService.listCodeByUpCode("USER_ROLE_CD");
+    	List<CodeInfo> userGbCdList =  codeService.listCodeByUpCode("USER_GB_CD");
+    	List<CodeInfo> busiRollCdList =  codeService.listCodeByUpCode("BUSI_ROLL_CD");
+    	
+    	ref.put("compList", compList);
+    	ref.put("deptList", deptList);
+    	ref.put("authCdList", authCdList);
+    	ref.put("userGbCdList", userGbCdList);
+    	ref.put("busiRollCdList", busiRollCdList);
+    	
+		return ResponseEntity.ok(ApiResponse.<UserInfo>builder()
+				.data(userInfo)
+				.ref(ref)
 				.build());
     }
     
     @Operation(summary = "시스템관리 - 소속 등록 및 수정 팝업", description = "소속 등록 및 수정 팝업")
     @GetMapping(value = "/system/company")
-    public ResponseEntity<ApiResponse<Map<String, Object>>> systemCompanyPopup(HttpServletRequest request
+    public ResponseEntity<ApiResponse<CompInfo>> systemCompanyPopup(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
     		, @RequestParam(value = "seq", required = false) Long compSeq) {
     	
-    	Map<String, Object> resultData = new HashMap<>();
+    	CompInfo compInfo = null;
     	
     	if(compSeq != null) {
-    		CompInfo compInfo = compService.getCompBySeq(compSeq, loginUserInfo.getUserSeq());
-    		resultData.put("compInfo", compInfo);
+    		compInfo = compService.getCompBySeq(compSeq, loginUserInfo.getUserSeq());
     	}
     	
-		return ResponseEntity.ok(ApiResponse.<Map<String, Object>>builder()
-				.data(resultData)
+    	//참조 데이터
+    	Map<String, Object> ref = new HashMap<>();
+    	
+    	List<CodeInfo> compGbCdList =  codeService.listCodeByUpCode("COMP_GB_CD");
+    	
+    	ref.put("compGbCdList", compGbCdList);
+    	
+		return ResponseEntity.ok(ApiResponse.<CompInfo>builder()
+				.data(compInfo)
+				.ref(ref)
+				.build());
+    }
+    
+    
+    @Operation(summary = "시스템관리 - 프로젝트 등록 및 수정 팝업", description = "프로젝트 등록 및 수정 팝업")
+    @GetMapping(value = "/system/project")
+    public ResponseEntity<ApiResponse<ProjInfo>> systemProjPopup(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
+    		, @RequestParam(value = "seq", required = false) Long projSeq) {
+    	
+    	ProjInfo projInfo = null;
+    	
+    	if( projSeq != null) {
+    		projInfo = projService.getProjBySeq(projSeq, loginUserInfo.getUserSeq());
+    	}
+    	
+    	//참조 데이터
+    	Map<String, Object> ref = new HashMap<>();
+    	
+    	Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
+		List<CompInfo> compList = compService.listComp(map);
+    	
+    	ref.put("compList", compList);
+
+		return ResponseEntity.ok(ApiResponse.<ProjInfo>builder()
+				.data(projInfo)
+				.ref(ref)
 				.build());
     }
     

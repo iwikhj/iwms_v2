@@ -19,11 +19,12 @@
 			, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = NOTI.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn					
 			, NOTI.USE_YN AS useYn
 			, DATE_FORMAT(NOTI.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
-			, FN_GET_USER_NM(NOTI.REG_SEQ) AS regNm
+			, REG.USER_NM AS regNm
 			, DATE_FORMAT(NOTI.UPT_DT, "%Y-%m-%d %H:%i:%s") AS uptDt
 			, FN_GET_USER_NM(NOTI.UPT_SEQ) AS uptNm
 		FROM TB_NOTICE NOTI
 		LEFT JOIN TB_COMPANY COMP ON NOTI.COMP_SEQ = COMP.COMP_SEQ 
+		LEFT JOIN TB_USER REG ON NOTI.REG_SEQ = REG.USER_SEQ
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE NOTI.USE_YN = 'Y' AND (LOGIN.COMP_SEQ = NOTI.COMP_SEQ OR NOTI.COMP_SEQ IS NULL) END)		
 		<if test='compNm != null and compNm != ""'>
@@ -31,10 +32,13 @@
 		</if>		
 		<if test='title != null and title != ""'>
 			AND NOTI.TITLE LIKE CONCAT('%', #{title}, '%') 
-		</if>		
-		<if test='useYn != null and useYn != ""'>
-			AND NOTI.USE_YN = UPPER(#{useYn})
 		</if>			
+		<if test='noticeGbCd != null and noticeGbCd != ""'>
+			AND NOTI.NOTICE_GB_CD = UPPER(#{noticeGbCd})
+		</if>		
+		<if test='regNm != null and regNm != ""'>
+			AND REG.USER_NM LIKE CONCAT('%', #{regNm}, '%') 
+		</if>				
 		ORDER BY NOTI.NOTICE_SEQ DESC
 		<if test='pagination != null and pagination != ""'>
 			LIMIT #{pagination.limitPerPage} OFFSET #{pagination.offset}
@@ -48,6 +52,7 @@
 			COUNT(*)
 		FROM TB_NOTICE NOTI
 		LEFT JOIN TB_COMPANY COMP ON NOTI.COMP_SEQ = COMP.COMP_SEQ 
+		LEFT JOIN TB_USER REG ON NOTI.REG_SEQ = REG.USER_SEQ
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE NOTI.USE_YN = 'Y' AND (LOGIN.COMP_SEQ = NOTI.COMP_SEQ OR NOTI.COMP_SEQ IS NULL) END)		
 		<if test='compNm != null and compNm != ""'>
@@ -55,10 +60,13 @@
 		</if>		
 		<if test='title != null and title != ""'>
 			AND NOTI.TITLE LIKE CONCAT('%', #{title}, '%') 
-		</if>	
-		<if test='useYn != null and useYn != ""'>
-			AND NOTI.USE_YN = UPPER(#{useYn})
-		</if>					
+		</if>			
+		<if test='noticeGbCd != null and noticeGbCd != ""'>
+			AND NOTI.NOTICE_GB_CD = UPPER(#{noticeGbCd})
+		</if>		
+		<if test='regNm != null and regNm != ""'>
+			AND REG.USER_NM LIKE CONCAT('%', #{regNm}, '%')
+		</if>						
 	</select>		
 	
 	<resultMap id="resultNoticeMap" type="com.iwi.iwms.api.notice.domain.NoticeInfo">

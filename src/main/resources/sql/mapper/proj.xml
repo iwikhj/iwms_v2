@@ -27,6 +27,15 @@
 		<if test='compSeq != null and compSeq != ""'>
 			AND PROJ.COMP_SEQ = #{compSeq}
 		</if>
+		<if test='projNm != null and projNm != ""'>
+			AND LOWER(PROJ.PROJ_NM) LIKE CONCAT('%', LOWER(#{projNm}), '%') 
+		</if>		
+		<if test='projStdYmd != null and projStdYmd != ""'>
+			AND PROJ.PROJ_STD_YMD &gt;= #{projStdYmd}
+		</if>	
+		<if test='projEndYmd != null and projEndYmd != ""'>
+			AND PROJ.PROJ_END_YMD &lt;= #{projEndYmd}
+		</if>			
 		<if test='useYn != null and useYn != ""'>
 			AND PROJ.USE_YN = UPPER(#{useYn})
 		</if>		
@@ -48,6 +57,15 @@
 		<if test='compSeq != null and compSeq != ""'>
 			AND PROJ.COMP_SEQ = #{compSeq}
 		</if>
+		<if test='projNm != null and projNm != ""'>
+			AND LOWER(PROJ.PROJ_NM) LIKE CONCAT('%', LOWER(#{projNm}), '%') 
+		</if>			
+		<if test='projStdYmd != null and projStdYmd != ""'>
+			AND PROJ.PROJ_STD_YMD &gt;= #{projStdYmd}
+		</if>	
+		<if test='projEndYmd != null and projEndYmd != ""'>
+			AND PROJ.PROJ_END_YMD &lt;= #{projEndYmd}
+		</if>			
 		<if test='useYn != null and useYn != ""'>
 			AND PROJ.USE_YN = UPPER(#{useYn})
 		</if>				

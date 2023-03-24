@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iwi.iwms.api.code.domain.Code;
@@ -39,20 +40,21 @@ public class CodeController {
 
 	private final CodeService codeService;
 	
-    @Operation(summary = "코드 목록", description = "전체 코드 목록")
+    @Operation(summary = "코드 목록 조회", description = "상위 코드별 하위 코드 목록 조회")
     @GetMapping(value = "")
     public ResponseEntity<ApiResponse<List<CodeInfo>>> listAllCode(HttpServletRequest request
-    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
+    		, @RequestParam(value = "codeCd", required = true) String upCode) {
     	
-    	Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
-    	List<CodeInfo> codeList = codeService.listCode(map);
+    	//Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
+    	List<CodeInfo> codeList = codeService.listCodeByUpCode(upCode);
     	
 		return ResponseEntity.ok(ApiResponse.<List<CodeInfo>>builder()
 				.data(codeList)
 				.build());
     }
     
-    @Operation(summary = "코드 등록", description = "코드 등록")
+    @Operation(hidden = true, summary = "코드 등록", description = "코드 등록")
 	@PostMapping(value = "", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> insertCode(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo		

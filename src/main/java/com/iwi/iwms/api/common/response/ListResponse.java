@@ -10,13 +10,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-@Builder
 @Getter
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 public class ListResponse<T> {
 	
 	@Schema(description = "데이터")
     private T data;
+	
+	@Schema(description = "참조")
+	private Map<String, Object> ref;
 	
 	@Schema(description = "검색 조건")
 	private Map<String, Object> query;
@@ -25,8 +27,9 @@ public class ListResponse<T> {
 	private LoginUserInfo loginUserInfo;
 	
 	@Builder
-	private ListResponse(Map<String, Object> query, LoginUserInfo loginUserInfo, T data) {
+	private ListResponse(Map<String, Object> ref, Map<String, Object> query, LoginUserInfo loginUserInfo, T data) {
 		this.data = data;
+		this.ref = ref;
 		if(query != null && query.containsKey("loginUserSeq")) {
 			query.remove("loginUserSeq");
 		}

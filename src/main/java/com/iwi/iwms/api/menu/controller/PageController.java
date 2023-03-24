@@ -43,7 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("${app.root}/${app.version}/pages")
-public class MenuPageController {
+public class PageController {
 	
 	private static final int DEFAULT_PAGE = 1;
 	

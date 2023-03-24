@@ -79,7 +79,8 @@ public class AuthProvider {
 	        
 	        return accessTokenResponse;
 		} catch(ProcessingException | InternalServerErrorException e) {
-			throw new InternalServerErrorException(e.getMessage());
+			//throw new InternalServerErrorException(e.getMessage());
+			throw new NotAuthorizedException(e.getMessage());
 		} catch(NotAuthorizedException e) {
 			throw new NotAuthorizedException(e.getMessage());
 		} catch(Exception e) {

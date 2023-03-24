@@ -1,7 +1,6 @@
 package com.iwi.iwms.api.code.service.impl;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -19,10 +18,10 @@ public class CodeServiceImpl implements CodeService {
 	private final CodeMapper codeMapper;
 	
 	@Override
-	public List<CodeInfo> listCode(Map<String, Object> map) {
-		return codeMapper.listCode(map);
+	public List<CodeInfo> listCodeByUpCode(String codeCd) {
+		return codeMapper.listCodeByUpCode(codeCd);
 	}
-
+	
 	@Override
 	public void insertCode(Code code) {
 		codeMapper.insertCode(code);

@@ -53,6 +53,9 @@ public class ProjController {
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
 			, @RequestParam(value = "compSeq", required = false) Long compSeq
+			, @RequestParam(value = "projNm", required = false) String projNm
+			, @RequestParam(value = "projStdYmd", required = false) String projStdYmd
+			, @RequestParam(value = "projEndYmd", required = false) String projEndYmd
 			, @RequestParam(value = "useYn", required = false) String useYn) {
 		
 		Map<String, Object> map = PredicateMap.make(request, loginUserInfo);

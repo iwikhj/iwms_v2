@@ -3,7 +3,6 @@ package com.iwi.iwms.api.login.service.impl;
 import java.time.Duration;
 import java.util.Optional;
 
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotAuthorizedException;
 
 import org.keycloak.representations.AccessTokenResponse;
@@ -50,7 +49,6 @@ public class LoginServiceImpl implements LoginService{
 		// 사용불가 ID
 		if(userInfo.getUseYn().equals("N")) {
 			throw new CommonException(ErrorCode.LOGIN_FAILED_SUSPENDED_ID);
-
 		}
 		
 		// 비밀번호 5회 이상 불일치
@@ -79,8 +77,6 @@ public class LoginServiceImpl implements LoginService{
 			userMapper.updateLoginSuccess(User.builder().loginIp(login.getLoginIp()).userSeq(userInfo.getUserSeq()).build());
 			
 			return accessTokenResponse;
-		} catch(InternalServerErrorException e) {
-			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
 		}  catch(RedisConnectionFailureException e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
 		} catch(NotAuthorizedException e) {

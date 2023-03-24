@@ -50,7 +50,8 @@ public class NoticeController {
 			, @RequestParam(value = "limit", required = false, defaultValue = "15") int limit
 			, @RequestParam(value = "compNm", required = false) String compNm
 			, @RequestParam(value = "title", required = false) String title
-			, @RequestParam(value = "useYn", required = false) String useYn) {
+			, @RequestParam(value = "noticeGbCd", required = false) String noticeGbCd
+			, @RequestParam(value = "regNm", required = false) String regNm) {
 		
 		Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
 		map.put("pagination", new Pagination(page, limit, noticeService.countNotice(map)));

@@ -49,7 +49,7 @@
 		<if test='useYn != null and useYn != ""'>
 			AND REQ.USE_YN = UPPER(#{useYn})
 		</if>		
-		GROUP BY REQ.REQ_SEQ	
+		-- GROUP BY REQ.REQ_SEQ	
 		ORDER BY REQ.REQ_SEQ DESC
 		<if test='pagination != null and pagination != ""'>
 			LIMIT #{pagination.limitPerPage} OFFSET #{pagination.offset}
