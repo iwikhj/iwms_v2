@@ -87,10 +87,10 @@
 			AND LOWER(COMP.COMP_NM) LIKE CONCAT('%', LOWER(#{compNm}), '%') 
 		</if>	
 		<if test='busiRollCd != null and busiRollCd != ""'>
-			AND USER.BUSI_ROLL_CD = UPPER(#{busiRollCd})
+			AND USER.BUSI_ROLL_CD = #{busiRollCd}
 		</if>	
 		<if test='useYn != null and useYn != ""'>
-			AND USER.USE_YN = UPPER(#{useYn})
+			AND USER.USE_YN = #{useYn}
 		</if>			
 	</select>	
 	

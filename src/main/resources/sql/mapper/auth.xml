@@ -36,7 +36,7 @@
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE AUTH.USE_YN = 'Y' END)
 		<if test='useYn != null and useYn != ""'>
-			AND AUTH.USE_YN = UPPER(#{useYn})
+			AND AUTH.USE_YN = #{useYn}
 		</if>			
 	</select>	
 
@@ -46,7 +46,7 @@
 			ofType="com.iwi.iwms.api.auth.domain.AuthMenuInfo" select="getAuthMenuByAuthSeq"/>
 	</resultMap>
 	
-	<!-- 권한 단일 조회 -->
+	<!-- 권한 상세 조회 -->
 	<select id="getAuthBySeq" parameterType="hashMap"
 		resultMap="resultAuthMap">
 		SELECT 
@@ -67,7 +67,7 @@
 	 
 	<!-- 권한 코드로 단일 조회 -->
 	<select id="getAuthByAuthCd" parameterType="String"
-		resultMap="resultAuthMap">
+		resultType="com.iwi.iwms.api.auth.domain.AuthInfo">
 		SELECT 
 			AUTH.AUTH_SEQ AS authSeq
 			, AUTH.AUTH_CD AS authCd

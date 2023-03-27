@@ -47,7 +47,7 @@
 			AND LOWER(COMP.COMP_NM) LIKE CONCAT('%', LOWER(#{compNm}), '%') 
 		</if>	
 		<if test='useYn != null and useYn != ""'>
-			AND COMP.USE_YN = UPPER(#{useYn})
+			AND COMP.USE_YN = #{useYn}
 		</if>						
 	</select>	
 
@@ -185,7 +185,7 @@
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE DEPT.USE_YN = 'Y' END)
 			AND DEPT.COMP_SEQ = #{compSeq}
 		<if test='useYn != null and useYn != ""'>
-			AND DEPT.USE_YN = UPPER(#{useYn})
+			AND DEPT.USE_YN = #{useYn}
 		</if>		
 		ORDER BY DEPT.DEPT_ORDER_NO		
 	</select>		

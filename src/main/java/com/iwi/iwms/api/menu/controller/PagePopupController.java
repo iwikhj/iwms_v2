@@ -3,6 +3,7 @@ package com.iwi.iwms.api.menu.controller;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -81,9 +82,13 @@ public class PagePopupController {
     	//참조 데이터
     	Map<String, Object> ref = new HashMap<>();
     	
-    	List<UserSiteInfo> siteList = userService.listSiteByUserSeq(3);
+    	List<UserSiteInfo> siteList = userService.listSiteByUserSeq(loginUserInfo.getUserSeq());
+    	List<CodeInfo> reqGbCdList =  codeService.listCodeByUpCode("REQ_GB_CD");
+    	List<CodeInfo> reqTypeCdList =  codeService.listCodeByUpCode("REQ_TYPE_CD");
     	
     	ref.put("siteList", siteList);
+    	ref.put("reqGbCdList", reqGbCdList);
+    	ref.put("reqTypeCdList", reqTypeCdList);
 
 		return ResponseEntity.ok(ApiResponse.<ReqInfo>builder()
 				.data(reqInfo)
@@ -116,7 +121,13 @@ public class PagePopupController {
     		deptList = compService.listDept(map);
     	}
     	
-    	List<CodeInfo> authCdList = codeService.listCodeByUpCode("USER_ROLE_CD");
+    	List<CodeInfo> authCdList = authService.listAuth(map).stream()
+	    		.map(v -> CodeInfo.builder()
+	    					.codeCd(v.getAuthCd())
+	    					.codeNm(v.getAuthNm())
+	    					.build())
+	    		.collect(Collectors.toList());
+    	
     	List<CodeInfo> userGbCdList =  codeService.listCodeByUpCode("USER_GB_CD");
     	List<CodeInfo> busiRollCdList =  codeService.listCodeByUpCode("BUSI_ROLL_CD");
     	

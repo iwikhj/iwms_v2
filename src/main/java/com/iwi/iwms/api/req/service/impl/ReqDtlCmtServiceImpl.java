@@ -14,8 +14,8 @@ import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.file.domain.UploadFile;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
 import com.iwi.iwms.api.file.service.FileService;
-import com.iwi.iwms.api.req.domain.ReqDtlCmt;
-import com.iwi.iwms.api.req.domain.ReqDtlCmtInfo;
+import com.iwi.iwms.api.req.domain.Cmt;
+import com.iwi.iwms.api.req.domain.CmtInfo;
 import com.iwi.iwms.api.req.domain.ReqDtlInfo;
 import com.iwi.iwms.api.req.mapper.ReqDtlCmtMapper;
 import com.iwi.iwms.api.req.mapper.ReqDtlMapper;
@@ -38,9 +38,9 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 	private final FileService fileService;
 
 	@Override
-	public ReqDtlCmtInfo getReqDtlCmtBySeq(long reqDtlCmtSeq, long loginUserSeq) {
+	public CmtInfo getReqDtlCmtBySeq(long cmtSeq, long loginUserSeq) {
 		Map<String, Object> map = new HashMap<>();
-		map.put("reqDtlCmtSeq", reqDtlCmtSeq);
+		map.put("cmtSeq", cmtSeq);
 		map.put("loginUserSeq", loginUserSeq);
 		
 		return Optional.ofNullable(reqDtlCmtMapper.getReqDtlCmtBySeq(map))
@@ -49,56 +49,60 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 	
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
-	public void insertReqDtlCmt(ReqDtlCmt reqDtlCmt) {
+	public CmtInfo insertReqDtlCmt(Cmt cmt) {
 		Map<String, Object> map = new HashMap<>();
-		map.put("reqDtlSeq", reqDtlCmt.getReqDtlSeq());
-		map.put("loginUserSeq", reqDtlCmt.getLoginUserSeq());
+		map.put("reqDtlSeq", cmt.getReqDtlSeq());
+		map.put("loginUserSeq", cmt.getLoginUserSeq());
 		
 		ReqDtlInfo reqDtlInfo = Optional.ofNullable(reqDtlMapper.getReqDtlBySeq(map))
 			.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "요청사항 상세를 찾을 수 없습니다."));				
 
-		reqDtlCmtMapper.insertReqDtlCmt(reqDtlCmt);
+		reqDtlCmtMapper.insertReqDtlCmt(cmt);
 		
 		// 첨부파일 저장
-		if(!CollectionUtils.isEmpty(reqDtlCmt.getFiles())) {
-			UploadFile uploadFile = reqDtlCmt.getFileInfo();
-			uploadFile.setFileRefSeq(reqDtlCmt.getReqDtlCmtSeq());
-			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + reqDtlInfo.getReqSeq() + "/" + reqDtlCmt.getReqDtlSeq() + "/" + reqDtlCmt.getReqDtlCmtSeq());
-			fileService.insertAttachFiles(reqDtlCmt.getFiles(), uploadFile);
+		if(!CollectionUtils.isEmpty(cmt.getFiles())) {
+			UploadFile uploadFile = cmt.getFileInfo();
+			uploadFile.setFileRefSeq(cmt.getCmtSeq());
+			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + reqDtlInfo.getReqSeq() + "/" + cmt.getReqDtlSeq() + "/" + cmt.getCmtSeq());
+			fileService.insertAttachFiles(cmt.getFiles(), uploadFile);
 		}
+		
+		return this.getReqDtlCmtBySeq(cmt.getCmtSeq(), cmt.getLoginUserSeq());
 	}
 	
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
-	public int updateReqDtlCmt(ReqDtlCmt reqDtlCmt) {
-		ReqDtlCmtInfo reqDtlCmtInfo = this.getReqDtlCmtBySeq(reqDtlCmt.getReqDtlCmtSeq(), reqDtlCmt.getLoginUserSeq());
+	public CmtInfo updateReqDtlCmt(Cmt cmt) {
+		this.getReqDtlCmtBySeq(cmt.getCmtSeq(), cmt.getLoginUserSeq());
 		
-		int result = reqDtlCmtMapper.updateReqDtlCmt(reqDtlCmt);
+		reqDtlCmtMapper.updateReqDtlCmt(cmt);
 		
 		// 첨부파일 삭제
-		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(reqDtlCmt.getFileInfo());
+		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(cmt.getFileInfo());
 		if(!CollectionUtils.isEmpty(attachedFiles)) {
-			fileService.deleteAttachFiles(attachedFiles, reqDtlCmt.getAttachedFilesSeq());
+			fileService.deleteAttachFiles(attachedFiles, cmt.getAttachedFilesSeq());
 		}
 		
 		// 첨부파일 저장
-		if(!CollectionUtils.isEmpty(reqDtlCmt.getFiles())) {
-			UploadFile uploadFile = reqDtlCmt.getFileInfo();
-			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + reqDtlCmtInfo.getReqSeq() + "/" + reqDtlCmt.getReqDtlSeq() + "/" + reqDtlCmt.getReqDtlCmtSeq());
-			fileService.insertAttachFiles(reqDtlCmt.getFiles(), uploadFile);
+		if(!CollectionUtils.isEmpty(cmt.getFiles())) {
+			UploadFile uploadFile = cmt.getFileInfo();
+			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + cmt.getReqSeq() + "/" + cmt.getReqDtlSeq() + "/" + cmt.getCmtSeq());
+			fileService.insertAttachFiles(cmt.getFiles(), uploadFile);
 		}
-		return result;	
+		
+		return this.getReqDtlCmtBySeq(cmt.getCmtSeq(), cmt.getLoginUserSeq());
+	
 	}
 
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
-	public int deleteReqDtlCmt(ReqDtlCmt reqDtlCmt) {
-		this.getReqDtlCmtBySeq(reqDtlCmt.getReqDtlCmtSeq(), reqDtlCmt.getLoginUserSeq());
+	public int deleteReqDtlCmt(Cmt cmt) {
+		this.getReqDtlCmtBySeq(cmt.getCmtSeq(), cmt.getLoginUserSeq());
 
-		int result = reqDtlCmtMapper.deleteReqDtlCmt(reqDtlCmt);
+		int result = reqDtlCmtMapper.deleteReqDtlCmt(cmt);
 		
 		// 첨부파일 삭제(디렉토리까지)
-		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(reqDtlCmt.getFileInfo());
+		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(cmt.getFileInfo());
 		if(!CollectionUtils.isEmpty(attachedFiles)) {
 			fileService.deleteAttachAll(attachedFiles);
 		}

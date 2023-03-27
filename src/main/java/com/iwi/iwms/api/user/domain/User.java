@@ -45,7 +45,7 @@ public class User {
 	private Long authSeq;
 	
 	@NotNull(message = "권한은 필수 입력 사항입니다")
-	@Schema(description = "권한: [ADMIN: 최고관리자, PM: PM, PL: PL, ENG: 작업자, CM: 현업담당자, USER: 일반사용자]", allowableValues = {"ADMIN", "PM", "PL", "ENG", "CM", "USER"}) 
+	@Schema(description = "권한: [ADMIN: 최고관리자, PM: PM, PL: PL, ENG: 작업자, CM: 현업담당자, USER: 일반사용자]", allowableValues = {"ROLE_IWMS_ADMIN", "ROLE_IWMS_PM", "ROLE_IWMS_PL", "ROLE_IWMS_ENG", "ROLE_IWMS_CM", "ROLE_IWMS_USER"}) 
 	private String authCd;	
 	
 	@NotNull(message = "소속은 필수 입력 사항입니다")

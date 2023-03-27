@@ -2,32 +2,40 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.iwi.iwms.api.req.mapper.ReqDtlCmtMapper">
 
+	<resultMap id="resultReqDtlCmtMap" type="com.iwi.iwms.api.req.domain.CmtInfo">
+		<result property="cmtSeq" column="cmtSeq"/>
+	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=cmtSeq" 
+			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>		
+	</resultMap>
+	
 	<!-- 요청사항 상세 코멘트 단일 조회 -->				
 	<select id="getReqDtlCmtBySeq" parameterType="hashMap"
-		resultType="com.iwi.iwms.api.req.domain.ReqDtlCmtInfo">
+		resultMap="resultReqDtlCmtMap">
 		SELECT
 			DTL.REQ_SEQ AS reqSeq
 			, CMT.REQ_DTL_SEQ AS reqDtlSeq
-			, CMT.REQ_DTL_CMT_SEQ AS reqDtlCmtSeq
-			, CMT.REQ_DTL_CMT AS reqDtlCmt
-			, HIS.REQ_DTL_STAT_CD AS reqDtlStatCd
-			, FN_GET_CODE_NM('REQ_DTL_STAT_CD', HIS.REQ_DTL_STAT_CD) AS reqDtlStat
+			, CMT.REQ_DTL_CMT_SEQ AS cmtSeq
+			, CMT.REQ_DTL_CMT AS cmt
+			, HIS.REQ_DTL_STAT_CD AS statCd
+			, FN_GET_CODE_NM('REQ_DTL_STAT_CD', HIS.REQ_DTL_STAT_CD) AS stat
 			, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = CMT.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn
 			, CMT.USE_YN AS useYn
 			, DATE_FORMAT(CMT.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 			, FN_GET_USER_NM(CMT.REG_SEQ) AS regNm
+			, 'TB_REQ_DTL_CMT' AS fileRefTb
+			, 'REQ_DTL_CMT_SEQ' AS fileRefCol				
 		FROM TB_REQ_DTL DTL
 		INNER JOIN TB_REQ_DTL_CMT CMT ON DTL.REQ_DTL_SEQ = CMT.REQ_DTL_SEQ
 		INNER JOIN TB_REQ_DTL_HIS HIS ON CMT.REQ_DTL_SEQ = HIS.REQ_DTL_SEQ
 			AND CMT.REQ_DTL_HIS_SEQ = HIS.REQ_DTL_HIS_SEQ
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE CMT.USE_YN = 'Y' END)	
-			AND CMT.REQ_DTL_CMT_SEQ = #{reqDtlCmtSeq}
+			AND CMT.REQ_DTL_CMT_SEQ = #{cmtSeq}
 	</select>	
 		
 	<!-- 요청사항 상세 코멘트 등록 -->		
-	<insert id="insertReqDtlCmt" parameterType="com.iwi.iwms.api.req.domain.ReqDtlCmt"
-				useGeneratedKeys="true" keyProperty="reqDtlCmtSeq">
+	<insert id="insertReqDtlCmt" parameterType="com.iwi.iwms.api.req.domain.Cmt"
+				useGeneratedKeys="true" keyProperty="cmtSeq">
 		INSERT INTO TB_REQ_DTL_CMT
 		(
 		    REQ_DTL_SEQ
@@ -37,28 +45,28 @@
 			, REG_SEQ
 		) VALUES (
 			#{reqDtlSeq}
-			, #{reqDtlHisSeq}
-			, #{reqDtlCmt}
+			, #{hisSeq}
+			, #{cmt}
 			, #{useYn}
 			, #{loginUserSeq}
 		)		
 	</insert>		
 
 	<!-- 요청사항 상세 코멘트 수정 -->		
-	<update id="updateReqDtlCmt" parameterType="com.iwi.iwms.api.req.domain.ReqDtlCmt">
+	<update id="updateReqDtlCmt" parameterType="com.iwi.iwms.api.req.domain.Cmt">
 		UPDATE TB_REQ_DTL_CMT 
 		SET
-			REQ_DTL_CMT = #{reqDtlCmt}
+			REQ_DTL_CMT = #{cmt}
 			, useYn = #{useYn}
 			, UPT_DT = CURRENT_TIMESTAMP
 			, UPT_SEQ = #{loginUserSeq}
-		WHERE REQ_DTL_CMT_SEQ = #{reqDtlCmtSeq}	
+		WHERE REQ_DTL_CMT_SEQ = #{cmtSeq}	
 	</update>
 
 	<!-- 요청사항 상세 코멘트 삭제 -->		
-	<delete id="deleteReqDtlCmt" parameterType="com.iwi.iwms.api.req.domain.ReqDtlCmt">
+	<delete id="deleteReqDtlCmt" parameterType="com.iwi.iwms.api.req.domain.Cmt">
 		DELETE 
 		FROM TB_REQ_DTL_CMT
-		WHERE REQ_DTL_CMT_SEQ = #{reqDtlCmtSeq}	 
+		WHERE REQ_DTL_CMT_SEQ = #{cmtSeq}	 
 	</delete>
 </mapper>

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.iwi.iwms.api.auth.domain.AuthInfo;
-import com.iwi.iwms.api.auth.mapper.AuthMapper;
+import com.iwi.iwms.api.auth.service.AuthService;
 import com.iwi.iwms.api.common.errors.CommonException;
 import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
@@ -33,7 +33,7 @@ public class UserServiceImpl implements UserService {
 
 	private final UserMapper userMapper;
 	
-	private final AuthMapper authMapper;
+	private final AuthService authService;
 	
 	private final AuthProvider keycloakProvider;
 	
@@ -72,9 +72,7 @@ public class UserServiceImpl implements UserService {
 		String firstName = user.getUserNm(); 
 		String email = user.getUserEmail();
 		
-		AuthInfo authInfo = Optional.ofNullable(authMapper.getAuthByAuthCd(user.getAuthCd()))
-				.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "사용자 권한을 찾을 수 없습니다."));				
-
+		AuthInfo authInfo = authService.getAuthByAuthCd(user.getAuthCd());
 		String role = authInfo.getAuthCd();
 		
 		if(keycloakProvider.existsUsername(username)) {
@@ -97,14 +95,12 @@ public class UserServiceImpl implements UserService {
 	public int updateUser(UserUpdate userUpdate) {
 		UserInfo userInfo = this.getUserBySeq(userUpdate.getUserSeq(), userUpdate.getLoginUserSeq());
 		
-		AuthInfo authInfo = Optional.ofNullable(authMapper.getAuthByAuthCd(userUpdate.getAuthCd()))
-				.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "사용자 권한을 찾을 수 없습니다."));				
-
+		AuthInfo authInfo = authService.getAuthByAuthCd(userUpdate.getAuthCd());
 		userUpdate.setAuthSeq(authInfo.getAuthSeq());
+		
 		int result = userMapper.updateUser(userUpdate);
 		
 		if(result > 0) {
-			
 			//인증 서버의 사용자 이름 수정
 			if(!userUpdate.getUserNm().equals(userInfo.getUserNm())) {
 				String lastName = "iwms"; 
@@ -113,7 +109,6 @@ public class UserServiceImpl implements UserService {
 				
 				keycloakProvider.updateUser(userInfo.getSsoKey(), firstName, lastName, email);
 			}
-			
 			
 			//인증 서버의 사용자 권한 수정
 			if(userUpdate.getAuthSeq() != userInfo.getAuthSeq()) {
@@ -132,7 +127,6 @@ public class UserServiceImpl implements UserService {
 		int result = userMapper.deleteUser(user);
 		
 		if(result > 0) {
-			
 			//인증 서버의 사용자 삭제
 			keycloakProvider.deleteUser(userInfo.getSsoKey());
 		}

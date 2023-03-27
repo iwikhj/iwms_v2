@@ -1,16 +1,16 @@
 package com.iwi.iwms.api.req.service;
 
-import com.iwi.iwms.api.req.domain.ReqCmt;
-import com.iwi.iwms.api.req.domain.ReqCmtInfo;
+import com.iwi.iwms.api.req.domain.Cmt;
+import com.iwi.iwms.api.req.domain.CmtInfo;
 
 public interface ReqCmtService {
 
-	ReqCmtInfo getReqCmtBySeq(long reqCmtSeq, long loginUserSeq);
+	CmtInfo getReqCmtBySeq(long cmtSeq, long loginUserSeq);
 	
-	void insertReqCmt(ReqCmt reqCmt);
+	CmtInfo insertReqCmt(Cmt cmt);
 	
-	int updateReqCmt(ReqCmt reqCmt);
+	CmtInfo updateReqCmt(Cmt cmt);
 
-	int deleteReqCmt(ReqCmt reqCmt);
+	int deleteReqCmt(Cmt cmt);
 	
 }

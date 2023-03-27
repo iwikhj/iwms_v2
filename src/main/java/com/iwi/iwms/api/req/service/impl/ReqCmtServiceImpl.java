@@ -14,8 +14,8 @@ import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.file.domain.UploadFile;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
 import com.iwi.iwms.api.file.service.FileService;
-import com.iwi.iwms.api.req.domain.ReqCmt;
-import com.iwi.iwms.api.req.domain.ReqCmtInfo;
+import com.iwi.iwms.api.req.domain.Cmt;
+import com.iwi.iwms.api.req.domain.CmtInfo;
 import com.iwi.iwms.api.req.mapper.ReqCmtMapper;
 import com.iwi.iwms.api.req.mapper.ReqMapper;
 import com.iwi.iwms.api.req.service.ReqCmtService;
@@ -37,9 +37,9 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 	private final FileService fileService;
 
 	@Override
-	public ReqCmtInfo getReqCmtBySeq(long reqCmtSeq, long loginUserSeq) {
+	public CmtInfo getReqCmtBySeq(long cmtSeq, long loginUserSeq) {
 		Map<String, Object> map = new HashMap<>();
-		map.put("reqCmtSeq", reqCmtSeq);
+		map.put("cmtSeq", cmtSeq);
 		map.put("loginUserSeq", loginUserSeq);
 		
 		return Optional.ofNullable(reqCmtMapper.getReqCmtBySeq(map))
@@ -48,55 +48,58 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 	
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
-	public void insertReqCmt(ReqCmt reqCmt) {
+	public CmtInfo insertReqCmt(Cmt cmt) {
 		Map<String, Object> map = new HashMap<>();
-		map.put("reqSeq", reqCmt.getReqSeq());
-		map.put("loginUserSeq", reqCmt.getLoginUserSeq());
+		map.put("reqSeq", cmt.getReqSeq());
+		map.put("loginUserSeq", cmt.getLoginUserSeq());
 		
 		Optional.ofNullable(reqMapper.getReqBySeq(map))
 			.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "요청사항을 찾을 수 없습니다."));				
 	
-		reqCmtMapper.insertReqCmt(reqCmt);
+		reqCmtMapper.insertReqCmt(cmt);
 		
 		// 첨부파일 저장
-		if(!CollectionUtils.isEmpty(reqCmt.getFiles())) {
-			UploadFile uploadFile = reqCmt.getFileInfo();
-			uploadFile.setFileRefSeq(reqCmt.getReqCmtSeq());
-			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + reqCmt.getReqSeq());
-			fileService.insertAttachFiles(reqCmt.getFiles(), uploadFile);
+		if(!CollectionUtils.isEmpty(cmt.getFiles())) {
+			UploadFile uploadFile = cmt.getFileInfo();
+			uploadFile.setFileRefSeq(cmt.getCmtSeq());
+			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + cmt.getReqSeq());
+			fileService.insertAttachFiles(cmt.getFiles(), uploadFile);
 		}
+		
+		return this.getReqCmtBySeq(cmt.getCmtSeq(), cmt.getLoginUserSeq());
 	}
 
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
-	public int updateReqCmt(ReqCmt reqCmt) {
-		this.getReqCmtBySeq(reqCmt.getReqCmtSeq(), reqCmt.getLoginUserSeq());
+	public CmtInfo updateReqCmt(Cmt cmt) {
+		this.getReqCmtBySeq(cmt.getCmtSeq(), cmt.getLoginUserSeq());
 		
-		int result = reqCmtMapper.updateReqCmt(reqCmt);
+		reqCmtMapper.updateReqCmt(cmt);
 		
 		// 첨부파일 삭제
-		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(reqCmt.getFileInfo());
+		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(cmt.getFileInfo());
 		if(!CollectionUtils.isEmpty(attachedFiles)) {
-			fileService.deleteAttachFiles(attachedFiles, reqCmt.getAttachedFilesSeq());
+			fileService.deleteAttachFiles(attachedFiles, cmt.getAttachedFilesSeq());
 		}
 		
 		// 첨부파일 저장
-		if(!CollectionUtils.isEmpty(reqCmt.getFiles())) {
-			UploadFile uploadFile = reqCmt.getFileInfo();
-			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + reqCmt.getReqSeq());
-			fileService.insertAttachFiles(reqCmt.getFiles(), uploadFile);
+		if(!CollectionUtils.isEmpty(cmt.getFiles())) {
+			UploadFile uploadFile = cmt.getFileInfo();
+			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + cmt.getReqSeq());
+			fileService.insertAttachFiles(cmt.getFiles(), uploadFile);
 		}
-		return result;	
+		
+		return this.getReqCmtBySeq(cmt.getCmtSeq(), cmt.getLoginUserSeq());
 	}
 
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
-	public int deleteReqCmt(ReqCmt reqCmt) {
-		this.getReqCmtBySeq(reqCmt.getReqCmtSeq(), reqCmt.getLoginUserSeq());
+	public int deleteReqCmt(Cmt cmt) {
+		this.getReqCmtBySeq(cmt.getCmtSeq(), cmt.getLoginUserSeq());
 	
-		int result = reqCmtMapper.deleteReqCmt(reqCmt);
+		int result = reqCmtMapper.deleteReqCmt(cmt);
 		
-		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(reqCmt.getFileInfo());
+		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(cmt.getFileInfo());
 		if(!CollectionUtils.isEmpty(attachedFiles)) {
 			fileService.deleteAttachFiles(attachedFiles, null);
 		}

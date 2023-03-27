@@ -94,7 +94,7 @@ public class ReqDtlInfo {
 	private List<ReqDtlHisInfo> histories;
 	
 	@Schema(description = "코멘트 목록") 
-	private List<ReqDtlCmtInfo> comments;
+	private List<CmtInfo> comments;
 	
 	@Schema(description = "작성자 여부") 
 	private String ownerYn;	

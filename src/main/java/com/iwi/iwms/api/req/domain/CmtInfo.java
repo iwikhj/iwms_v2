@@ -16,22 +16,25 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReqCmtInfo {
+public class CmtInfo {
 	
 	@Schema(description = "요청사항 SEQ")
-	private long reqSeq;
+	private Long reqSeq;
 	
-	@Schema(description = "요청사항 코멘트 SEQ")
-	private Long reqCmtSeq;
+	@Schema(description = "요청사항 상세 SEQ")
+	private Long reqDtlSeq;
+	
+	@Schema(description = "코멘트 SEQ")
+	private Long cmtSeq;
 
-	@Schema(description = "요청사항 코멘트") 
-	private String reqCmt;
+	@Schema(description = "코멘트") 
+	private String cmt;
 	
-	@Schema(description = "요청사항 상태 코드") 
-	private String reqStatCd;
+	@Schema(description = "상태 코드") 
+	private String statCd;
 	
-	@Schema(description = "요청사항 상태") 
-	private String reqStat;
+	@Schema(description = "상태") 
+	private String stat;
 	
 	@Schema(description = "첨부된 파일 정보")
 	private List<UploadFileInfo> attachedFiles;
@@ -47,4 +50,5 @@ public class ReqCmtInfo {
 	
 	@Schema(description = "등록자") 
 	private String regNm;
+
 }

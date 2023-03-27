@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.iwi.iwms.api.auth.domain.AuthInfo;
 import com.iwi.iwms.api.auth.service.AuthService;
+import com.iwi.iwms.api.code.domain.CodeInfo;
+import com.iwi.iwms.api.code.service.CodeService;
 import com.iwi.iwms.api.common.response.ListResponse;
 import com.iwi.iwms.api.common.response.Response;
 import com.iwi.iwms.api.comp.domain.CompInfo;
@@ -50,6 +52,8 @@ public class PageController {
 	private static final int DEFAULT_PAGE = 1;
 	
 	private static final int DEFAULT_LIMIT = 15;
+	
+	private final CodeService codeService;
 	
 	private final NoticeService noticeService;
 	
@@ -130,8 +134,19 @@ public class PageController {
     	Map<String, Object> ref = new HashMap<>();
     	
     	List<UserSiteInfo> siteList = userService.listSiteByUserSeq(loginUserInfo.getUserSeq());
+    	List<CodeInfo> reqStatCdList =  codeService.listCodeByUpCode("REQ_STAT_CD");
+    	List<CodeInfo> reqDtlStatCdList =  codeService.listCodeByUpCode("REQ_DTL_STAT_CD");
+    	reqStatCdList.addAll(reqDtlStatCdList);
+    	
+    	List<CodeInfo> reqGbCdList =  codeService.listCodeByUpCode("REQ_GB_CD");
+    	List<CodeInfo> reqTypeCdList =  codeService.listCodeByUpCode("REQ_TYPE_CD");
+    	List<CodeInfo> busiRollCdList =  codeService.listCodeByUpCode("BUSI_ROLL_CD");
     	
     	ref.put("siteList", siteList);
+    	ref.put("reqStatCdList", reqStatCdList);
+    	ref.put("reqGbCdList", reqGbCdList);
+    	ref.put("reqTypeCdList", reqTypeCdList);
+    	ref.put("busiRollCdList", busiRollCdList);
     	
 		return ResponseEntity.ok(ListResponse.<List<ReqInfo>>builder()
 				.data(listReq)
@@ -155,16 +170,8 @@ public class PageController {
 		}
     	ReqDtlInfo reqDtl = reqDtlService.getReqDtlByReqAndDtlSeq(map);
     	
-    	//참조 데이터
-    	Map<String, Object> ref = new HashMap<>();
-    	
-    	List<UserSiteInfo> siteList = userService.listSiteByUserSeq(loginUserInfo.getUserSeq());
-    	
-    	ref.put("siteList", siteList);
-    	
 		return ResponseEntity.ok(Response.<ReqDtlInfo>builder()
 				.data(reqDtl)
-				.ref(ref)
 				.loginUserInfo(loginUserInfo)
 				.build());
     }
@@ -270,8 +277,16 @@ public class PageController {
     	
     	List<UserInfo> listUser = userService.listUser(map);
     	
+    	//참조 데이터
+    	Map<String, Object> ref = new HashMap<>();
+    	
+    	List<CodeInfo> busiRollCdList =  codeService.listCodeByUpCode("BUSI_ROLL_CD");
+    	
+    	ref.put("busiRollCdList", busiRollCdList);
+    	
 		return ResponseEntity.ok(ListResponse.<List<UserInfo>>builder()
 				.data(listUser)
+				.ref(ref)
 				.query(map)
 				.loginUserInfo(loginUserInfo)
 				.build());
@@ -288,8 +303,16 @@ public class PageController {
     	
 		List<CompInfo> listComp = compService.listComp(map);
     	
+    	//참조 데이터
+    	Map<String, Object> ref = new HashMap<>();
+    	
+    	List<CodeInfo> compGbCdList =  codeService.listCodeByUpCode("COMP_GB_CD");
+    	
+    	ref.put("compGbCdList", compGbCdList);
+    	
 		return ResponseEntity.ok(ListResponse.<List<CompInfo>>builder()
 				.data(listComp)
+				.ref(ref)
 				.query(map)
 				.loginUserInfo(loginUserInfo)
 				.build());

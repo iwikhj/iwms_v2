@@ -67,7 +67,7 @@
 			AND PROJ.PROJ_END_YMD &lt;= #{projEndYmd}
 		</if>			
 		<if test='useYn != null and useYn != ""'>
-			AND PROJ.USE_YN = UPPER(#{useYn})
+			AND PROJ.USE_YN = #{useYn}
 		</if>				
 	</select>		
 
@@ -295,7 +295,7 @@
 		<include refid="selectSite"></include>
 			AND SITE.PROJ_SEQ = #{projSeq}
 		<if test='useYn != null and useYn != ""'>
-			AND SITE.USE_YN = UPPER(#{useYn})
+			AND SITE.USE_YN = #{useYn}
 		</if>			
 		ORDER BY SITE.SITE_SEQ DESC
 		<if test='pagination != null and pagination != ""'>
@@ -315,7 +315,7 @@
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE COMP.USE_YN = 'Y' AND PROJ.USE_YN = 'Y' AND SITE.USE_YN = 'Y' END)	
 			AND SITE.PROJ_SEQ = #{projSeq}
 		<if test='useYn != null and useYn != ""'>
-			AND SITE.USE_YN = UPPER(#{useYn})
+			AND SITE.USE_YN = #{useYn}
 		</if>				
 	</select>	
 

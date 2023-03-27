@@ -21,19 +21,22 @@ import lombok.ToString;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReqCmt {
-
-	@Schema(hidden = true, description = "요청사항 코멘트 SEQ")
-	private Long reqCmtSeq;
+public class Cmt {
 	
 	@Schema(hidden = true, description = "요청사항 SEQ")
-	private long reqSeq;
+	private Long reqSeq;
 	
-	@Schema(description = "요청사항 마지막 상태 SEQ")
-	private long reqHisSeq;
+	@Schema(hidden = true, description = "요청사항 상세 SEQ")
+	private Long reqDtlSeq;
+	
+	@Schema(hidden = true, description = "요청사항 코멘트 SEQ")
+	private Long cmtSeq;
+
+	@Schema(description = "이력 SEQ")
+	private long hisSeq;
 
 	@Schema(description = "요청사항 코멘트") 
-	private String reqCmt;
+	private String cmt;
 	
 	@Schema(description = "첨부할 파일")
 	private List<MultipartFile> files;
@@ -50,15 +53,22 @@ public class ReqCmt {
 	@Schema(hidden = true, description = "로그인 사용자 SEQ") 
 	private long loginUserSeq;
 	
-	public ReqCmt of(final LoginUserInfo loginUserInfo) {
+	public Cmt of(final LoginUserInfo loginUserInfo) {
 		this.loginUserSeq = loginUserInfo.getUserSeq();
 		
 		this.fileInfo = new UploadFile();
-		this.fileInfo.setFileRefTb("TB_REQ_CMT");
-		this.fileInfo.setFileRefCol("REQ_CMT_SEQ");
-		if(this.reqCmtSeq != null && this.reqCmtSeq != 0) {
-			this.fileInfo.setFileRefSeq(this.reqCmtSeq);
+		if(this.reqDtlSeq == null) {
+			this.fileInfo.setFileRefTb("TB_REQ_CMT");
+			this.fileInfo.setFileRefCol("REQ_CMT_SEQ");
+		} else {
+			this.fileInfo.setFileRefTb("TB_REQ_DTL_CMT");
+			this.fileInfo.setFileRefCol("REQ_DTL_CMT_SEQ");
 		}
+
+		if(this.cmtSeq != null) {
+			this.fileInfo.setFileRefSeq(this.cmtSeq);
+		}
+		
 		this.fileInfo.setLoginUserSeq(loginUserInfo.getUserSeq());
 		return this;
 	}

@@ -1,16 +1,16 @@
 package com.iwi.iwms.api.req.service;
 
-import com.iwi.iwms.api.req.domain.ReqDtlCmt;
-import com.iwi.iwms.api.req.domain.ReqDtlCmtInfo;
+import com.iwi.iwms.api.req.domain.Cmt;
+import com.iwi.iwms.api.req.domain.CmtInfo;
 
 public interface ReqDtlCmtService {
 
-	ReqDtlCmtInfo getReqDtlCmtBySeq(long reqDtlCmtSeq, long loginUserSeq);
+	CmtInfo getReqDtlCmtBySeq(long cmtSeq, long loginUserSeq);
 	
-	void insertReqDtlCmt(ReqDtlCmt reqDtlCmt);
+	CmtInfo insertReqDtlCmt(Cmt cmt);
 	
-	int updateReqDtlCmt(ReqDtlCmt reqDtlCmt);
+	CmtInfo updateReqDtlCmt(Cmt cmt);
 
-	int deleteReqDtlCmt(ReqDtlCmt reqDtlCmt);
+	int deleteReqDtlCmt(Cmt cmt);
 	
 }

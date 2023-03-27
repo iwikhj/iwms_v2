@@ -4,18 +4,18 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
-import com.iwi.iwms.api.req.domain.ReqCmt;
-import com.iwi.iwms.api.req.domain.ReqCmtInfo;
+import com.iwi.iwms.api.req.domain.Cmt;
+import com.iwi.iwms.api.req.domain.CmtInfo;
 
 @Mapper
 public interface ReqCmtMapper {
 	
-	ReqCmtInfo getReqCmtBySeq(Map<String, Object> map);
+	CmtInfo getReqCmtBySeq(Map<String, Object> map);
 
-	void insertReqCmt(ReqCmt reqCmt);
+	void insertReqCmt(Cmt cmt);
 	
-	int updateReqCmt(ReqCmt reqCmt);
+	int updateReqCmt(Cmt cmt);
 	
-	int deleteReqCmt(ReqCmt reqCmt);
+	int deleteReqCmt(Cmt cmt);
 
 }

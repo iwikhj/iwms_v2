@@ -53,7 +53,7 @@
 	   	<collection property="histories" column="reqSeq=reqSeq,reqDtlSeq=reqDtlSeq,loginUserSeq=loginUserSeq" 
 			ofType="com.iwi.iwms.api.req.domain.ReqDtlHisInfo" select="listHisByReqAndDtlSeq"/>
 	   	<collection property="comments" column="reqSeq=reqSeq,reqDtlSeq=reqDtlSeq,loginUserSeq=loginUserSeq" 
-			ofType="com.iwi.iwms.api.req.domain.ReqDtlCmtInfo" select="listCmtByReqAndDtlSeq"/>	
+			ofType="com.iwi.iwms.api.req.domain.CmtInfo" select="listCmtByReqAndDtlSeq"/>	
 	</resultMap>
 
 	<!-- 요청사항 상세 단일 조회 -->		
@@ -232,9 +232,9 @@
         ORDER BY regDt
 	</select>		
 
-	<resultMap id="resultReqAndDtlCmtMap" type="com.iwi.iwms.api.req.domain.ReqDtlCmtInfo">
-		<result property="reqDtlCmtSeq" column="reqDtlCmtSeq"/>
-	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=reqDtlCmtSeq" 
+	<resultMap id="resultReqAndDtlCmtMap" type="com.iwi.iwms.api.req.domain.CmtInfo">
+		<result property="cmtSeq" column="cmtSeq"/>
+	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=cmtSeq" 
 			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>
 	</resultMap>
 		
@@ -247,10 +247,10 @@
 			SELECT
 				REQ.REQ_SEQ AS reqSeq
 				, null AS reqDtlSeq
-				, CMT.REQ_CMT_SEQ AS reqDtlCmtSeq
-				, CMT.REQ_CMT AS reqDtlCmt
-				, HIS.REQ_STAT_CD AS reqDtlStatCd
-				, FN_GET_CODE_NM('REQ_STAT_CD', HIS.REQ_STAT_CD) AS reqDtlStat
+				, CMT.REQ_CMT_SEQ AS cmtSeq
+				, CMT.REQ_CMT AS cmt
+				, HIS.REQ_STAT_CD AS statCd
+				, FN_GET_CODE_NM('REQ_STAT_CD', HIS.REQ_STAT_CD) AS stat
 				, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = CMT.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn
 				, CMT.USE_YN AS useYn
 				, DATE_FORMAT(CMT.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
@@ -268,10 +268,10 @@
 			SELECT
 				REQ.REQ_SEQ AS reqSeq
 				, DTL.REQ_DTL_SEQ AS reqDtlSeq
-				, CMT.REQ_DTL_CMT_SEQ AS reqDtlCmtSeq
-				, CMT.REQ_DTL_CMT AS reqDtlCmt
-				, HIS.REQ_DTL_STAT_CD AS reqDtlStatCd
-				, FN_GET_CODE_NM('REQ_DTL_STAT_CD', HIS.REQ_DTL_STAT_CD) AS reqDtlStat
+				, CMT.REQ_DTL_CMT_SEQ AS cmtSeq
+				, CMT.REQ_DTL_CMT AS cmt
+				, HIS.REQ_DTL_STAT_CD AS statCd
+				, FN_GET_CODE_NM('REQ_DTL_STAT_CD', HIS.REQ_DTL_STAT_CD) AS stat
 				, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = CMT.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn
 				, CMT.USE_YN AS useYn
 				, DATE_FORMAT(CMT.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
