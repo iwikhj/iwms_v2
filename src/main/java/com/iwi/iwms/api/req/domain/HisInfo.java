@@ -12,22 +12,22 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReqDtlHisInfo {
+public class HisInfo {
 
 	@Schema(description = "요청사항 SEQ") 
-	private long reqSeq;
+	private Long reqSeq;
 	
 	@Schema(description = "요청사항 상세 SEQ") 
 	private Long reqDtlSeq;
 	
-	@Schema(description = "요청사항 상세 상태 코드") 
-	private String reqDtlStatCd;
+	@Schema(description = "상태 코드") 
+	private String statCd;
 	
-	@Schema(description = "요청사항 상세 상태") 
-	private String reqDtlStat;
+	@Schema(description = "상태") 
+	private String stat;
 	
-	@Schema(description = "요청사항 상태 코멘트") 
-	private String reqDtlStatCmt;
+	@Schema(description = "상태 코멘트") 
+	private String statCmt;
 	
 	@Schema(description = "작성자 여부") 
 	private String ownerYn;

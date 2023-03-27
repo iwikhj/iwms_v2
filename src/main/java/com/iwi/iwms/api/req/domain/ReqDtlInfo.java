@@ -19,13 +19,13 @@ import lombok.ToString;
 public class ReqDtlInfo {
 	
 	@Schema(description = "요청사항 SEQ")
-	private long reqSeq;
+	private Long reqSeq;
 	
 	@Schema(description = "요청사항 번호") 
 	private String reqNo;
 	
 	@Schema(description = "요청사항 상세 SEQ") 
-	private long reqDtlSeq;
+	private Long reqDtlSeq;
 	
 	@Schema(description = "요청사항 상세 번호") 
 	private String reqDtlNo;
@@ -60,14 +60,17 @@ public class ReqDtlInfo {
 	@Schema(description = "요청사항 구분") 
 	private String reqGb;
 	
-	@Schema(description = "요청사항 이력 SEQ")
-	private long reqHisSeq;
+	@Schema(description = "이력 SEQ")
+	private long hisSeq;
 	
-	@Schema(description = "요청사항 상태 코드") 
-	private String reqStatCd;
+	@Schema(description = "상태 코드") 
+	private String statCd;
 
-	@Schema(description = "요청사항 상태") 
-	private String reqStat;
+	@Schema(description = "상태") 
+	private String stat;
+	
+	@Schema(description = "상태 코멘트") 
+	private String statCmt;
 	
 	@Schema(description = "담당자") 
 	private String reqDtlUser;
@@ -78,20 +81,11 @@ public class ReqDtlInfo {
 	@Schema(description = "담당자 업무") 
 	private String busiRoll;
 	
-	@Schema(description = "요청사항 상세 이력 SEQ")
-	private long reqDtlHisSeq;
-	
-	@Schema(description = "요청사항 상세 상태 코드") 
-	private String reqDtlStatCd;
-
-	@Schema(description = "요청사항 상세 상태") 
-	private String reqDtlStat;
-	
 	@Schema(description = "첨부된 파일 정보")
 	private List<UploadFileInfo> attachedFiles;
 
 	@Schema(description = "처리 내역 목록") 
-	private List<ReqDtlHisInfo> histories;
+	private List<HisInfo> histories;
 	
 	@Schema(description = "코멘트 목록") 
 	private List<CmtInfo> comments;

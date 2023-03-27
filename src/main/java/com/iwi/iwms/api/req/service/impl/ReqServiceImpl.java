@@ -15,8 +15,8 @@ import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.file.domain.UploadFile;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
 import com.iwi.iwms.api.file.service.FileService;
+import com.iwi.iwms.api.req.domain.His;
 import com.iwi.iwms.api.req.domain.Req;
-import com.iwi.iwms.api.req.domain.ReqHis;
 import com.iwi.iwms.api.req.domain.ReqInfo;
 import com.iwi.iwms.api.req.enums.ReqStatCode;
 import com.iwi.iwms.api.req.mapper.ReqMapper;
@@ -70,14 +70,15 @@ public class ReqServiceImpl implements ReqService {
 			req.setSiteSeq(siteSeq);
 			reqMapper.insertReq(req);
 			
-			ReqHis reqHis = ReqHis.builder()
+			
+			His his = His.builder()
 					.reqSeq(req.getReqSeq())
-					.reqStatCd(status.getCode())
-					.reqStatCmt(status.getMessage())
+					.statCd(status.getCode())
+					.statCmt(status.getMessage())
 					.loginUserSeq(req.getLoginUserSeq())
 					.build();
 			
-			reqMapper.insertReqHis(reqHis);
+			reqMapper.insertReqHis(his);
 			
 			// 첨부파일 저장
 			if(!CollectionUtils.isEmpty(req.getFiles())) {
@@ -128,38 +129,34 @@ public class ReqServiceImpl implements ReqService {
 
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
-	public void insertReqHis(ReqHis reqHis) {
-		this.getReqBySeq(reqHis.getReqSeq(), reqHis.getLoginUserSeq());
+	public void updateReqStat(His his) {
+		ReqInfo reqInfo = this.getReqBySeq(his.getReqSeq(), his.getLoginUserSeq());
 		
-		ReqStatCode oldStatus = ReqStatCode.findByCode(reqMapper.getCurrentReqStatBySeq(reqHis.getReqSeq()));
-		ReqStatCode newStatus = ReqStatCode.findByCode(reqHis.getReqStatCd());
-		log.info("[요청사항 상태 변경] <{} -> {}>", oldStatus.getMessage(), newStatus.getMessage());
+		ReqStatCode oldStat = ReqStatCode.findByCode(reqInfo.getStatCd());
+		ReqStatCode newStat = ReqStatCode.findByCode(his.getStatCd());
+		log.info("[요청사항 상태 변경] <{} -> {}>", oldStat.getMessage(), newStat.getMessage());
 		
-		if(oldStatus == newStatus) {
-        	throw new CommonException(ErrorCode.DUPLICATE_ERROR, "이미 " + newStatus.getMessage() + " 상태입니다.");
+		if(oldStat == newStat) {
+        	throw new CommonException(ErrorCode.DUPLICATE_ERROR, "이미 " + newStat.getMessage() + " 상태입니다.");
 		}
 		
-		if(newStatus == ReqStatCode.REQUEST && oldStatus != ReqStatCode.NEGO) {
-        	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + oldStatus.getMessage() + "중 입니다. " + ReqStatCode.NEGO.getMessage() + " 상태에서만 재요청을 진행할 수 있습니다.");
+		if(newStat == ReqStatCode.REQUEST && oldStat != ReqStatCode.NEGO) {
+        	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + oldStat.getMessage() + "중 입니다. " + ReqStatCode.NEGO.getMessage() + " 상태에서만 재요청을 진행할 수 있습니다.");
+		}
+		if(newStat == ReqStatCode.AGREE && oldStat != ReqStatCode.REQUEST) {
+        	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + oldStat.getMessage() + "중 입니다. " + ReqStatCode.REQUEST.getMessage() + " 상태에서만 합의를 진행할 수 있습니다.");
+		}
+		if(newStat == ReqStatCode.NEGO && oldStat != ReqStatCode.REQUEST) {
+        	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + oldStat.getMessage() + "중 입니다. " + ReqStatCode.REQUEST.getMessage() + " 상태에서만 협의요청을 진행할 수 있습니다.");
+		}
+		if(newStat == ReqStatCode.REJECT && oldStat != ReqStatCode.REQUEST) {
+        	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + oldStat.getMessage() + "중 입니다. " + ReqStatCode.REQUEST.getMessage() + " 상태에서만 반려를 진행할 수 있습니다.");
+		}
+		if(!StringUtils.hasText(his.getStatCmt())) {
+			his.setStatCmt(newStat.getMessage());
 		}
 		
-		if(newStatus == ReqStatCode.AGREE && oldStatus != ReqStatCode.REQUEST) {
-        	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + oldStatus.getMessage() + "중 입니다. " + ReqStatCode.REQUEST.getMessage() + " 상태에서만 합의를 진행할 수 있습니다.");
-		}
-		
-		if(newStatus == ReqStatCode.NEGO && oldStatus != ReqStatCode.REQUEST) {
-        	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + oldStatus.getMessage() + "중 입니다. " + ReqStatCode.REQUEST.getMessage() + " 상태에서만 협의요청을 진행할 수 있습니다.");
-		}
-		
-		if(newStatus == ReqStatCode.REJECT && oldStatus != ReqStatCode.REQUEST) {
-        	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + oldStatus.getMessage() + "중 입니다. " + ReqStatCode.REQUEST.getMessage() + " 상태에서만 반려를 진행할 수 있습니다.");
-		}
-		
-		if(!StringUtils.hasText(reqHis.getReqStatCmt())) {
-			reqHis.setReqStatCmt(newStatus.getMessage());
-		}
-		
-		reqMapper.insertReqHis(reqHis);
+		reqMapper.insertReqHis(his);
 	}
 
 }

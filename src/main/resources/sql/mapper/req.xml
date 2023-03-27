@@ -21,9 +21,9 @@
 			, FN_GET_USER_NM(DTL.REQ_DTL_USER_SEQ) AS reqDtlUser
 			, DTL.BUSI_ROLL_CD AS busiRollCd
 			, FN_GET_CODE_NM('BUSI_ROLL_CD', DTL.BUSI_ROLL_CD) AS busiRoll
-			, CASE WHEN DHIS.REQ_DTL_SEQ IS NULL THEN HIS.REQ_STAT_CD ELSE DHIS.REQ_DTL_STAT_CD END AS reqStatCd
-			, CASE WHEN DHIS.REQ_DTL_SEQ IS NULL THEN FN_GET_CODE_NM('REQ_STAT_CD', HIS.REQ_STAT_CD) ELSE FN_GET_CODE_NM('REQ_DTL_STAT_CD', DHIS.REQ_DTL_STAT_CD) END AS reqStat 
-			, CASE WHEN DHIS.REQ_DTL_SEQ IS NULL THEN HIS.REQ_STAT_CMT ELSE DHIS.REQ_DTL_STAT_CMT END AS reqStatCmt
+			, CASE WHEN DHIS.REQ_DTL_SEQ IS NULL THEN HIS.REQ_STAT_CD ELSE DHIS.REQ_DTL_STAT_CD END AS statCd
+			, CASE WHEN DHIS.REQ_DTL_SEQ IS NULL THEN FN_GET_CODE_NM('REQ_STAT_CD', HIS.REQ_STAT_CD) ELSE FN_GET_CODE_NM('REQ_DTL_STAT_CD', DHIS.REQ_DTL_STAT_CD) END AS stat 
+			, CASE WHEN DHIS.REQ_DTL_SEQ IS NULL THEN HIS.REQ_STAT_CMT ELSE DHIS.REQ_DTL_STAT_CMT END AS statCmt
 			, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = REQ.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn
 			, REQ.DEL_YN AS delYn	
 			, REQ.USE_YN AS useYn	
@@ -49,7 +49,7 @@
 
 	<resultMap id="resultReqMap" type="com.iwi.iwms.api.req.domain.ReqInfo">
 		<result property="reqSeq" column="reqSeq"/>			
-		<association property="finalReqStat" column="reqSeq" select="getFinalReqStatBySeq"/>
+		<association property="finalStat" column="reqSeq" select="getFinalStatBySeq"/>
 	</resultMap>
 	
 	<!-- 요청사항 목록 조회 -->		
@@ -64,8 +64,8 @@
 		<if test='busiRollCd != null and busiRollCd != ""'>
 			AND t1.busiRollCd = #{busiRollCd}
 		</if>		
-		<if test='reqStatCd != null and reqStatCd != ""'>
-			AND t1.reqStatCd = #{reqStatCd}
+		<if test='statCd != null and statCd != ""'>
+			AND t1.statCd = #{statCd}
 		</if>			
 		<if test='siteSeq != null and siteSeq != ""'>
 			AND t1.siteSeq = #{siteSeq}
@@ -103,8 +103,8 @@
 		<if test='busiRollCd != null and busiRollCd != ""'>
 			AND t1.busiRollCd = #{busiRollCd}
 		</if>		
-		<if test='reqStatCd != null and reqStatCd != ""'>
-			AND t1.reqStatCd = #{reqStatCd}
+		<if test='statCd != null and statCd != ""'>
+			AND t1.statCd = #{statCd}
 		</if>			
 		<if test='siteSeq != null and siteSeq != ""'>
 			AND t1.siteSeq = #{siteSeq}
@@ -147,6 +147,7 @@
 			, FN_GET_CODE_NM('REQ_TYPE_CD', REQ.REQ_TYPE_CD) AS reqType
 			, REQ.REQ_GB_CD AS reqGbCd
 			, FN_GET_CODE_NM('REQ_GB_CD', REQ.REQ_GB_CD) AS reqGb
+			, HIS.REQ_STAT_CD AS statCd
 			, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = REQ.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn
 			, REQ.DEL_YN AS delYn	
 			, REQ.USE_YN AS useYn	
@@ -156,38 +157,27 @@
 			, 'REQ_SEQ' AS fileRefCol			
 		FROM TB_REQ REQ
 		INNER JOIN TB_SITE SITE ON REQ.SITE_SEQ = SITE.SITE_SEQ
+		INNER JOIN TB_REQ_HIS HIS ON REQ.REQ_SEQ = HIS.REQ_SEQ
+			AND HIS.REQ_HIS_SEQ = (SELECT MAX(REQ_HIS_SEQ) FROM TB_REQ_HIS WHERE REQ_SEQ = REQ.REQ_SEQ)	   		
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE REQ.DEL_YN = 'N' AND REQ.USE_YN = 'Y' END)	
 			AND REQ.REQ_SEQ = #{reqSeq}
 	</select>	
 
 	<!-- 요청사항 최종 상태 -->		
-	<select id="getFinalReqStatBySeq" parameterType="long"
+	<select id="getFinalStatBySeq" parameterType="long"
 		resultType="string">
 		SELECT
-			FN_GET_CODE_NM(SUBSTRING(finalReqStatCd, 3), LEFT(finalReqStatCd, 2)) AS finalReqStat     
+			FN_GET_CODE_NM(SUBSTRING(finalStatCd, 3), LEFT(finalStatCd, 2)) AS finalStat     
 		FROM (
 			SELECT 	
-				MIN(CASE WHEN DTL.REQ_DTL_STAT_CD IS NULL THEN CONCAT(HIS.REQ_STAT_CD, 'REQ_STAT_CD') ELSE CONCAT(DTL.REQ_DTL_STAT_CD, 'REQ_DTL_STAT_CD')  END) AS finalReqStatCd
+				MIN(CASE WHEN DTL.REQ_DTL_STAT_CD IS NULL THEN CONCAT(HIS.REQ_STAT_CD, 'REQ_STAT_CD') ELSE CONCAT(DTL.REQ_DTL_STAT_CD, 'REQ_DTL_STAT_CD')  END) AS finalStatCd
 			FROM TB_REQ REQ
 			INNER JOIN TB_REQ_HIS HIS ON REQ.REQ_SEQ = HIS.REQ_SEQ
 				AND HIS.REQ_HIS_SEQ = (SELECT MAX(REQ_HIS_SEQ) FROM TB_REQ_HIS WHERE REQ_SEQ = REQ.REQ_SEQ)	
 			LEFT JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ	
 	           WHERE REQ.REQ_SEQ = #{reqSeq}
 		) t1
-	</select>	
-	
-	<!-- 요청사항 현재 상태 -->		
-	<select id="getCurrentReqStatBySeq" parameterType="long"
-		resultType="string">
-		SELECT
-			HIS.REQ_STAT_CD
-		FROM TB_REQ REQ
-		INNER JOIN TB_REQ_HIS HIS ON REQ.REQ_SEQ = HIS.REQ_SEQ
-			AND HIS.REQ_HIS_SEQ = (SELECT MAX(REQ_HIS_SEQ) FROM TB_REQ_HIS WHERE REQ_SEQ = REQ.REQ_SEQ)	 
-		WHERE REQ.DEL_YN = 'N' 
-			AND REQ.USE_YN = 'Y'
-			AND REQ.REQ_SEQ = #{reqSeq} 
 	</select>	
 	
 	<!-- 요청사항 등록 -->	
@@ -249,7 +239,7 @@
 	</delete>
 	
 	<!-- 요청사항 이력 등록 -->	
-	<insert id="insertReqHis" parameterType="com.iwi.iwms.api.req.domain.ReqHis">
+	<insert id="insertReqHis" parameterType="com.iwi.iwms.api.req.domain.His">
 		INSERT INTO TB_REQ_HIS
 		(
 		    REQ_SEQ
@@ -258,8 +248,8 @@
 			, REG_SEQ
 		) VALUES (
 			#{reqSeq}
-			, #{reqStatCd}
-			, #{reqStatCmt}
+			, #{statCd}
+			, #{statCmt}
 			, #{loginUserSeq}
 		)		
 	</insert>

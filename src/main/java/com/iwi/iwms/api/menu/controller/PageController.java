@@ -163,15 +163,17 @@ public class PageController {
     		, @RequestParam(value = "rSeq", required = true) long reqSeq
     		, @RequestParam(value = "dSeq", required = false) Long reqDtlSeq) {
     	
-    	Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
-		map.put("reqSeq", reqSeq);
-		if(reqDtlSeq != null) {
-			map.put("reqDtlSeq", reqDtlSeq);
+    	ReqDtlInfo reqDtlInfo = null;
+    	
+		if(reqDtlSeq == null) {
+			reqDtlInfo = reqDtlService.getReqDtlByReqSeq(reqSeq, loginUserInfo.getUserSeq());
+		} else {
+			reqDtlInfo = reqDtlService.getReqDtlBySeq(reqSeq, reqDtlSeq, loginUserInfo.getUserSeq());
 		}
-    	ReqDtlInfo reqDtl = reqDtlService.getReqDtlByReqAndDtlSeq(map);
+    	
     	
 		return ResponseEntity.ok(Response.<ReqDtlInfo>builder()
-				.data(reqDtl)
+				.data(reqDtlInfo)
 				.loginUserInfo(loginUserInfo)
 				.build());
     }

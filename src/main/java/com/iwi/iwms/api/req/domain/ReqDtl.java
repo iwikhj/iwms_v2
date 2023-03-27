@@ -18,14 +18,14 @@ import lombok.ToString;
 @AllArgsConstructor
 public class ReqDtl {
 
+	@Schema(hidden = true, description = "요청사항 SEQ")
+	private Long reqSeq;
+	
 	@Schema(hidden = true, description = "요청사항 상세 SEQ")
 	private Long reqDtlSeq;
 
-	@Schema(hidden = true, description = "요청사항 SEQ")
-	private long reqSeq;
-	
 	@Schema(hidden = true, description = "요청사항 상세 상태 코드: [11:접수, 12:처리중, 13:처리완료, 14:검수완료, 15:취소]", allowableValues = {"11", "12", "13", "14", "15"}) 
-	private String reqDtlStatCd;
+	private String statCd;
 	
 	@Schema(description = "담당자 SEQ") 
 	private List<Long> reqDtlUserSeqs;

@@ -18,8 +18,8 @@ import com.iwi.iwms.api.req.domain.Cmt;
 import com.iwi.iwms.api.req.domain.CmtInfo;
 import com.iwi.iwms.api.req.domain.ReqDtlInfo;
 import com.iwi.iwms.api.req.mapper.ReqDtlCmtMapper;
-import com.iwi.iwms.api.req.mapper.ReqDtlMapper;
 import com.iwi.iwms.api.req.service.ReqDtlCmtService;
+import com.iwi.iwms.api.req.service.ReqDtlService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +31,9 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 	
 	private static final String UPLOAD_PATH_PREFIX = "request/";
 	
-	private final ReqDtlMapper reqDtlMapper;
-	
 	private final ReqDtlCmtMapper reqDtlCmtMapper;
+	
+	private final ReqDtlService reqDtlService;
 
 	private final FileService fileService;
 
@@ -44,18 +44,13 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 		map.put("loginUserSeq", loginUserSeq);
 		
 		return Optional.ofNullable(reqDtlCmtMapper.getReqDtlCmtBySeq(map))
-					.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "요청사항 상세 코멘트를 찾을 수 없습니다."));				
+					.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "작업 코멘트를 찾을 수 없습니다."));				
 	}
 	
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public CmtInfo insertReqDtlCmt(Cmt cmt) {
-		Map<String, Object> map = new HashMap<>();
-		map.put("reqDtlSeq", cmt.getReqDtlSeq());
-		map.put("loginUserSeq", cmt.getLoginUserSeq());
-		
-		ReqDtlInfo reqDtlInfo = Optional.ofNullable(reqDtlMapper.getReqDtlBySeq(map))
-			.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "요청사항 상세를 찾을 수 없습니다."));				
+		ReqDtlInfo reqDtlInfo = reqDtlService.getReqDtlBySeq(cmt.getReqSeq(), cmt.getReqDtlSeq(), cmt.getLoginUserSeq());
 
 		reqDtlCmtMapper.insertReqDtlCmt(cmt);
 		

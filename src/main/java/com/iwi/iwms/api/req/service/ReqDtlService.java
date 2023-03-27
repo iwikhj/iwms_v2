@@ -1,16 +1,13 @@
 package com.iwi.iwms.api.req.service;
 
-import java.util.Map;
-
 import com.iwi.iwms.api.req.domain.ReqDtl;
 import com.iwi.iwms.api.req.domain.ReqDtlInfo;
 
-
 public interface ReqDtlService {
 
-	ReqDtlInfo getReqDtlByReqAndDtlSeq(Map<String, Object> map);
+	ReqDtlInfo getReqDtlByReqSeq(long reqSeq, long loginUserSeq);
 	
-	ReqDtlInfo getReqDtlBySeq(long reqSeq, long loginUserSeq);
+	ReqDtlInfo getReqDtlBySeq(long reqSeq, long reqDtlSeq, long loginUserSeq);
 
 	void insertReqDtl(ReqDtl reqDtl);
 	
@@ -18,11 +15,5 @@ public interface ReqDtlService {
 	
 	int deleteReqDtl(ReqDtl reqDtl);
 	
-	int updateReqDtlStatByInProgress(ReqDtl reqDtl);
-	
-	int updateReqDtlStatByProcessed(ReqDtl reqDtl);
-	
-	int updateReqDtlStatByInspectionCompleted(ReqDtl reqDtl);
-	
-	int updateReqDtlStatByCancel(ReqDtl reqDtl);
+	void updateReqDtlStat(ReqDtl reqDtl);
 }

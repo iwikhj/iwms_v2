@@ -17,8 +17,8 @@ import com.iwi.iwms.api.file.service.FileService;
 import com.iwi.iwms.api.req.domain.Cmt;
 import com.iwi.iwms.api.req.domain.CmtInfo;
 import com.iwi.iwms.api.req.mapper.ReqCmtMapper;
-import com.iwi.iwms.api.req.mapper.ReqMapper;
 import com.iwi.iwms.api.req.service.ReqCmtService;
+import com.iwi.iwms.api.req.service.ReqService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,9 +30,9 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 
 	private static final String UPLOAD_PATH_PREFIX = "request/";
 
-	private final ReqMapper reqMapper;
-
 	private final ReqCmtMapper reqCmtMapper;
+	
+	private final ReqService reqService;
 	
 	private final FileService fileService;
 
@@ -49,13 +49,8 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public CmtInfo insertReqCmt(Cmt cmt) {
-		Map<String, Object> map = new HashMap<>();
-		map.put("reqSeq", cmt.getReqSeq());
-		map.put("loginUserSeq", cmt.getLoginUserSeq());
+		reqService.getReqBySeq(cmt.getReqSeq(), cmt.getLoginUserSeq());
 		
-		Optional.ofNullable(reqMapper.getReqBySeq(map))
-			.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "요청사항을 찾을 수 없습니다."));				
-	
 		reqCmtMapper.insertReqCmt(cmt);
 		
 		// 첨부파일 저장

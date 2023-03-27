@@ -18,15 +18,13 @@
 			, FN_GET_CODE_NM('REQ_TYPE_CD', REQ.REQ_TYPE_CD) AS reqType
 			, REQ.REQ_GB_CD AS reqGbCd
 			, FN_GET_CODE_NM('REQ_GB_CD', REQ.REQ_GB_CD) AS reqGb
-			, RHIS.REQ_HIS_SEQ AS reqHisSeq
-            , RHIS.REQ_STAT_CD AS reqStatCd
-			, FN_GET_CODE_NM('REQ_STAT_CD', RHIS.REQ_STAT_CD) AS reqStat 
+			, CASE WHEN DHIS.REQ_DTL_SEQ IS NULL THEN HIS.REQ_HIS_SEQ ELSE DHIS.REQ_DTL_HIS_SEQ END AS hisSeq
+			, CASE WHEN DHIS.REQ_DTL_SEQ IS NULL THEN HIS.REQ_STAT_CD ELSE DHIS.REQ_DTL_STAT_CD END AS statCd
+			, CASE WHEN DHIS.REQ_DTL_SEQ IS NULL THEN FN_GET_CODE_NM('REQ_STAT_CD', HIS.REQ_STAT_CD) ELSE FN_GET_CODE_NM('REQ_DTL_STAT_CD', DHIS.REQ_DTL_STAT_CD) END AS stat 
+			, CASE WHEN DHIS.REQ_DTL_SEQ IS NULL THEN HIS.REQ_STAT_CMT ELSE DHIS.REQ_DTL_STAT_CMT END AS statCmt
 			, FN_GET_USER_NM(DTL.REQ_DTL_USER_SEQ) AS reqDtlUser
 			, DTL.BUSI_ROLL_CD AS busiRollCd
 			, FN_GET_CODE_NM('BUSI_ROLL_CD', DTL.BUSI_ROLL_CD) AS busiRoll 
-			, DHIS.REQ_DTL_HIS_SEQ AS reqDtlHisSeq
-            , DHIS.REQ_DTL_STAT_CD AS reqDtlStatCd
-			, FN_GET_CODE_NM('REQ_DTL_STAT_CD', DHIS.REQ_DTL_STAT_CD) AS reqDtlStat 
 			, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = REQ.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn
 			, DTL.USE_YN AS useYn
 			, DATE_FORMAT(DTL.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
@@ -36,8 +34,8 @@
 			, LOGIN.USER_SEQ AS loginUserSeq
 		FROM TB_REQ REQ
 		INNER JOIN TB_SITE SITE ON REQ.SITE_SEQ = SITE.SITE_SEQ
-		INNER JOIN TB_REQ_HIS RHIS ON REQ.REQ_SEQ = RHIS.REQ_SEQ
-			AND RHIS.REQ_HIS_SEQ = (SELECT MAX(REQ_HIS_SEQ) FROM TB_REQ_HIS WHERE REQ_SEQ = REQ.REQ_SEQ)	
+		INNER JOIN TB_REQ_HIS HIS ON REQ.REQ_SEQ = HIS.REQ_SEQ
+			AND HIS.REQ_HIS_SEQ = (SELECT MAX(REQ_HIS_SEQ) FROM TB_REQ_HIS WHERE REQ_SEQ = REQ.REQ_SEQ)	
 		LEFT JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ		
 		LEFT JOIN TB_REQ_DTL_HIS DHIS ON DTL.REQ_DTL_SEQ = DHIS.REQ_DTL_SEQ
 			AND DHIS.REQ_DTL_HIS_SEQ = (SELECT MAX(REQ_DTL_HIS_SEQ) FROM TB_REQ_DTL_HIS WHERE REQ_DTL_SEQ = DTL.REQ_DTL_SEQ)		
@@ -51,26 +49,34 @@
 	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=reqSeq" 
 			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>		
 	   	<collection property="histories" column="reqSeq=reqSeq,reqDtlSeq=reqDtlSeq,loginUserSeq=loginUserSeq" 
-			ofType="com.iwi.iwms.api.req.domain.ReqDtlHisInfo" select="listHisByReqAndDtlSeq"/>
+			ofType="com.iwi.iwms.api.req.domain.HisInfo" select="listHisBySeq"/>
 	   	<collection property="comments" column="reqSeq=reqSeq,reqDtlSeq=reqDtlSeq,loginUserSeq=loginUserSeq" 
-			ofType="com.iwi.iwms.api.req.domain.CmtInfo" select="listCmtByReqAndDtlSeq"/>	
+			ofType="com.iwi.iwms.api.req.domain.CmtInfo" select="listCmtBySeq"/>	
 	</resultMap>
+	
+	<!-- 요청사항 상세 수 -->		
+	<select id="countReqDtlByReqSeq" parameterType="hashMap"
+		resultType="int">
+		SELECT 
+			COUNT(*)
+		FROM TB_REQ_DTL DTL	
+		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
+		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE DTL.USE_YN = 'Y'END)
+		AND DTL.REQ_SEQ = #{reqSeq}
+	</select>		
 
-	<!-- 요청사항 상세 단일 조회 -->		
-	<select id="getReqDtlByReqAndDtlSeq" parameterType="hashMap"
+	<!-- 요청사항 상세 조회 -->		
+	<select id="getReqDtlByReqSeq" parameterType="hashMap"
 		resultMap="resultReqDtlMap">
 		<include refid="selectReqDtl"></include>
 			AND REQ.REQ_SEQ = #{reqSeq}
-		<if test='reqDtlSeq != null and reqDtlSeq != ""'>
-			AND DTL.REQ_DTL_SEQ = #{reqDtlSeq}
-		</if>			
-		LIMIT 1
 	</select>	
 	
-	<!-- 요청사항 상세 단일 조회 -->		
+	<!-- 요청사항 상세 조회 -->		
 	<select id="getReqDtlBySeq" parameterType="hashMap"
 		resultMap="resultReqDtlMap">
 		<include refid="selectReqDtl"></include>
+			AND REQ.REQ_SEQ = #{reqSeq}
 			AND DTL.REQ_DTL_SEQ = #{reqDtlSeq}		
 	</select>	
 
@@ -100,7 +106,7 @@
 			, #{reqSeq}
 			, #{reqDtlUserSeq}
 			, (SELECT BUSI_ROLL_CD FROM TB_USER WHERE USER_SEQ = #{reqDtlUserSeq})
-			, #{reqDtlStatCd}
+			, #{statCd}
 			, #{tgtMm}
 			, #{useYn}
 			, #{loginUserSeq}
@@ -108,10 +114,10 @@
 	</insert>	
 	
 	<!-- 처리중: 담당자 확인 -->	
-	<update id="updateReqDtlStatByInProgress" parameterType="com.iwi.iwms.api.req.domain.ReqDtl">
+	<update id="updateReqDtlStatInProgress" parameterType="com.iwi.iwms.api.req.domain.ReqDtl">
 		UPDATE TB_REQ_DTL 
 		SET
-			REQ_DTL_STAT_CD = #{reqDtlStatCd}
+			REQ_DTL_STAT_CD = #{statCd}
 			, REQ_DTL_STD_YMD = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
 			, MNG_OK_YMD = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
 			, MNG_OK_USER_SEQ = #{loginUserSeq}
@@ -120,11 +126,11 @@
 		WHERE REQ_DTL_SEQ = #{reqDtlSeq}	
 	</update>		
 
-	<!-- 처리완료: 처리 일시 업데이트 -->	
-	<update id="updateReqDtlStatByProcessed" parameterType="com.iwi.iwms.api.req.domain.ReqDtl">
+	<!-- 처리완료: 처리 시간 업데이트 -->	
+	<update id="updateReqDtlStatProcessed" parameterType="com.iwi.iwms.api.req.domain.ReqDtl">
 		UPDATE TB_REQ_DTL 
 		SET
-			REQ_DTL_STAT_CD = #{reqDtlStatCd}
+			REQ_DTL_STAT_CD = #{statCd}
 			, PROC_YMD = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
 			, PROC_HH = #{procHh}
 			, UPT_DT = CURRENT_TIMESTAMP
@@ -133,10 +139,10 @@
 	</update>	
 
 	<!-- 검수완료: 고객사 확인 + 고객사 평가 업데이트 -->	
-	<update id="updateReqDtlStatByInspectionCompleted" parameterType="com.iwi.iwms.api.req.domain.ReqDtl">
+	<update id="updateReqDtlStatInspectionCompleted" parameterType="com.iwi.iwms.api.req.domain.ReqDtl">
 		UPDATE TB_REQ_DTL 
 		SET
-			REQ_DTL_STAT_CD = #{reqDtlStatCd}
+			REQ_DTL_STAT_CD = #{statCd}
 			, REQ_DTL_END_YMD = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
 			, CUS_OK_YMD = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
 			, CUS_OK_USER_SEQ = #{loginUserSeq}
@@ -148,10 +154,10 @@
 	</update>	
 	
 	<!-- 취소: 취소 -->	
-	<update id="updateReqDtlStatByCancel" parameterType="com.iwi.iwms.api.req.domain.ReqDtl">
+	<update id="updateReqDtlStatCancel" parameterType="com.iwi.iwms.api.req.domain.ReqDtl">
 		UPDATE TB_REQ_DTL 
 		SET
-			REQ_DTL_STAT_CD = #{reqDtlStatCd}
+			REQ_DTL_STAT_CD = #{statCd}
 			, CANCEL_YMD = DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
 			, CANCEL_USER_SEQ = #{loginUserSeq}
 			, UPT_DT = CURRENT_TIMESTAMP
@@ -178,7 +184,7 @@
 	</delete>
 	
 	<!-- 요청사항 상세 이력 등록 -->	
-	<insert id="insertReqDtlHis" parameterType="com.iwi.iwms.api.req.domain.ReqDtlHis">
+	<insert id="insertReqDtlHis" parameterType="com.iwi.iwms.api.req.domain.His">
 		INSERT INTO TB_REQ_DTL_HIS
 		(
 		    REQ_DTL_SEQ
@@ -187,25 +193,25 @@
 			, REG_SEQ
 		) VALUES (
 			#{reqDtlSeq}
-			, #{reqDtlStatCd}
-			, #{reqDtlStatCmt}
+			, #{statCd}
+			, #{statCmt}
 			, #{loginUserSeq}
 		)		
 	</insert>
 	
 
 	<!-- 요청사항 상세 이력 조회 -->	
-	<select id="listHisByReqAndDtlSeq" parameterType="hashMap"
-		resultType="com.iwi.iwms.api.req.domain.ReqDtlHisInfo">
+	<select id="listHisBySeq" parameterType="hashMap"
+		resultType="com.iwi.iwms.api.req.domain.HisInfo">
 		SELECT
 			*
 		FROM (
 			SELECT
 				REQ.REQ_SEQ AS reqSeq
 				, null AS reqDtlSeq
-				, HIS.REQ_STAT_CD AS reqDtlStatCd
-				, FN_GET_CODE_NM('REQ_STAT_CD', HIS.REQ_STAT_CD) AS reqDtlStat			
-				, HIS.REQ_STAT_CMT AS reqDtlStatCmt
+				, HIS.REQ_STAT_CD AS statCd
+				, FN_GET_CODE_NM('REQ_STAT_CD', HIS.REQ_STAT_CD) AS stat			
+				, HIS.REQ_STAT_CMT AS statCmt
 				, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = HIS.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn
 				, DATE_FORMAT(HIS.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 				, FN_GET_USER_NM(HIS.REG_SEQ) AS regNm
@@ -217,9 +223,9 @@
 			SELECT
 				REQ.REQ_SEQ AS reqSeq
 				, DTL.REQ_DTL_SEQ AS reqDtlSeq
-				, HIS.REQ_DTL_STAT_CD AS reqDtlStatCd
-				, FN_GET_CODE_NM('REQ_DTL_STAT_CD', HIS.REQ_DTL_STAT_CD) AS reqDtlStat
-				, HIS.REQ_DTL_STAT_CMT AS reqDtlStatCmt
+				, HIS.REQ_DTL_STAT_CD AS statCd
+				, FN_GET_CODE_NM('REQ_DTL_STAT_CD', HIS.REQ_DTL_STAT_CD) AS stat
+				, HIS.REQ_DTL_STAT_CMT AS statCmt
 				, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = HIS.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn
 				, DATE_FORMAT(HIS.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 				, FN_GET_USER_NM(HIS.REG_SEQ) AS regNm
@@ -228,7 +234,7 @@
 			INNER JOIN TB_REQ_DTL_HIS HIS ON DTL.REQ_DTL_SEQ = HIS.REQ_DTL_SEQ
 			LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 			WHERE DTL.REQ_DTL_SEQ = #{reqDtlSeq}
-		) STAT
+		) HIS
         ORDER BY regDt
 	</select>		
 
@@ -239,7 +245,7 @@
 	</resultMap>
 		
 	<!-- 요청사항 상세 코멘트 조회 -->	
-	<select id="listCmtByReqAndDtlSeq" parameterType="hashMap"
+	<select id="listCmtBySeq" parameterType="hashMap"
 		resultMap="resultReqAndDtlCmtMap">
 		SELECT
 			*
@@ -286,7 +292,7 @@
 			LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}	
 			WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE CMT.USE_YN = 'Y' END)	
 				AND DTL.REQ_DTL_SEQ = #{reqDtlSeq}
-		) STAT
+		) CMT
         ORDER BY regDt
 	</select>		
 </mapper>

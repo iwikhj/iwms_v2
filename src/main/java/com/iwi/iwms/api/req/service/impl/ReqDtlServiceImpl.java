@@ -14,15 +14,15 @@ import org.springframework.util.CollectionUtils;
 import com.iwi.iwms.api.common.errors.CommonException;
 import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.file.service.FileService;
+import com.iwi.iwms.api.req.domain.His;
 import com.iwi.iwms.api.req.domain.ReqDtl;
-import com.iwi.iwms.api.req.domain.ReqDtlHis;
 import com.iwi.iwms.api.req.domain.ReqDtlInfo;
 import com.iwi.iwms.api.req.domain.ReqInfo;
 import com.iwi.iwms.api.req.enums.ReqDtlStatCode;
 import com.iwi.iwms.api.req.enums.ReqStatCode;
 import com.iwi.iwms.api.req.mapper.ReqDtlMapper;
-import com.iwi.iwms.api.req.mapper.ReqMapper;
 import com.iwi.iwms.api.req.service.ReqDtlService;
+import com.iwi.iwms.api.req.service.ReqService;
 import com.iwi.iwms.api.user.domain.UserSiteInfo;
 import com.iwi.iwms.api.user.service.UserService;
 
@@ -36,25 +36,32 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 	
 	private static final String UPLOAD_PATH_PREFIX = "request/";
 
-	private final ReqMapper reqMapper;
-	
 	private final ReqDtlMapper reqDtlMapper;
+	
+	private final ReqService reqService;
 
 	private final FileService fileService;
 	
 	private final UserService userService;
 	
 	@Override
-	public ReqDtlInfo getReqDtlByReqAndDtlSeq(Map<String, Object> map) {
-		Optional.ofNullable(reqMapper.getReqBySeq(map))
-				.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "요청사항을 찾을 수 없습니다."));	
+	public ReqDtlInfo getReqDtlByReqSeq(long reqSeq, long loginUserSeq) {
+		Map<String, Object> map = new HashMap<>();
+		map.put("reqSeq", reqSeq);
+		map.put("loginUserSeq", loginUserSeq);
 		
-		return reqDtlMapper.getReqDtlByReqAndDtlSeq(map);
+		if(reqDtlMapper.countReqDtlByReqSeq(map) > 0) {
+			throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "이미 담당자가 배정된 요청사항입니다. 작업을 지정해서 요청해주세요.");
+		}
+		
+		return Optional.ofNullable(reqDtlMapper.getReqDtlByReqSeq(map))
+				.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "요청사항 상세를 찾을 수 없습니다."));		
 	}
 	
 	@Override
-	public ReqDtlInfo getReqDtlBySeq(long reqDtlSeq, long loginUserSeq) {
+	public ReqDtlInfo getReqDtlBySeq(long reqSeq, long reqDtlSeq, long loginUserSeq) {
 		Map<String, Object> map = new HashMap<>();
+		map.put("reqSeq", reqSeq);
 		map.put("reqDtlSeq", reqDtlSeq);
 		map.put("loginUserSeq", loginUserSeq);
 		
@@ -65,17 +72,12 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public void insertReqDtl(ReqDtl reqDtl) {
-		Map<String, Object> map = new HashMap<>();
-		map.put("reqSeq", reqDtl.getReqSeq());
-		map.put("loginUserSeq", reqDtl.getLoginUserSeq());
+		ReqInfo reqInfo = reqService.getReqBySeq(reqDtl.getReqSeq(), reqDtl.getLoginUserSeq());
 		
-		ReqInfo reqInfo = Optional.ofNullable(reqMapper.getReqBySeq(map))
-			.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "요청사항을 찾을 수 없습니다."));				
+		ReqStatCode reqStatus = ReqStatCode.findByCode(reqInfo.getStatCd());
 		
-		ReqStatCode status = ReqStatCode.findByCode(reqInfo.getReqStatCd());
-		
-		if(status != ReqStatCode.AGREE) {
-        	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + status.getMessage() + "중 입니다. " + ReqStatCode.AGREE.getMessage() + " 상태에서만 담당자 배정을 진행할 수 있습니다.");
+		if(reqStatus != ReqStatCode.AGREE) {
+        	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + reqStatus.getMessage() + "중 입니다. " + ReqStatCode.AGREE.getMessage() + " 상태에서만 담당자 배정을 진행할 수 있습니다.");
 		}
 		
 		if(CollectionUtils.isEmpty(reqDtl.getReqDtlUserSeqs())) {
@@ -88,7 +90,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
         	throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "작업 공수는 필수 입력 사항입니다.");
 		} 
 		
-		ReqDtlStatCode dtlStatus = ReqDtlStatCode.RECEIPT;	//RECEIPT
+		ReqDtlStatCode status = ReqDtlStatCode.RECEIPT;	//RECEIPT
 		
 		for(int i = 0; i < reqDtl.getReqDtlUserSeqs().size(); i++) {
 			long reqDtlUserSeq = reqDtl.getReqDtlUserSeqs().get(i);
@@ -101,24 +103,24 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 					
 			reqDtl.setReqDtlUserSeq(reqDtlUserSeq);
 			reqDtl.setTgtMm(tgtMm);
-			reqDtl.setReqDtlStatCd(dtlStatus.getCode());
+			reqDtl.setStatCd(status.getCode());
 			reqDtlMapper.insertReqDtl(reqDtl);
 			
-			ReqDtlHis reqDtlHis = ReqDtlHis.builder()
+			His his = His.builder()
 					.reqDtlSeq(reqDtl.getReqDtlSeq())
-					.reqDtlStatCd(dtlStatus.getCode())
-					.reqDtlStatCmt(dtlStatus.getMessage())
+					.statCd(status.getCode())
+					.statCmt(status.getMessage())
 					.loginUserSeq(reqDtl.getLoginUserSeq())
 					.build();
 			
-			reqDtlMapper.insertReqDtlHis(reqDtlHis);
+			reqDtlMapper.insertReqDtlHis(his);
 		}
 	}
 
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int updateReqDtl(ReqDtl reqDtl) {
-		this.getReqDtlBySeq(reqDtl.getReqDtlSeq(), reqDtl.getLoginUserSeq());
+		this.getReqDtlBySeq(reqDtl.getReqSeq(), reqDtl.getReqDtlSeq(), reqDtl.getLoginUserSeq());
 		int result = reqDtlMapper.updateReqDtl(reqDtl);
 		
 		return result;		
@@ -128,7 +130,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public int deleteReqDtl(ReqDtl reqDtl) {
-		ReqDtlInfo reqDtlInfo = this.getReqDtlBySeq(reqDtl.getReqDtlSeq(), reqDtl.getLoginUserSeq());
+		ReqDtlInfo reqDtlInfo = this.getReqDtlBySeq(reqDtl.getReqSeq(), reqDtl.getReqDtlSeq(), reqDtl.getLoginUserSeq());
 		
 		int result = reqDtlMapper.deleteReqDtl(reqDtl);
 		
@@ -144,90 +146,50 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
-	public int updateReqDtlStatByInProgress(ReqDtl reqDtl) {
-		this.getReqDtlBySeq(reqDtl.getReqDtlSeq(), reqDtl.getLoginUserSeq());
+	public void updateReqDtlStat(ReqDtl reqDtl) {
+		ReqDtlInfo reqDtlInfo = this.getReqDtlBySeq(reqDtl.getReqSeq(), reqDtl.getReqDtlSeq(), reqDtl.getLoginUserSeq());
 		
-		ReqDtlStatCode status = ReqDtlStatCode.IN_PROGRESS;	//IN_PROGRESS
+		ReqDtlStatCode oldStat = ReqDtlStatCode.findByCode(reqDtlInfo.getStatCd());
+		ReqDtlStatCode newStat = ReqDtlStatCode.findByCode(reqDtl.getStatCd());
+		log.info("[작업 상태 변경] <{} -> {}>", oldStat.getMessage(), newStat.getMessage());
 		
-		reqDtl.setReqDtlStatCd(status.getCode());
-		reqDtlMapper.updateReqDtlStatByInProgress(reqDtl);
+		if(oldStat == newStat) {
+        	throw new CommonException(ErrorCode.DUPLICATE_ERROR, "이미 " + newStat.getMessage() + " 상태입니다.");
+		}
 		
-		ReqDtlHis reqDtlHis = ReqDtlHis.builder()
+		if(newStat == ReqDtlStatCode.IN_PROGRESS && oldStat != ReqDtlStatCode.RECEIPT) {
+        	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + oldStat.getMessage() + " 상태입니다. " + ReqDtlStatCode.RECEIPT.getMessage() + " 상태에서만 담당자 확인을 진행할 수 있습니다.");
+		}
+		if(newStat == ReqDtlStatCode.PROCESSED && oldStat != ReqDtlStatCode.IN_PROGRESS) {
+        	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + oldStat.getMessage() + " 상태입니다. " + ReqDtlStatCode.IN_PROGRESS.getMessage() + " 상태에서만 처리 완료를 진행할 수 있습니다.");
+		}
+		if(newStat == ReqDtlStatCode.INSPECTION_COMPLETED && oldStat != ReqDtlStatCode.PROCESSED) {
+        	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + oldStat.getMessage() + " 상태입니다. " + ReqDtlStatCode.PROCESSED.getMessage() + " 상태에서만 검수 완료를 진행할 수 있습니다.");
+		}
+		
+		int result = 0; 
+		if(newStat == ReqDtlStatCode.IN_PROGRESS) {
+			result = reqDtlMapper.updateReqDtlStatInProgress(reqDtl);
+		} else if(newStat == ReqDtlStatCode.PROCESSED) {
+			result = reqDtlMapper.updateReqDtlStatProcessed(reqDtl);
+		} else if(newStat == ReqDtlStatCode.INSPECTION_COMPLETED) {
+			result = reqDtlMapper.updateReqDtlStatInspectionCompleted(reqDtl);
+		} else if(newStat == ReqDtlStatCode.CANCEL) {
+			result = reqDtlMapper.updateReqDtlStatCancel(reqDtl);
+		}
+		
+		if(result == 0) {
+        	throw new CommonException(ErrorCode.STATUS_ERROR, "작업 상태 변경에 실패했습니다.");
+		}
+		
+		His his = His.builder()
 				.reqDtlSeq(reqDtl.getReqDtlSeq())
-				.reqDtlStatCd(status.getCode())
-				.reqDtlStatCmt(status.getMessage())
+				.statCd(newStat.getCode())
+				.statCmt(newStat.getMessage())
 				.loginUserSeq(reqDtl.getLoginUserSeq())
 				.build();
 		
-		reqDtlMapper.insertReqDtlHis(reqDtlHis);
-		
-		return 1;
-	}
-
-	@Transactional(rollbackFor = {Exception.class})
-	@Override
-	public int updateReqDtlStatByProcessed(ReqDtl reqDtl) {
-		this.getReqDtlBySeq(reqDtl.getReqDtlSeq(), reqDtl.getLoginUserSeq());
-
-		ReqDtlStatCode status = ReqDtlStatCode.PROCESSED;	//PROCESSED
-		
-		reqDtl.setReqDtlStatCd(status.getCode());
-		reqDtlMapper.updateReqDtlStatByProcessed(reqDtl);
-		
-		ReqDtlHis reqDtlHis = ReqDtlHis.builder()
-				.reqDtlSeq(reqDtl.getReqDtlSeq())
-				.reqDtlStatCd(status.getCode())
-				.reqDtlStatCmt(status.getMessage())
-				.loginUserSeq(reqDtl.getLoginUserSeq())
-				.build();
-		
-		reqDtlMapper.insertReqDtlHis(reqDtlHis);
-		
-		return 1;
-	}
-	
-	@Transactional(rollbackFor = {Exception.class})
-	@Override
-	public int updateReqDtlStatByInspectionCompleted(ReqDtl reqDtl) {
-		this.getReqDtlBySeq(reqDtl.getReqDtlSeq(), reqDtl.getLoginUserSeq());
-
-		ReqDtlStatCode status = ReqDtlStatCode.INSPECTION_COMPLETED;	//INSPECTION_COMPLETED
-		
-		reqDtl.setReqDtlStatCd(status.getCode());
-		reqDtlMapper.updateReqDtlStatByInspectionCompleted(reqDtl);
-		
-		ReqDtlHis reqDtlHis = ReqDtlHis.builder()
-				.reqDtlSeq(reqDtl.getReqDtlSeq())
-				.reqDtlStatCd(status.getCode())
-				.reqDtlStatCmt(status.getMessage())
-				.loginUserSeq(reqDtl.getLoginUserSeq())
-				.build();
-		
-		reqDtlMapper.insertReqDtlHis(reqDtlHis);
-		
-		return 1;
-	}
-
-	@Transactional(rollbackFor = {Exception.class})
-	@Override
-	public int updateReqDtlStatByCancel(ReqDtl reqDtl) {
-		this.getReqDtlBySeq(reqDtl.getReqDtlSeq(), reqDtl.getLoginUserSeq());
-	
-		ReqDtlStatCode status = ReqDtlStatCode.CANCEL;	//CANCEL
-		
-		reqDtl.setReqDtlStatCd(status.getCode());
-		reqDtlMapper.updateReqDtlStatByCancel(reqDtl);
-		
-		ReqDtlHis reqDtlHis = ReqDtlHis.builder()
-				.reqDtlSeq(reqDtl.getReqDtlSeq())
-				.reqDtlStatCd(status.getCode())
-				.reqDtlStatCmt(status.getMessage())
-				.loginUserSeq(reqDtl.getLoginUserSeq())
-				.build();
-		
-		reqDtlMapper.insertReqDtlHis(reqDtlHis);
-		
-		return 1;
+		reqDtlMapper.insertReqDtlHis(his);
 	}
 
 }

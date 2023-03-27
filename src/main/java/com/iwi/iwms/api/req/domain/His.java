@@ -1,7 +1,5 @@
 package com.iwi.iwms.api.req.domain;
 
-import javax.validation.constraints.NotNull;
-
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -18,22 +16,27 @@ import lombok.ToString;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReqHis {
+public class His {
 
 	@Schema(hidden = true, description = "요청사항 SEQ")
-	private long reqSeq;
+	private Long reqSeq;
 	
-	@NotNull(message = "요청사항 상태 코드는 필수 입력 사항입니다")
-	@Schema(description = "요청사항 상태 코드: [01:요청, 02:합의, 03:협의요청, 04:반려, 05:취소]", allowableValues = {"01", "02", "03", "04", "05"}) 
-	private String reqStatCd;
+	@Schema(hidden = true, description = "요청사항 상세 SEQ")
+	private Long reqDtlSeq;
+	
+	@Schema(hidden = true, description = "이력 SEQ")
+	private Long hisSeq;
+	
+	@Schema(hidden = true, description = "상태 코드: [01:요청, 02:합의, 03:협의요청, 04:반려, 05:취소, 11:접수, 12:처리중, 13:처리완료, 14:검수완료, 15:담당자취소]", allowableValues = {"01", "02", "03", "04", "05", "11", "12", "13", "14", "15"}) 
+	private String statCd;
 	
 	@Schema(description = "요청사항 상태 코멘트") 
-	private String reqStatCmt;
+	private String statCmt;
 	
 	@Schema(hidden = true, description = "로그인 사용자 SEQ") 
 	private long loginUserSeq;
 	
-	public ReqHis of(final LoginUserInfo loginUserInfo) {
+	public His of(final LoginUserInfo loginUserInfo) {
 		this.loginUserSeq = loginUserInfo.getUserSeq();
 		return this;
 	}

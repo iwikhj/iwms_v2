@@ -3,8 +3,8 @@ package com.iwi.iwms.api.req.service;
 import java.util.List;
 import java.util.Map;
 
+import com.iwi.iwms.api.req.domain.His;
 import com.iwi.iwms.api.req.domain.Req;
-import com.iwi.iwms.api.req.domain.ReqHis;
 import com.iwi.iwms.api.req.domain.ReqInfo;
 
 public interface ReqService {
@@ -21,5 +21,5 @@ public interface ReqService {
 	
 	int deleteReq(Req req);
 	
-	void insertReqHis(ReqHis reqHis);
+	void updateReqStat(His his);
 }

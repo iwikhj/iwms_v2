@@ -69,17 +69,17 @@ public class ReqInfo {
 	@Schema(description = "작업 구분") 
 	private String busiRoll;
 	
-	@Schema(description = "요청사항 상태 코드") 
-	private String reqStatCd;
+	@Schema(description = "상태 코드") 
+	private String statCd;
 
-	@Schema(description = "요청사항 상태") 
-	private String reqStat;
+	@Schema(description = "상태") 
+	private String stat;
 	
-	@Schema(description = "요청사항 상태 코멘트") 
-	private String reqStatCmt;
+	@Schema(description = "상태 코멘트") 
+	private String statCmt;
 
-	@Schema(description = "요청 사항 최종 상태") 
-	private String finalReqStat;
+	@Schema(description = "최종 상태") 
+	private String finalStat;
 	
 	@Schema(description = "첨부된 파일 정보")
 	private List<UploadFileInfo> attachedFiles;	
