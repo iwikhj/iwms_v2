@@ -57,7 +57,7 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 		if(!CollectionUtils.isEmpty(cmt.getFiles())) {
 			UploadFile uploadFile = cmt.getFileInfo();
 			uploadFile.setFileRefSeq(cmt.getCmtSeq());
-			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + cmt.getReqSeq());
+			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + cmt.getReqSeq() + "/comment/" + cmt.getCmtSeq());
 			fileService.insertAttachFiles(cmt.getFiles(), uploadFile);
 		}
 		
@@ -80,7 +80,7 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 		// 첨부파일 저장
 		if(!CollectionUtils.isEmpty(cmt.getFiles())) {
 			UploadFile uploadFile = cmt.getFileInfo();
-			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + cmt.getReqSeq());
+			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + cmt.getReqSeq() + "/comment/" + cmt.getCmtSeq());
 			fileService.insertAttachFiles(cmt.getFiles(), uploadFile);
 		}
 		
@@ -96,7 +96,7 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 		
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(cmt.getFileInfo());
 		if(!CollectionUtils.isEmpty(attachedFiles)) {
-			fileService.deleteAttachFiles(attachedFiles, null);
+			fileService.deleteAttachAll(attachedFiles);
 		}
 		
 		return result;

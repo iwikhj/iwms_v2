@@ -16,7 +16,6 @@ import com.iwi.iwms.api.file.domain.UploadFileInfo;
 import com.iwi.iwms.api.file.service.FileService;
 import com.iwi.iwms.api.req.domain.Cmt;
 import com.iwi.iwms.api.req.domain.CmtInfo;
-import com.iwi.iwms.api.req.domain.ReqDtlInfo;
 import com.iwi.iwms.api.req.mapper.ReqDtlCmtMapper;
 import com.iwi.iwms.api.req.service.ReqDtlCmtService;
 import com.iwi.iwms.api.req.service.ReqDtlService;
@@ -50,7 +49,7 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public CmtInfo insertReqDtlCmt(Cmt cmt) {
-		ReqDtlInfo reqDtlInfo = reqDtlService.getReqDtlBySeq(cmt.getReqSeq(), cmt.getReqDtlSeq(), cmt.getLoginUserSeq());
+		reqDtlService.getReqDtlBySeq(cmt.getReqSeq(), cmt.getReqDtlSeq(), cmt.getLoginUserSeq());
 
 		reqDtlCmtMapper.insertReqDtlCmt(cmt);
 		
@@ -58,7 +57,7 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 		if(!CollectionUtils.isEmpty(cmt.getFiles())) {
 			UploadFile uploadFile = cmt.getFileInfo();
 			uploadFile.setFileRefSeq(cmt.getCmtSeq());
-			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + reqDtlInfo.getReqSeq() + "/" + cmt.getReqDtlSeq() + "/" + cmt.getCmtSeq());
+			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + cmt.getReqSeq() + "/task/" + cmt.getReqDtlSeq() + "/comment/" + cmt.getCmtSeq());
 			fileService.insertAttachFiles(cmt.getFiles(), uploadFile);
 		}
 		
@@ -81,7 +80,7 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 		// 첨부파일 저장
 		if(!CollectionUtils.isEmpty(cmt.getFiles())) {
 			UploadFile uploadFile = cmt.getFileInfo();
-			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + cmt.getReqSeq() + "/" + cmt.getReqDtlSeq() + "/" + cmt.getCmtSeq());
+			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + cmt.getReqSeq() + "/task/" + cmt.getReqDtlSeq() + "/comment/" + cmt.getCmtSeq());
 			fileService.insertAttachFiles(cmt.getFiles(), uploadFile);
 		}
 		

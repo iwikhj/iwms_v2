@@ -55,7 +55,7 @@
 		UPDATE TB_REQ_CMT 
 		SET
 			REQ_CMT = #{cmt}
-			, useYn = #{useYn}
+			, USE_YN = #{useYn}
 			, UPT_DT = CURRENT_TIMESTAMP
 			, UPT_SEQ = #{loginUserSeq}
 		WHERE REQ_CMT_SEQ = #{cmtSeq}	
