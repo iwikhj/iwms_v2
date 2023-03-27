@@ -55,7 +55,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 		}
 		
 		return Optional.ofNullable(reqDtlMapper.getReqDtlByReqSeq(map))
-				.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "요청사항 상세를 찾을 수 없습니다."));		
+				.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "요청사항을 찾을 수 없습니다."));		
 	}
 	
 	@Override
@@ -66,7 +66,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 		map.put("loginUserSeq", loginUserSeq);
 		
 		return Optional.ofNullable(reqDtlMapper.getReqDtlBySeq(map))
-				.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "요청사항 상세를 찾을 수 없습니다."));				
+				.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "작업을 찾을 수 없습니다."));				
 	}
 	
 	@Transactional(rollbackFor = {Exception.class})
