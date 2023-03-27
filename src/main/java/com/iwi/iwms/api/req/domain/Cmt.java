@@ -29,13 +29,13 @@ public class Cmt {
 	@Schema(hidden = true, description = "요청사항 상세 SEQ")
 	private Long reqDtlSeq;
 	
-	@Schema(hidden = true, description = "요청사항 코멘트 SEQ")
+	@Schema(hidden = true, description = "코멘트 SEQ")
 	private Long cmtSeq;
 
 	@Schema(description = "이력 SEQ")
 	private long hisSeq;
 
-	@Schema(description = "요청사항 코멘트") 
+	@Schema(description = "코멘트") 
 	private String cmt;
 	
 	@Schema(description = "첨부할 파일")
