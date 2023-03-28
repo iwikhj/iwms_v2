@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Mapper;
 
+import com.iwi.iwms.api.comp.domain.DeptInfo;
 import com.iwi.iwms.api.req.domain.His;
 import com.iwi.iwms.api.req.domain.Req;
 import com.iwi.iwms.api.req.domain.ReqInfo;
@@ -25,4 +26,6 @@ public interface ReqMapper {
 	int deleteReq(Req req);
 	
 	void insertReqHis(His is);
+	
+	List<DeptInfo> listDeptForTask(long projSeq);
 }

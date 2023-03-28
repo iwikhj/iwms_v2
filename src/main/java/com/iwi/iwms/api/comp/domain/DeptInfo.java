@@ -1,5 +1,9 @@
 package com.iwi.iwms.api.comp.domain;
 
+import java.util.List;
+
+import com.iwi.iwms.api.user.domain.UserInfo;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,4 +37,6 @@ public class DeptInfo {
 	@Schema(description = "사용 여부")
 	private String useYn;
 	
+	@Schema(description = "부서 인원")
+	private List<UserInfo> users;
 }

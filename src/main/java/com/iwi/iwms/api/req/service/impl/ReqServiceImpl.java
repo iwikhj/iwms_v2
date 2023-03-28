@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 
 import com.iwi.iwms.api.common.errors.CommonException;
 import com.iwi.iwms.api.common.errors.ErrorCode;
+import com.iwi.iwms.api.comp.domain.DeptInfo;
 import com.iwi.iwms.api.file.domain.UploadFile;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
 import com.iwi.iwms.api.file.service.FileService;
@@ -157,6 +158,11 @@ public class ReqServiceImpl implements ReqService {
 		}
 		
 		reqMapper.insertReqHis(his);
+	}
+
+	@Override
+	public List<DeptInfo> listDeptForTask(long projSeq) {
+		return reqMapper.listDeptForTask(projSeq);
 	}
 
 }

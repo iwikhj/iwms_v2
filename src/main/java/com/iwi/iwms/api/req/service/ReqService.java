@@ -3,6 +3,7 @@ package com.iwi.iwms.api.req.service;
 import java.util.List;
 import java.util.Map;
 
+import com.iwi.iwms.api.comp.domain.DeptInfo;
 import com.iwi.iwms.api.req.domain.His;
 import com.iwi.iwms.api.req.domain.Req;
 import com.iwi.iwms.api.req.domain.ReqInfo;
@@ -22,4 +23,6 @@ public interface ReqService {
 	int deleteReq(Req req);
 	
 	void updateReqStat(His his);
+	
+	List<DeptInfo> listDeptForTask(long projSeq);
 }

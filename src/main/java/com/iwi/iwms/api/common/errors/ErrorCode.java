@@ -47,8 +47,11 @@ public enum ErrorCode {
 	LOGIN_FAILED_RETRY_EXCEEDED
 	(HttpStatus.UNAUTHORIZED, "052", "로그인 실패. 로그인 재시도 허용 초과."),
 	
+	API_NOT_EXISTS
+	(HttpStatus.NOT_FOUND, "080", "존재하지 않는 API."),
+	
 	INTERNAL_SERVER_ERROR
-	(HttpStatus.INTERNAL_SERVER_ERROR, "090", "서버 시스템 오류."),
+	(HttpStatus.INTERNAL_SERVER_ERROR, "090", "내부 시스템 오류."),
 	
 	INTERNAL_SERIVCE_ERROR
 	(HttpStatus.SERVICE_UNAVAILABLE, "091", "내부 서비스 오류.")

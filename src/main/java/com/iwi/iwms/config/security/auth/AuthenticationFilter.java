@@ -106,11 +106,8 @@ public class AuthenticationFilter extends GenericFilterBean {
 				return AuthCode.EXPIRED;
 			}
 		} catch(BadJwtException e) {
-			//log.info("BadJwtException: {}", e.getMessage()); 
 		} catch(JwtException e) {
-			//log.info("JwtException: {}", e.getMessage());
-		} catch(Exception e) {
-		}
+		} catch(Exception e) {}
         
         return AuthCode.INVALID;
     }
@@ -180,12 +177,12 @@ public class AuthenticationFilter extends GenericFilterBean {
 	private void printLog(HttpServletRequest request, AuthCode authCode) {
 		try {
 			String bearerToken = StringUtils.hasText(request.getHeader(HttpHeaders.AUTHORIZATION)) ? request.getHeader(HttpHeaders.AUTHORIZATION) : "";
-			String remoteAddr = StringUtils.hasText(request.getRemoteAddr()) ? request.getRemoteAddr() : "-";
+			String remoteAddr = StringUtils.hasText(request.getRemoteAddr()) ? request.getRemoteAddr() : " ";
 			String url = StringUtils.hasText(request.getRequestURI()) ? request.getRequestURI().toString() : "";
-			String method = StringUtils.hasText(request.getMethod()) ? request.getMethod() : "-";
+			String method = StringUtils.hasText(request.getMethod()) ? request.getMethod() : " ";
 			String queryString = StringUtils.hasText(request.getQueryString()) ? request.getQueryString() : "";
-			String referer = StringUtils.hasText(request.getHeader("Referer")) ? request.getHeader("Referer") : "-";
-			String agent = StringUtils.hasText(request.getHeader("User-Agent")) ? request.getHeader("User-Agent") : "-";;
+			String referer = StringUtils.hasText(request.getHeader("Referer")) ? request.getHeader("Referer") : " ";
+			String agent = StringUtils.hasText(request.getHeader("User-Agent")) ? request.getHeader("User-Agent") : " ";;
 			String fullUrl = url + (StringUtils.hasText(queryString) ? ("?" + queryString) : "");
 			
 	        StringJoiner sj = new StringJoiner(">, <", "<", ">");

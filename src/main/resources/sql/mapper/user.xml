@@ -108,6 +108,7 @@
 			USER_SEQ AS userSeq
 			, USER_ID AS userId
 			, SSO_KEY AS ssoKey
+			, USER_EMAIL AS userEmail
 			, LOGIN_ERR_CNT AS loginErrCnt
 			, USE_YN AS useYn		
 		FROM TB_USER	

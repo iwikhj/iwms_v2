@@ -36,6 +36,9 @@ public class ReqInfo {
 	@Schema(description = "요청사항 제목") 
 	private String reqTitle;
 	
+	@Schema(description = "프로젝트 SEQ")
+	private long projSeq;
+	
 	@Schema(description = "사이트 SEQ")
 	private long siteSeq;
 	

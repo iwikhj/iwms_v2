@@ -1,9 +1,8 @@
 package com.iwi.iwms.api.common.errors;
 
-import javax.ws.rs.InternalServerErrorException;
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
-import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindException;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,22 +29,27 @@ public class ExceptionHandlers {
         return errorReturn(e.getCode(), e.getReason(), e);
     }
     
+	@ExceptionHandler(NoHandlerFoundException.class)
+	protected ResponseEntity<ErrorResponse> handleNoHandlerFoundException(NoHandlerFoundException e,
+			HttpServletRequest request) {
+    	return errorReturn(ErrorCode.API_NOT_EXISTS, e.getMessage(), e);
+	}
+    
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<?> handleMethodArgumentNotValidException(MethodArgumentNotValidException e){
     	String message = e.getBindingResult().getFieldErrors().stream()
 				    			.map(v -> v.getDefaultMessage())
-				    			.findFirst()
+				    			.findAny()
 				    			.get();
     	
     	return errorReturn(ErrorCode.PARAMETER_MALFORMED, message, e);
-
     }
     
     @ExceptionHandler(BindException.class)
     public ResponseEntity<?> handleBindException(BindException e){
     	String message = e.getBindingResult().getFieldErrors().stream()
 				    			.map(v -> v.getDefaultMessage())
-				    			.findFirst()
+				    			.findAny()
 				    			.get();
     	
     	return errorReturn(ErrorCode.PARAMETER_MALFORMED, message, e);
@@ -52,17 +57,7 @@ public class ExceptionHandlers {
     
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException e){
-        return errorReturn(ErrorCode.AUTHORIZATION_FAILED, null, e);
-    }
-    
-    @ExceptionHandler(InternalServerErrorException.class)
-    public ResponseEntity<?> handleInternalServerErrorException(InternalServerErrorException e){
-        return errorReturn(ErrorCode.INTERNAL_SERIVCE_ERROR, "Keycloak", e);
-    }
-    
-    @ExceptionHandler(RedisConnectionFailureException.class)
-    public ResponseEntity<?> handleRedisConnectionFailureException(RedisConnectionFailureException e){
-    	 return errorReturn(ErrorCode.INTERNAL_SERIVCE_ERROR, "Redis", e);
+        return errorReturn(ErrorCode.AUTHORIZATION_FAILED, e.getMessage(), e);
     }
     
     @ExceptionHandler({Exception.class})

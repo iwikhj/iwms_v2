@@ -69,7 +69,7 @@ public class PagePopupController {
 	
     @Operation(summary = "유지보수 - 유지보수 등록 및 수정 팝업", description = "유지보수 등록 및 수정 팝업")
     @GetMapping(value = "/maintain/request")
-    public ResponseEntity<ApiResponse<ReqInfo>> maintainRequestPopup(HttpServletRequest request
+    public ResponseEntity<ApiResponse<ReqInfo>> requestPopup(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
     		, @RequestParam(value = "seq", required = false) Long reqSeq) {
     	
@@ -95,11 +95,32 @@ public class PagePopupController {
 				.ref(ref)
 				.build());
     }
+    
+    @Operation(summary = "유지보수 - 유지보수 작업 담당자 배정 팝업", description = "작업 담당자 배정 팝업")
+    @GetMapping(value = "/maintain/task")
+    public ResponseEntity<ApiResponse<ReqInfo>> requestTaskPopup(HttpServletRequest request
+    		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
+    		, @RequestParam(value = "seq", required = true) long reqSeq) {
+    	
+    	ReqInfo reqInfo = reqService.getReqBySeq(reqSeq, loginUserInfo.getUserSeq());
+    	
+    	//참조 데이터
+    	Map<String, Object> ref = new HashMap<>();
+    	
+    	List<DeptInfo> deptList = reqService.listDeptForTask(reqInfo.getProjSeq());
+    	
+    	ref.put("deptList", deptList);
+
+		return ResponseEntity.ok(ApiResponse.<ReqInfo>builder()
+				.data(reqInfo)
+				.ref(ref)
+				.build());
+    }   
   
     
     @Operation(summary = "시스템관리 - 사용자 등록 및 수정 팝업", description = "사용자 등록 및 수정 팝업")
     @GetMapping(value = "/system/user")
-    public ResponseEntity<ApiResponse<UserInfo>> systemUserPopup(HttpServletRequest request
+    public ResponseEntity<ApiResponse<UserInfo>> userPopup(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
     		, @RequestParam(value = "seq", required = false) Long userSeq) {
     	
@@ -145,7 +166,7 @@ public class PagePopupController {
     
     @Operation(summary = "시스템관리 - 소속 등록 및 수정 팝업", description = "소속 등록 및 수정 팝업")
     @GetMapping(value = "/system/company")
-    public ResponseEntity<ApiResponse<CompInfo>> systemCompanyPopup(HttpServletRequest request
+    public ResponseEntity<ApiResponse<CompInfo>> companyPopup(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
     		, @RequestParam(value = "seq", required = false) Long compSeq) {
     	
@@ -171,7 +192,7 @@ public class PagePopupController {
     
     @Operation(summary = "시스템관리 - 프로젝트 등록 및 수정 팝업", description = "프로젝트 등록 및 수정 팝업")
     @GetMapping(value = "/system/project")
-    public ResponseEntity<ApiResponse<ProjInfo>> systemProjPopup(HttpServletRequest request
+    public ResponseEntity<ApiResponse<ProjInfo>> projPopup(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
     		, @RequestParam(value = "seq", required = false) Long projSeq) {
     	

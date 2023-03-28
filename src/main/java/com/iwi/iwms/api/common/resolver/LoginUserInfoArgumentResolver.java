@@ -65,7 +65,7 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
 		*/
 		
 		//return Optional.ofNullable(objectMapper.convertValue(redis.getHash(ssoKey, "user"), LoginUserInfo.class))
-		//			.orElseThrow(() -> new CommonException(ErrorCode.AUTHENTICATION_FAILED, "로그인 정보를 찾을 수 없습니다."));
+		//			.orElseThrow(() -> new CommonException(ErrorCode.AUTHORIZATION_FAILED, "로그인 정보를 찾을 수 없습니다."));
 
 		
 		return userService.getLoginUser(ssoKey);

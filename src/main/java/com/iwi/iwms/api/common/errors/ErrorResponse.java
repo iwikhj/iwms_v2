@@ -27,7 +27,7 @@ public class ErrorResponse {
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return "";
 	}
 	
 	@Builder
