@@ -47,8 +47,10 @@
 		<result property="reqSeq" column="reqSeq"/>
 		<result property="reqDtlSeq" column="reqDtlSeq"/>
 	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=reqSeq" 
-			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>		
-	   	<collection property="histories" column="reqSeq=reqSeq,reqDtlSeq=reqDtlSeq,loginUserSeq=loginUserSeq" 
+			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>	
+	   	<collection property="participants" column="reqSeq=reqSeq" 
+			ofType="com.iwi.iwms.api.req.domain.ParticipantInfo" select="listParticipantBySeq"/>			
+	   	<collection property="histories" column="reqSeq=reqSeq,reqDtlSeq=reqDtlSeq" 
 			ofType="com.iwi.iwms.api.req.domain.HisInfo" select="listHisBySeq"/>
 	   	<collection property="comments" column="reqSeq=reqSeq,reqDtlSeq=reqDtlSeq,loginUserSeq=loginUserSeq" 
 			ofType="com.iwi.iwms.api.req.domain.CmtInfo" select="listCmtBySeq"/>	
@@ -198,6 +200,34 @@
 			, #{loginUserSeq}
 		)		
 	</insert>
+	
+	<!-- 참여자 조회 -->	
+	<select id="listParticipantBySeq" parameterType="hashMap"
+		resultType="com.iwi.iwms.api.req.domain.ParticipantInfo">
+		SELECT 
+			USER.USER_SEQ AS userSeq
+            , USER.USER_NM AS userNm
+            , USER.USER_GB_CD AS userGbCd
+            , FN_GET_CODE_NM('USER_GB_CD', USER.USER_GB_CD)  AS userGb
+            , USER.POSI_NM AS posiNm
+            , USER.BUSI_ROLL_CD AS busiRollCd
+            , FN_GET_CODE_NM('BUSI_ROLL_CD', USER.BUSI_ROLL_CD)  AS busiRoll
+		FROM TB_USER USER
+		INNER JOIN (
+			SELECT 
+				REG_SEQ AS USER_SEQ
+            FROM TB_REQ_HIS
+            WHERE REQ_SEQ = #{reqSeq}
+            GROUP BY REG_SEQ        
+			UNION ALL    
+			SELECT 
+				REQ_DTL_USER_SEQ AS USER_SEQ
+            FROM TB_REQ_DTL
+            WHERE REQ_SEQ = #{reqSeq}         
+            GROUP BY REQ_DTL_USER_SEQ
+        ) PART ON USER.USER_SEQ = PART.USER_SEQ
+        ORDER BY FIELD(USER.USER_GB_CD, '00', '10', '11', '01')
+	</select>	
 
 	<!-- 요청사항 상세 이력 조회 -->	
 	<select id="listHisBySeq" parameterType="hashMap"
@@ -211,12 +241,10 @@
 				, HIS.REQ_STAT_CD AS statCd
 				, FN_GET_CODE_NM('REQ_STAT_CD', HIS.REQ_STAT_CD) AS stat			
 				, HIS.REQ_STAT_CMT AS statCmt
-				, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = HIS.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn
 				, DATE_FORMAT(HIS.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 				, FN_GET_USER_NM(HIS.REG_SEQ) AS regNm
 			FROM TB_REQ REQ
 			INNER JOIN TB_REQ_HIS HIS ON REQ.REQ_SEQ = HIS.REQ_SEQ
-			LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 			WHERE REQ.REQ_SEQ = #{reqSeq}
 			UNION ALL    
 			SELECT
@@ -225,14 +253,13 @@
 				, HIS.REQ_DTL_STAT_CD AS statCd
 				, FN_GET_CODE_NM('REQ_DTL_STAT_CD', HIS.REQ_DTL_STAT_CD) AS stat
 				, HIS.REQ_DTL_STAT_CMT AS statCmt
-				, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = HIS.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn
 				, DATE_FORMAT(HIS.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 				, FN_GET_USER_NM(HIS.REG_SEQ) AS regNm
 			FROM TB_REQ REQ
 			INNER JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ
 			INNER JOIN TB_REQ_DTL_HIS HIS ON DTL.REQ_DTL_SEQ = HIS.REQ_DTL_SEQ
-			LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
-			WHERE DTL.REQ_DTL_SEQ = #{reqDtlSeq}
+			WHERE REQ.REQ_SEQ = #{reqSeq}
+				AND DTL.REQ_DTL_SEQ = #{reqDtlSeq}
 		) HIS
         ORDER BY regDt
 	</select>		
@@ -267,8 +294,7 @@
 			INNER JOIN TB_REQ_HIS HIS ON CMT.REQ_SEQ = HIS.REQ_SEQ
 				AND CMT.REQ_HIS_SEQ = HIS.REQ_HIS_SEQ
 			LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}	
-			WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE CMT.USE_YN = 'Y' END)	
-				AND REQ.REQ_SEQ = #{reqSeq}
+			WHERE REQ.REQ_SEQ = #{reqSeq}
 			UNION ALL    
 			SELECT
 				REQ.REQ_SEQ AS reqSeq
@@ -289,8 +315,7 @@
 			INNER JOIN TB_REQ_DTL_HIS HIS ON CMT.REQ_DTL_SEQ = HIS.REQ_DTL_SEQ
 				AND CMT.REQ_DTL_HIS_SEQ = HIS.REQ_DTL_HIS_SEQ
 			LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}	
-			WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE CMT.USE_YN = 'Y' END)	
-				AND DTL.REQ_DTL_SEQ = #{reqDtlSeq}
+			WHERE REQ.REQ_SEQ = #{reqSeq}
 		) CMT
         ORDER BY regDt
 	</select>		
