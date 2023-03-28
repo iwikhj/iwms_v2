@@ -1,12 +1,11 @@
 package com.iwi.iwms.api.common.errors;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -31,9 +30,13 @@ public class ExceptionHandlers {
     }
     
 	@ExceptionHandler(NoHandlerFoundException.class)
-	protected ResponseEntity<ErrorResponse> handleNoHandlerFoundException(NoHandlerFoundException e,
-			HttpServletRequest request) {
+	protected ResponseEntity<ErrorResponse> handleNoHandlerFoundException(NoHandlerFoundException e) {
     	return errorReturn(ErrorCode.API_NOT_EXISTS, e.getMessage(), e);
+	}
+    
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+	protected ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
+    	return errorReturn(ErrorCode.METHOD_NOT_ALLOWED, e.getMessage(), e);
 	}
     
     @ExceptionHandler(MethodArgumentNotValidException.class)

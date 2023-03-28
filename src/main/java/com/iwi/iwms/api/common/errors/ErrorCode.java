@@ -50,6 +50,9 @@ public enum ErrorCode {
 	API_NOT_EXISTS
 	(HttpStatus.NOT_FOUND, "080", "존재하지 않는 API."),
 	
+	METHOD_NOT_ALLOWED
+	(HttpStatus.METHOD_NOT_ALLOWED, "081", "지원하지 않는 HTTP Method."),
+	
 	INTERNAL_SERVER_ERROR
 	(HttpStatus.INTERNAL_SERVER_ERROR, "090", "내부 시스템 오류."),
 	
