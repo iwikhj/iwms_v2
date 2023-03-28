@@ -74,18 +74,21 @@ public class LoginServiceImpl implements LoginService{
 			redis.setHash(key, "refreshToken", accessTokenResponse.getRefreshToken(), timeout);
 			
 			// 로그인한 사용자의 접속IP를 저장 및 LOGIN_ERR_CNT 초기화. 
-			userMapper.updateLoginSuccess(User.builder().loginIp(login.getLoginIp()).userSeq(userInfo.getUserSeq()).build());
+			userMapper.updateLoginSuccess(User.builder()
+					.loginIp(login.getLoginIp())
+					.userSeq(userInfo.getUserSeq())
+					.build());
 			
 			return accessTokenResponse;
 		}  catch(RedisConnectionFailureException e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
 		} catch(NotAuthorizedException e) {
-			userMapper.updateLoginFailure(User.builder().userId(userInfo.getUserId()).build());
+			userMapper.updateLoginFailure(User.builder()
+					.userId(userInfo.getUserId())
+					.build());
+			
 			throw new CommonException(ErrorCode.LOGIN_FAILED_INCORRECT_ID_PW);
-		} catch(Exception e) {
-			//e.printStackTrace();
-			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, e.getMessage());
-		} 
+		}
 	}
 	
 	@Override

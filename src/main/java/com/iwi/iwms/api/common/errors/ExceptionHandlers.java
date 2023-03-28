@@ -26,17 +26,17 @@ public class ExceptionHandlers {
     
     @ExceptionHandler(CommonException.class)
     protected ResponseEntity<?> handleCommonException(CommonException e) {
-        return errorReturn(e.getCode(), e.getReason(), e);
+        return responseError(e.getCode(), e.getReason(), e);
     }
     
 	@ExceptionHandler(NoHandlerFoundException.class)
 	protected ResponseEntity<ErrorResponse> handleNoHandlerFoundException(NoHandlerFoundException e) {
-    	return errorReturn(ErrorCode.API_NOT_EXISTS, e.getMessage(), e);
+    	return responseError(ErrorCode.API_NOT_EXISTS, e.getMessage(), e);
 	}
     
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
 	protected ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
-    	return errorReturn(ErrorCode.METHOD_NOT_ALLOWED, e.getMessage(), e);
+    	return responseError(ErrorCode.METHOD_NOT_ALLOWED, e.getMessage(), e);
 	}
     
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -46,7 +46,7 @@ public class ExceptionHandlers {
 				    			.findAny()
 				    			.get();
     	
-    	return errorReturn(ErrorCode.PARAMETER_MALFORMED, message, e);
+    	return responseError(ErrorCode.PARAMETER_MALFORMED, message, e);
     }
     
     @ExceptionHandler(BindException.class)
@@ -56,26 +56,26 @@ public class ExceptionHandlers {
 				    			.findAny()
 				    			.get();
     	
-    	return errorReturn(ErrorCode.PARAMETER_MALFORMED, message, e);
+    	return responseError(ErrorCode.PARAMETER_MALFORMED, message, e);
     }
     
     @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<?> handleAccessDeniedException(AuthenticationException e){
-        return errorReturn(ErrorCode.AUTHENTICATION_FAILED, e.getMessage(), e);
+        return responseError(ErrorCode.AUTHENTICATION_FAILED, e.getMessage(), e);
     }
     
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException e){
-        return errorReturn(ErrorCode.AUTHORIZATION_FAILED, e.getMessage(), e);
+        return responseError(ErrorCode.AUTHORIZATION_FAILED, e.getMessage(), e);
     }
     
     @ExceptionHandler({Exception.class})
     public ResponseEntity<?> handleException(Exception e) {
     	e.printStackTrace();
-    	return errorReturn(ErrorCode.INTERNAL_SERVER_ERROR, e.getMessage(), e);
+    	return responseError(ErrorCode.INTERNAL_SERVER_ERROR, e.getMessage(), e);
     }
     
-    private ResponseEntity<ErrorResponse> errorReturn(ErrorCode code, String message, Exception e) {
+    private ResponseEntity<ErrorResponse> responseError(ErrorCode code, String message, Exception e) {
     	ErrorResponse er = ErrorResponse.builder()
 	    		.code(code)
 	    		.message(message)
