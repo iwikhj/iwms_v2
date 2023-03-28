@@ -14,21 +14,16 @@ import org.springframework.stereotype.Component;
 import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.common.errors.ErrorResponse;
 
-import lombok.extern.slf4j.Slf4j;
-
 @Component
-@Slf4j
 public class AuthenticationEntryPointHandler implements AuthenticationEntryPoint {
 
     @Override
     public void commence(HttpServletRequest request,  HttpServletResponse response, AuthenticationException e) throws IOException, ServletException {
-      
-    	log.error("UnAuthorizaed!!! message : " + e.getMessage());
-    	
     	ErrorCode code = ErrorCode.AUTHENTICATION_FAILED;
     	
     	String er = ErrorResponse.builder()
 	    		.code(code)
+	    		.message(e.getMessage())
 	    		.build()
 	    		.toJson();
 		

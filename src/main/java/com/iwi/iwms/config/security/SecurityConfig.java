@@ -88,9 +88,8 @@ public class SecurityConfig {
         */
 		http
 		 	.authorizeRequests()
-		 	.antMatchers(root + "/system/**").hasRole("IWMS_ADMIN")
-		 	.antMatchers(HttpMethod.DELETE, root + "/notice/**").hasAnyRole("IWMS_ADMIN", "IWMS_PM");
-		
+		 	.antMatchers(HttpMethod.POST, root + "/auths/**").hasRole("IWMS_ADMIN")
+		 	.antMatchers(root + "/notices/**").hasAnyRole("IWMS_PM");
 	}
 	
 	@Bean

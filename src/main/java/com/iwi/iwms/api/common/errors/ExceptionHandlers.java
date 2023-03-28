@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.WebDataBinder;
@@ -53,6 +54,11 @@ public class ExceptionHandlers {
 				    			.get();
     	
     	return errorReturn(ErrorCode.PARAMETER_MALFORMED, message, e);
+    }
+    
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<?> handleAccessDeniedException(AuthenticationException e){
+        return errorReturn(ErrorCode.AUTHENTICATION_FAILED, e.getMessage(), e);
     }
     
     @ExceptionHandler(AccessDeniedException.class)

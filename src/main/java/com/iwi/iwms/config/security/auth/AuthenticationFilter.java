@@ -62,7 +62,7 @@ public class AuthenticationFilter extends GenericFilterBean {
      	String token = request.getHeader(HttpHeaders.AUTHORIZATION);
     	if(token == null) {
     		printLog(request, AuthCode.INVALID);
-    		errorReturn(response, ErrorCode.AUTHENTICATION_HEADER_NOT_EXISTS);
+    		responseError(response, ErrorCode.AUTHENTICATION_HEADER_NOT_EXISTS);
     		return;
     	}
         
@@ -74,11 +74,11 @@ public class AuthenticationFilter extends GenericFilterBean {
         if(AuthCode.VERIFIED.equals(tokenStatus)) {
         	//ok
         } else if(AuthCode.EXPIRED.equals(tokenStatus)) {
-    		errorReturn(response, ErrorCode.AUTHENTICATION_EXPIRED);
+    		responseError(response, ErrorCode.AUTHENTICATION_EXPIRED);
     		return;
     		
         } else if(AuthCode.INVALID.equals(tokenStatus)) {
-    		errorReturn(response, ErrorCode.AUTHENTICATION_HEADER_MALFORMED);
+    		responseError(response, ErrorCode.AUTHENTICATION_HEADER_MALFORMED);
     		return;
         }
         
@@ -198,18 +198,14 @@ public class AuthenticationFilter extends GenericFilterBean {
 		} catch(Exception e) {}
 	}
     
-    private void errorReturn(HttpServletResponse response, ErrorCode code) {
-    	try {
-        	String er = ErrorResponse.builder()
-    	    		.code(code)
-    	    		.build()
-    	    		.toJson();
-    		
-            response.setStatus(code.getStatus().value());
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.getWriter().write(er);
-    	} catch (IOException e) {
-    		//log.info("IOException: {}", e.getMessage());
-    	}
+    private void responseError(HttpServletResponse response, ErrorCode code) throws IOException {
+    	String er = ErrorResponse.builder()
+	    		.code(code)
+	    		.build()
+	    		.toJson();
+		
+        response.setStatus(code.getStatus().value());
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.getWriter().write(er);
     }
 }
