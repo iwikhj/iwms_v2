@@ -84,6 +84,9 @@ public class ReqDtlInfo {
 	@Schema(description = "첨부된 파일 정보")
 	private List<UploadFileInfo> attachedFiles;
 	
+	@Schema(description = "작업 목록") 
+	private List<TaskInfo> tasks;
+	
 	@Schema(description = "참여자 목록") 
 	private List<ParticipantInfo> participants;
 	
