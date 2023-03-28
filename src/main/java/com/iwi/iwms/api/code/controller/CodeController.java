@@ -1,7 +1,6 @@
 package com.iwi.iwms.api.code.controller;
 
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -24,7 +23,6 @@ import com.iwi.iwms.api.code.domain.CodeInfo;
 import com.iwi.iwms.api.code.service.CodeService;
 import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
-import com.iwi.iwms.utils.PredicateMap;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,14 +38,14 @@ public class CodeController {
 
 	private final CodeService codeService;
 	
-    @Operation(summary = "코드 목록 조회", description = "상위 코드별 하위 코드 목록 조회")
+    @Operation(summary = "코드 목록 조회", description = "코드 목록 조회")
     @GetMapping(value = "")
-    public ResponseEntity<ApiResponse<List<CodeInfo>>> listAllCode(HttpServletRequest request
+    public ResponseEntity<ApiResponse<List<CodeInfo>>> listCode(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
-    		, @RequestParam(value = "codeCd", required = true) String upCode) {
+    		, @RequestParam(value = "code", required = false) String code) {
     	
     	//Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
-    	List<CodeInfo> codeList = codeService.listCodeByUpCode(upCode);
+    	List<CodeInfo> codeList = codeService.listCodeByUpCode(code);
     	
 		return ResponseEntity.ok(ApiResponse.<List<CodeInfo>>builder()
 				.data(codeList)

@@ -24,9 +24,7 @@ import com.iwi.iwms.filestorage.FileStorageResponse;
 import com.iwi.iwms.filestorage.service.FileStorageService;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FileStorageServiceImpl implements FileStorageService {
@@ -39,15 +37,11 @@ public class FileStorageServiceImpl implements FileStorageService {
 	private Path rootPath;
 	
     @Value("${file.storage.root-path}")
-    private void setRootPath(String rootPath) {
+    private void setRootPath(String rootPath) throws IOException {
 		this.rootPath = Paths.get(rootPath).toAbsolutePath();
-        try {
-        	if (!Files.exists(this.rootPath)) {
-        		Files.createDirectories(this.rootPath);
-        	}
-        } catch (IOException e) {
-        	e.printStackTrace();
-        }
+		if (!Files.exists(this.rootPath)) {
+    		Files.createDirectories(this.rootPath);
+    	}
     }
 	
 	@Override
@@ -77,7 +71,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         		.build();
         	
         } catch (IOException e) {
-        	throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "File storage");
+        	throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "파일 스토리지 오류. " + e.getMessage());
         }
 	}
 	
@@ -94,7 +88,7 @@ public class FileStorageServiceImpl implements FileStorageService {
         	return Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
         	
         } catch (IOException e) {
-        	throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "File storage");
+        	throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "파일 스토리지 오류. " + e.getMessage());
         }
 	}
 	
@@ -122,13 +116,11 @@ public class FileStorageServiceImpl implements FileStorageService {
 	        if(resource.exists() || resource.isReadable()) {
 	            return resource;
 	        } else {
-            	throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "파일을 읽을 수 없습니다.");
+            	throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "파일 리소스가 존재하지 않거나 읽을 수 없습니다.");
 	        }
 		} catch (MalformedURLException e) {
-        	throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "File storage");
-
+        	throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "파일 스토리지 오류. " + e.getMessage());
 		}
-    	//return new InputStreamResource(getClass().getResourceAsStream(target.toString()));
 	}
 	
 	@Override
@@ -138,10 +130,10 @@ public class FileStorageServiceImpl implements FileStorageService {
 			try {
 				Files.delete(target);
 	        } catch (IOException e) {
-	        	throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "File storage");
+	        	throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "파일 스토리지 오류. " + e.getMessage());
 	        }		
     	} else {
-    		//throw new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "파일이 존재하지 않거나 확인할 수 없습니다.");
+    		//throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "파일이 존재하지 않거나 확인할 수 없습니다.");
     	}
 	}
 	
@@ -155,11 +147,10 @@ public class FileStorageServiceImpl implements FileStorageService {
 					.map(Path::toFile)
 					.forEach(File::delete);
 	        } catch (IOException e) {
-	        	throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "File storage");
-	        	
+	        	throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "파일 스토리지 오류. " + e.getMessage());
 	        }		
     	} else {
-    		//throw new CommonException(ErrorCode.TARGET_DATA_NOT_EXISTS, "디렉토리가 존재하지 않거나 확인할 수 없습니다.");
+    		//throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "디렉토리가 존재하지 않거나 확인할 수 없습니다.");
     	}
 	}
 }

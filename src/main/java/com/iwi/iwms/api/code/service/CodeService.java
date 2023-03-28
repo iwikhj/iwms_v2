@@ -7,7 +7,7 @@ import com.iwi.iwms.api.code.domain.CodeInfo;
 
 public interface CodeService {
 
-	List<CodeInfo> listCodeByUpCode(String codeCd);
+	List<CodeInfo> listCodeByUpCode(String code);
 	
 	void insertCode(Code code);
 	

@@ -18,8 +18,8 @@ public class CodeServiceImpl implements CodeService {
 	private final CodeMapper codeMapper;
 	
 	@Override
-	public List<CodeInfo> listCodeByUpCode(String codeCd) {
-		return codeMapper.listCodeByUpCode(codeCd);
+	public List<CodeInfo> listCodeByUpCode(String code) {
+		return codeMapper.listCodeByUpCode(code);
 	}
 	
 	@Override
