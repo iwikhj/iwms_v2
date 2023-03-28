@@ -29,9 +29,6 @@ public class HisInfo {
 	@Schema(description = "상태 코멘트") 
 	private String statCmt;
 	
-	@Schema(description = "작성자 여부") 
-	private String ownerYn;
-	
 	@Schema(description = "등록 일자") 
 	private String regDt;
 	
