@@ -12,9 +12,10 @@ public enum ReqStatCode {
 
 	REQUEST("01", "작업요청"),
 	AGREE("02", "합의"),
-	NEGO("03", "협의요청"),
-	REJECT("04", "반려"),
-	CANCEL("05", "취소")
+	NEGO_CHANGE("03", "협의요청(작업수정)"),
+	NEGO_ADD("04", "협의요청(요청추가)"),
+	REJECT("05", "반려"),
+	CANCEL("09", "취소")
 	;
 	
 	private String code;

@@ -141,13 +141,13 @@ public class ReqServiceImpl implements ReqService {
         	throw new CommonException(ErrorCode.DUPLICATE_ERROR, "이미 " + newStat.getMessage() + " 상태입니다.");
 		}
 		
-		if(newStat == ReqStatCode.REQUEST && oldStat != ReqStatCode.NEGO) {
-        	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + oldStat.getMessage() + "중 입니다. " + ReqStatCode.NEGO.getMessage() + " 상태에서만 재요청을 진행할 수 있습니다.");
+		if(newStat == ReqStatCode.REQUEST && (oldStat != ReqStatCode.NEGO_CHANGE || oldStat != ReqStatCode.NEGO_ADD)) {
+        	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + oldStat.getMessage() + "중 입니다. 협의요청 상태에서만 재요청을 진행할 수 있습니다.");
 		}
 		if(newStat == ReqStatCode.AGREE && oldStat != ReqStatCode.REQUEST) {
         	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + oldStat.getMessage() + "중 입니다. " + ReqStatCode.REQUEST.getMessage() + " 상태에서만 합의를 진행할 수 있습니다.");
 		}
-		if(newStat == ReqStatCode.NEGO && oldStat != ReqStatCode.REQUEST) {
+		if((newStat == ReqStatCode.NEGO_CHANGE || newStat == ReqStatCode.NEGO_ADD) && oldStat != ReqStatCode.REQUEST) {
         	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + oldStat.getMessage() + "중 입니다. " + ReqStatCode.REQUEST.getMessage() + " 상태에서만 협의요청을 진행할 수 있습니다.");
 		}
 		if(newStat == ReqStatCode.REJECT && oldStat != ReqStatCode.REQUEST) {

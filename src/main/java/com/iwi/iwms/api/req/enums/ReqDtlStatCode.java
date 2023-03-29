@@ -14,7 +14,7 @@ public enum ReqDtlStatCode {
 	IN_PROGRESS("12", "처리중"),
 	PROCESSED("13", "처리완료"),
 	INSPECTION_COMPLETED("14", "검수완료"),
-	CANCEL("15", "취소")
+	CANCEL("19", "취소")
     ;
 	
 	private String code;

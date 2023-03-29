@@ -168,7 +168,11 @@ public class ReqController {
 			, @PathVariable long reqSeq
 			, @ModelAttribute @Valid His his) {
 
-    	ReqStatCode status = ReqStatCode.NEGO;	//NEGO
+    	ReqStatCode status = ReqStatCode.NEGO_CHANGE;	//NEGO_CHANGE
+    	if(his.getNegoGb() == 2) {
+    		status = ReqStatCode.NEGO_ADD;				//NEGO_ADD
+    	}
+    	
     	his.setStatCd(status.getCode());
     	
     	reqService.updateReqStat(his.of(loginUserInfo));

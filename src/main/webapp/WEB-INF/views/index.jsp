@@ -152,6 +152,20 @@
 		});
 	}
 	
+	var download = (url, name) => {
+		fetch(url)
+	    .then(response => response.blob())
+		.then(blob => {
+			var fileObjectUrl = window.URL.createObjectURL(blob);
+			var a = document.createElement("a");
+			a.href = fileObjectUrl;
+			a.download = name;
+			a.click();
+			window.URL.revokeObjectURL(fileObjectUrl);
+		})
+		.catch(error => console.error('Failed to file download, ', error));  
+	}
+	
 	</script>
 </body>
 </html>

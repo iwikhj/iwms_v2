@@ -24,7 +24,7 @@ public class ReqDtl {
 	@Schema(hidden = true, description = "요청사항 상세 SEQ")
 	private Long reqDtlSeq;
 
-	@Schema(hidden = true, description = "요청사항 상세 상태 코드: [11:접수, 12:처리중, 13:처리완료, 14:검수완료, 15:취소]", allowableValues = {"11", "12", "13", "14", "15"}) 
+	@Schema(hidden = true, description = "요청사항 상세 상태 코드: [11:접수, 12:처리중, 13:처리완료, 14:검수완료, 19:취소]", allowableValues = {"11", "12", "13", "14", "19"}) 
 	private String statCd;
 	
 	@Schema(description = "담당자 SEQ") 
