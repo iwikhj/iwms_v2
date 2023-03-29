@@ -48,8 +48,6 @@
 		<result property="reqDtlSeq" column="reqDtlSeq"/>
 	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=reqSeq" 
 			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>	
-			
-			
 	   	<collection property="tasks" column="reqSeq=reqSeq" 
 			ofType="com.iwi.iwms.api.req.domain.TaskInfo" select="listTaskBySeq"/>			
 	   	<collection property="participants" column="reqSeq=reqSeq" 

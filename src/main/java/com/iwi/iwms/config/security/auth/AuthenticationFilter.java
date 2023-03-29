@@ -58,7 +58,7 @@ public class AuthenticationFilter extends GenericFilterBean {
 		
 		chain.doFilter(request, response);
 		
-		/*
+        /*
      	String token = request.getHeader(HttpHeaders.AUTHORIZATION);
     	if(token == null) {
     		printLog(request, AuthCode.INVALID);

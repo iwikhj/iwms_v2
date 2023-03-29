@@ -2,13 +2,15 @@ package com.iwi.iwms.config.redis;
 
 import java.util.concurrent.TimeUnit;
 
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import com.iwi.iwms.api.common.errors.CommonException;
+import com.iwi.iwms.api.common.errors.ErrorCode;
 
-@Slf4j
+import lombok.RequiredArgsConstructor;
+
 @RequiredArgsConstructor
 @Component
 public class RedisProvider {
@@ -23,31 +25,56 @@ public class RedisProvider {
 		 * opsForZSet  Sorted Set
 		 * opsForHash  Hash
 		 */
-    	redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.MILLISECONDS);
+    	try {
+        	redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.MILLISECONDS);
+    	} catch(RedisConnectionFailureException e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+    	}    	
     }
 
     public Object get(String key) {
-    	return redisTemplate.opsForValue().get(key);
+    	try {
+    		return redisTemplate.opsForValue().get(key);
+    	} catch(RedisConnectionFailureException e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+    	}
     }
 
     public boolean delete(String key) {
-    	return redisTemplate.delete(key);
+    	try {
+        	return redisTemplate.delete(key);
+    	} catch(RedisConnectionFailureException e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+    	}
     }
 
     public boolean hasKey(String key) {
-    	return redisTemplate.hasKey(key);
+    	try {
+        	return redisTemplate.hasKey(key);
+    	} catch(RedisConnectionFailureException e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+    	}
     }
 	
 	public void setHash(String key, String hashKey, Object value, long timeout) {
-		redisTemplate.opsForHash().put(key, hashKey, value);
-		redisTemplate.expire(key, timeout, TimeUnit.MILLISECONDS);
+    	try {
+    		redisTemplate.opsForHash().put(key, hashKey, value);
+    		redisTemplate.expire(key, timeout, TimeUnit.MILLISECONDS);
+    	} catch(RedisConnectionFailureException e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+    	}		
 	}
 	
 	public Object getHash(String key, String hashKey) {
-		if(redisTemplate.opsForHash().hasKey(key, hashKey)) {
-			return redisTemplate.opsForHash().get(key, hashKey);
-		}
-		return null;
+    	try {
+    		if(redisTemplate.opsForHash().hasKey(key, hashKey)) {
+    			return redisTemplate.opsForHash().get(key, hashKey);
+    		} else {
+				throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "리소스를 불러올 수 없습니다. [" + key + "]");
+    		}
+    	} catch(RedisConnectionFailureException e) {
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+    	}
 	}
 
 }

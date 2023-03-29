@@ -79,10 +79,9 @@ public class AuthProvider {
 	        
 	        return accessTokenResponse;
 		} catch(ProcessingException | InternalServerErrorException e) {
-			//throw new InternalServerErrorException(e.getMessage());
-			throw new NotAuthorizedException(e.getMessage());
+			throw new CommonException(ErrorCode.LOGIN_FAILED_INCORRECT_ID_PW);
 		} catch(NotAuthorizedException e) {
-			throw new NotAuthorizedException(e.getMessage());
+			throw new CommonException(ErrorCode.LOGIN_FAILED_INCORRECT_ID_PW);
 		} catch(Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
 		}

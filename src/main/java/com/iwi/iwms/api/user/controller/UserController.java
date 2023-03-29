@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.http.MediaType;
@@ -144,7 +143,7 @@ public class UserController {
     
     @Operation(summary = "내 정보", description = "내 정보")
     @GetMapping(value = "/me")
-    public ResponseEntity<ApiResponse<UserInfo>> getMe(HttpServletRequest request, HttpServletResponse response
+    public ResponseEntity<ApiResponse<UserInfo>> getMe(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
 
     	UserInfo user = userService.getUserBySeq(loginUserInfo.getUserSeq(), loginUserInfo.getUserSeq());

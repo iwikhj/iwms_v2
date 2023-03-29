@@ -3,10 +3,7 @@ package com.iwi.iwms.api.login.service.impl;
 import java.time.Duration;
 import java.util.Optional;
 
-import javax.ws.rs.NotAuthorizedException;
-
 import org.keycloak.representations.AccessTokenResponse;
-import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +33,7 @@ public class LoginServiceImpl implements LoginService{
 	
 	private final AuthProvider authProvider;
 	
-    private final RedisProvider redis;
+    private final RedisProvider redisProvider;
     
     private final ObjectMapper objectMapper;
     
@@ -56,39 +53,42 @@ public class LoginServiceImpl implements LoginService{
 			throw new CommonException(ErrorCode.LOGIN_FAILED_RETRY_EXCEEDED);
 		}
 		
+		// 인증 서버 인증 요청
+		AccessTokenResponse accessTokenResponse = null;
 		try {
-			// 인증 서버 인증 요청 
-			AccessTokenResponse accessTokenResponse = authProvider.grantToken(login.getUsername(), login.getPassword());
-			log.info("USERNAME: [{}]", login.getUsername());
-			String key = userInfo.getSsoKey();
-			
-			// 로그인한 사용자의 정보를 Redis 서버에 저장한다. 이후 요청에 대한 사용자 정보는 Redis 서버에서 불러온다.
-			// 사용자 정보의 만료 시간은 리플레시 토큰의 만료 시간과 동일하게 설정한다. 리플레시 토큰 만료시에는 다시 로그인해야 한다.
-			LoginUserInfo loginUserInfo = userMapper.getLoginUser(key);
-			if(redis.hasKey(key)) {
-				redis.delete(key);
-			}
-			
-			long timeout = Duration.ofSeconds(accessTokenResponse.getRefreshExpiresIn()).toMillis();
-			redis.setHash(key, "user", loginUserInfo, timeout);
-			redis.setHash(key, "refreshToken", accessTokenResponse.getRefreshToken(), timeout);
-			
-			// 로그인한 사용자의 접속IP를 저장 및 LOGIN_ERR_CNT 초기화. 
-			userMapper.updateLoginSuccess(User.builder()
-					.loginIp(login.getLoginIp())
-					.userSeq(userInfo.getUserSeq())
-					.build());
-			
-			return accessTokenResponse;
-		}  catch(RedisConnectionFailureException e) {
-			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
-		} catch(NotAuthorizedException e) {
+			accessTokenResponse = authProvider.grantToken(login.getUsername(), login.getPassword());
+		} catch(CommonException e) {
+			// 패스워드 불일치로 로그인 실패. LOGIN_ERR_CNT 증가
 			userMapper.updateLoginFailure(User.builder()
 					.userId(userInfo.getUserId())
-					.build());
-			
-			throw new CommonException(ErrorCode.LOGIN_FAILED_INCORRECT_ID_PW);
+					.build());			
+			throw new CommonException(e.getCode(), e.getReason());
 		}
+		
+		String key = userInfo.getSsoKey();
+		log.info("USERNAME: [{}], KEY: [{}]", login.getUsername(), key);
+		
+		// 로그인 사용자 정보 불러오기
+		LoginUserInfo loginUserInfo = userMapper.getLoginUser(key);
+		
+		// 로그인 사용자 정보 Redis 서버에 key가 존재하는지 확인하고 있으면 삭제
+		if(redisProvider.hasKey(key)) {
+			redisProvider.delete(key);
+		}
+		
+		// 로그인 사용자 정보 Redis 서버 저장
+		// key의 만료시간은 리플레시 토큰의 만료시간과 동일하게 설정
+		long timeout = Duration.ofSeconds(accessTokenResponse.getRefreshExpiresIn()).toMillis();
+		redisProvider.setHash(key, "user", loginUserInfo, timeout);
+		redisProvider.setHash(key, "refreshToken", accessTokenResponse.getRefreshToken(), timeout);
+		
+		// 로그인 성공. 사용자의 접속 정보 저장 및 LOGIN_ERR_CNT 초기화
+		userMapper.updateLoginSuccess(User.builder()
+				.loginIp(login.getLoginIp())
+				.userSeq(userInfo.getUserSeq())
+				.build());		
+		
+		return accessTokenResponse;
 	}
 	
 	@Override
@@ -100,12 +100,12 @@ public class LoginServiceImpl implements LoginService{
 			throw new CommonException(ErrorCode.AUTHENTICATION_REISSUE_FAILED, "리플레시 토큰 검증 실패.");
         }
 		
-        LoginUserInfo loginUserInfo = objectMapper.convertValue(redis.getHash(introspect.getSub(), "user"), LoginUserInfo.class);
+        LoginUserInfo loginUserInfo = objectMapper.convertValue(redisProvider.getHash(introspect.getSub(), "user"), LoginUserInfo.class);
         if(loginUserInfo == null || !loginUserInfo.getLoginIp().equals(reissue.getLoginIp())) {
         	throw new CommonException(ErrorCode.AUTHENTICATION_REISSUE_FAILED, "로그인 아이피와 요청 아이피가 일치하지 않습니다.");
         }
         
-		String storedRefreshtoken = (String) redis.getHash(introspect.getSub(), "refreshToken");
+		String storedRefreshtoken = (String) redisProvider.getHash(introspect.getSub(), "refreshToken");
 		if(storedRefreshtoken == null || !storedRefreshtoken.equals(reissue.getRefreshToken())) {
         	throw new CommonException(ErrorCode.AUTHENTICATION_REISSUE_FAILED, "요청한 리프레시 토큰과 서버에 저장된 리프레시 토큰이 일치하지 않습니다.");
 		}

@@ -34,20 +34,21 @@ public class FileStorageServiceImpl implements FileStorageService {
 	
 	private final Tika tika = new Tika();
 	
-	private Path rootPath;
+	private Path uploadPath;
 	
-    @Value("${file.storage.root-path}")
-    private void setRootPath(String rootPath) throws IOException {
-		this.rootPath = Paths.get(rootPath).toAbsolutePath();
-		if (!Files.exists(this.rootPath)) {
-    		Files.createDirectories(this.rootPath);
+    @Value("${file.storage.upload-path}")
+    private void setRootPath(String uploadPath) throws IOException {
+		this.uploadPath = Paths.get(uploadPath).toAbsolutePath();
+		//this.rootPath = Paths.get(System.getProperty("user.dir")).resolve(uploadPath.substring(1)).toAbsolutePath());
+		if (!Files.exists(this.uploadPath)) {
+    		Files.createDirectories(this.uploadPath);
     	}
     }
 	
 	@Override
 	public FileStorageResponse store(MultipartFile multipartFile, Path path, String filename) {
         try {
-        	Path forder = rootPath.resolve(path).normalize();
+        	Path forder = uploadPath.resolve(path).normalize();
         	if (!Files.exists(forder)) {
         		Files.createDirectories(forder);
         	}
@@ -78,12 +79,12 @@ public class FileStorageServiceImpl implements FileStorageService {
 	@Override
 	public Path move(Path source, Path target) {
 		try {
-        	source = rootPath.resolve(source).normalize();
+        	source = uploadPath.resolve(source).normalize();
         	if (!Files.exists(source)) {
             	throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "원본 파일이 존재하지 않거나 확인할 수 없습니다.");
         	}
         	
-        	target = rootPath.resolve(target).normalize();
+        	target = uploadPath.resolve(target).normalize();
         	
         	return Files.move(source, target, StandardCopyOption.REPLACE_EXISTING);
         	
@@ -106,7 +107,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 
 	@Override
 	public Resource loadAsResource(final Path path) {
-		Path target = rootPath.resolve(path).normalize();
+		Path target = uploadPath.resolve(path).normalize();
     	if (!Files.exists(target)) {
     		throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "파일이 존재하지 않거나 확인할 수 없습니다.");
     	}
@@ -125,7 +126,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 	
 	@Override
 	public void delete(final Path path) {
-		Path target = rootPath.resolve(path).normalize();
+		Path target = uploadPath.resolve(path).normalize();
     	if (Files.exists(target)) {
 			try {
 				Files.delete(target);
@@ -139,7 +140,7 @@ public class FileStorageServiceImpl implements FileStorageService {
 	
 	@Override
 	public void deleteAll(final Path path) {
-		Path target = rootPath.resolve(path).normalize();
+		Path target = uploadPath.resolve(path).normalize();
     	if (Files.exists(target)) {
 			try {
 				Files.walk(target)

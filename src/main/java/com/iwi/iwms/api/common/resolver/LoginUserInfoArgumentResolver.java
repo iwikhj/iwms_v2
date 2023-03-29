@@ -2,8 +2,6 @@ package com.iwi.iwms.api.common.resolver;
 
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -27,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResolver {
 	
-    private final RedisProvider redis;
+    private final RedisProvider redisProvider;
     
     private final ObjectMapper objectMapper;
     
@@ -41,14 +39,13 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
 	@Override
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-		HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+		//HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 		//String userId = (String)((ServletWebRequest) webRequest).getRequest().getAttribute("u");
 
 		//Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		Authentication authentication = Optional.ofNullable((Authentication) webRequest.getUserPrincipal())
 			.orElseThrow(() -> new CommonException(ErrorCode.AUTHENTICATION_FAILED, "인증되지 않은 사용자입니다."));
-
-		
+	
 		String ssoKey = authentication.getName();
 		
 		//if(request.getRequestURI().indexOf("logout") != -1) {
@@ -56,19 +53,9 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
 		//	return null;
 		//}
 		
-		/*
-		LoginUserInfo loginUserInfo = objectMapper.convertValue(redis.getHash(ssoKey, "user"), LoginUserInfo.class);
-		if(loginUserInfo == null) {
-			loginUserInfo = userService.getLoginUser(ssoKey);
-		}
-		return loginUserInfo;
-		*/
-		
-		//return Optional.ofNullable(objectMapper.convertValue(redis.getHash(ssoKey, "user"), LoginUserInfo.class))
-		//			.orElseThrow(() -> new CommonException(ErrorCode.AUTHORIZATION_FAILED, "로그인 정보를 찾을 수 없습니다."));
-
-		
 		return userService.getLoginUser(ssoKey);
+		//return Optional.ofNullable(objectMapper.convertValue(redisProvider.getHash(ssoKey, "user"), LoginUserInfo.class))
+		//			.orElseThrow(() -> new CommonException(ErrorCode.AUTHORIZATION_FAILED, "로그인 정보를 찾을 수 없습니다."));
 	}
 
 }
