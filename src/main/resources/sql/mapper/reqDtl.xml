@@ -235,15 +235,15 @@
 			SELECT 
 				REG_SEQ AS USER_SEQ
             FROM TB_REQ_HIS
-            WHERE REQ_SEQ = #{reqSeq}
-            GROUP BY REG_SEQ        
-			UNION ALL    
+            WHERE REQ_SEQ = #{reqSeq}     
+			UNION    
 			SELECT 
 				REQ_DTL_USER_SEQ AS USER_SEQ
             FROM TB_REQ_DTL
             WHERE REQ_SEQ = #{reqSeq}         
-            GROUP BY REQ_DTL_USER_SEQ
         ) PART ON USER.USER_SEQ = PART.USER_SEQ
+        WHERE USER.DEL_YN = 'N'
+			AND USER.USE_YN = 'Y'        
         ORDER BY FIELD(USER.USER_GB_CD, '00', '10', '11', '01')
 	</select>	
 

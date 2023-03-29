@@ -237,7 +237,9 @@
 			, USER.AUTH_SEQ AS authSeq
 			, AUTH.AUTH_CD AS authCd
 			, AUTH.AUTH_NM AS authNm
+			, USER.USER_GB_CD AS userGb
 			, FN_GET_CODE_NM('USER_GB_CD', USER.USER_GB_CD) AS userGb
+			, USER.BUSI_ROLL_CD AS busiRoll
 			, FN_GET_CODE_NM('BUSI_ROLL_CD', USER.BUSI_ROLL_CD) AS busiRoll
 			, DEPT.DEPT_NM AS deptNm
 			, USER.POSI_NM AS posiNm

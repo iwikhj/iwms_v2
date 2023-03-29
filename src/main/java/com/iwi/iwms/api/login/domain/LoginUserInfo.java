@@ -36,8 +36,14 @@ public class LoginUserInfo {
 	@Schema(description = "사용자 권한 이름") 
 	private String authNm;
 	
+	@Schema(description = "사용자 구분 코드") 
+	private String userGbCd;
+	
 	@Schema(description = "사용자 구분") 
 	private String userGb;
+	
+	@Schema(description = "사용자 업무 코드")
+	private String busiRollCd;
 	
 	@Schema(description = "사용자 업무")
 	private String busiRoll; 	
