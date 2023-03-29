@@ -48,6 +48,10 @@
 		<result property="reqDtlSeq" column="reqDtlSeq"/>
 	   	<collection property="attachedFiles" column="fileRefTb=fileRefTb,fileRefCol=fileRefCol,fileRefSeq=reqSeq" 
 			ofType="com.iwi.iwms.api.file.domain.UploadFileInfo" select="com.iwi.iwms.api.file.mapper.FileMapper.listFileByRef"/>	
+	 
+	   	<collection property="progress" column="reqSeq=reqSeq" 
+			ofType="com.iwi.iwms.api.req.domain.ProgressInfo" select="listProgressBySeq"/>	
+								
 	   	<collection property="tasks" column="reqSeq=reqSeq" 
 			ofType="com.iwi.iwms.api.req.domain.TaskInfo" select="listTaskBySeq"/>			
 	   	<collection property="participants" column="reqSeq=reqSeq" 
@@ -202,20 +206,58 @@
 			, #{loginUserSeq}
 		)		
 	</insert>
-	
+
+	<!-- 요청사항 진행 흐름 조회 -->	
+	<select id="listProgressBySeq" parameterType="hashMap"
+		resultType="com.iwi.iwms.api.req.domain.ProgressInfo">
+			SELECT
+				FN_GET_CODE_NM('REQ_PROGRESS_CD', HIS.REQ_STAT_CD) AS progress			
+				, DATE_FORMAT(HIS.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+				, FN_GET_USER_NM(HIS.REG_SEQ) AS regNm
+			FROM TB_REQ REQ
+			INNER JOIN TB_REQ_HIS HIS ON REQ.REQ_SEQ = HIS.REQ_SEQ
+			WHERE REQ.REQ_SEQ = #{reqSeq}
+			UNION ALL    
+			SELECT
+				HIS.progress AS progress	
+				, HIS.regDt AS regDt
+				, HIS.regNm AS regNm
+			FROM TB_REQ REQ
+            INNER JOIN (
+				SELECT 
+					DTL.REQ_SEQ AS reqSeq
+					, FN_GET_CODE_NM('REQ_PROGRESS_CD', '10') AS progress	
+                    , DATE_FORMAT(HIS.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+                    , FN_GET_USER_NM(HIS.REG_SEQ) AS regNm
+				FROM TB_REQ_DTL DTL
+				INNER JOIN TB_REQ_DTL_HIS HIS ON DTL.REQ_DTL_SEQ = HIS.REQ_DTL_SEQ
+                WHERE DTL.REQ_SEQ = #{reqSeq}  
+					AND HIS.REQ_DTL_STAT_CD = '11'
+                LIMIT 1
+            ) HIS ON REQ.REQ_SEQ = HIS.reqSeq
+			WHERE REQ.REQ_SEQ = #{reqSeq}   
+			UNION ALL    
+			SELECT
+				CONCAT(FN_GET_CODE_NM('BUSI_ROLL_CD', DTL.BUSI_ROLL_CD), ' (', FN_GET_CODE_NM('REQ_PROGRESS_CD', HIS.REQ_DTL_STAT_CD), ')') AS progress
+				, DATE_FORMAT(HIS.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+				, FN_GET_USER_NM(HIS.REG_SEQ) AS regNm
+			FROM TB_REQ_DTL DTL
+			INNER JOIN TB_REQ_DTL_HIS HIS ON DTL.REQ_DTL_SEQ = HIS.REQ_DTL_SEQ
+			WHERE DTL.REQ_SEQ = #{reqSeq}
+	</select>
+		
 	<!-- 작업 조회 -->	
 	<select id="listTaskBySeq" parameterType="hashMap"
 		resultType="com.iwi.iwms.api.req.domain.TaskInfo">
 		SELECT
-			REQ.REQ_SEQ AS reqSeq
+			DTL.REQ_SEQ AS reqSeq
 			, DTL.REQ_DTL_SEQ AS reqDtlSeq
 			, DTL.BUSI_ROLL_CD AS busiRollCd
-               , FN_GET_CODE_NM('BUSI_ROLL_CD', DTL.BUSI_ROLL_CD)  AS busiRoll
-               , DTL.REQ_DTL_USER_SEQ AS reqDtlUserSeq
-               , FN_GET_USER_NM(DTL.REQ_DTL_USER_SEQ) AS reqDtlUser
-		FROM TB_REQ REQ
-		INNER JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ
-           WHERE REQ.REQ_SEQ = #{reqSeq}
+			, FN_GET_CODE_NM('BUSI_ROLL_CD', DTL.BUSI_ROLL_CD)  AS busiRoll
+			, DTL.REQ_DTL_USER_SEQ AS reqDtlUserSeq
+			, FN_GET_USER_NM(DTL.REQ_DTL_USER_SEQ) AS reqDtlUser
+		FROM TB_REQ_DTL DTL
+        WHERE DTL.REQ_SEQ = #{reqSeq}
 		ORDER BY DTL.REQ_DTL_SEQ
 	</select>
 		
@@ -235,12 +277,14 @@
 			SELECT 
 				REG_SEQ AS USER_SEQ
             FROM TB_REQ_HIS
-            WHERE REQ_SEQ = #{reqSeq}     
-			UNION    
+            WHERE REQ_SEQ = #{reqSeq}
+            GROUP BY REG_SEQ
+			UNION ALL
 			SELECT 
 				REQ_DTL_USER_SEQ AS USER_SEQ
             FROM TB_REQ_DTL
-            WHERE REQ_SEQ = #{reqSeq}         
+            WHERE REQ_SEQ = #{reqSeq}
+            GROUP BY REQ_DTL_USER_SEQ
         ) PART ON USER.USER_SEQ = PART.USER_SEQ
         WHERE USER.DEL_YN = 'N'
 			AND USER.USE_YN = 'Y'        
@@ -266,17 +310,16 @@
 			WHERE REQ.REQ_SEQ = #{reqSeq}
 			UNION ALL    
 			SELECT
-				REQ.REQ_SEQ AS reqSeq
+				DTL.REQ_SEQ AS reqSeq
 				, DTL.REQ_DTL_SEQ AS reqDtlSeq
 				, HIS.REQ_DTL_STAT_CD AS statCd
 				, FN_GET_CODE_NM('REQ_DTL_STAT_CD', HIS.REQ_DTL_STAT_CD) AS stat
 				, HIS.REQ_DTL_STAT_CMT AS statCmt
 				, DATE_FORMAT(HIS.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 				, FN_GET_USER_NM(HIS.REG_SEQ) AS regNm
-			FROM TB_REQ REQ
-			INNER JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ
+			FROM TB_REQ_DTL DTL
 			INNER JOIN TB_REQ_DTL_HIS HIS ON DTL.REQ_DTL_SEQ = HIS.REQ_DTL_SEQ
-			WHERE REQ.REQ_SEQ = #{reqSeq}
+			WHERE DTL.REQ_SEQ = #{reqSeq}
 				AND DTL.REQ_DTL_SEQ = #{reqDtlSeq}
 		) HIS
         ORDER BY regDt
@@ -315,7 +358,7 @@
 			WHERE REQ.REQ_SEQ = #{reqSeq}
 			UNION ALL    
 			SELECT
-				REQ.REQ_SEQ AS reqSeq
+				DTL.REQ_SEQ AS reqSeq
 				, DTL.REQ_DTL_SEQ AS reqDtlSeq
 				, CMT.REQ_DTL_CMT_SEQ AS cmtSeq
 				, CMT.REQ_DTL_CMT AS cmt
@@ -327,13 +370,12 @@
 				, FN_GET_USER_NM(CMT.REG_SEQ) AS regNm
 				, 'TB_REQ_DTL_CMT' AS fileRefTb
 				, 'REQ_DTL_CMT_SEQ' AS fileRefCol			
-			FROM TB_REQ REQ
-			INNER JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ
+			FROM TB_REQ_DTL DTL
 			INNER JOIN TB_REQ_DTL_CMT CMT ON DTL.REQ_DTL_SEQ = CMT.REQ_DTL_SEQ
 			INNER JOIN TB_REQ_DTL_HIS HIS ON CMT.REQ_DTL_SEQ = HIS.REQ_DTL_SEQ
 				AND CMT.REQ_DTL_HIS_SEQ = HIS.REQ_DTL_HIS_SEQ
 			LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}	
-			WHERE REQ.REQ_SEQ = #{reqSeq}
+			WHERE DTL.REQ_SEQ = #{reqSeq}
 		) CMT
         ORDER BY regDt
 	</select>		

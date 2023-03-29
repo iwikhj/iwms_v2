@@ -84,6 +84,10 @@ public class ReqDtlInfo {
 	@Schema(description = "첨부된 파일 정보")
 	private List<UploadFileInfo> attachedFiles;
 	
+	
+	@Schema(description = "진행 상태") 
+	private List<ProgressInfo> progress;
+	
 	@Schema(description = "작업 목록") 
 	private List<TaskInfo> tasks;
 	
