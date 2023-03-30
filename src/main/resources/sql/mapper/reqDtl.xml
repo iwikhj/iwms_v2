@@ -211,7 +211,9 @@
 	<select id="listProgressBySeq" parameterType="hashMap"
 		resultType="com.iwi.iwms.api.req.domain.ProgressInfo">
 			SELECT
-				FN_GET_CODE_NM('REQ_PROG_CD', HIS.REQ_STAT_CD) AS progress			
+				REQ.REQ_SEQ AS reqSeq
+				, null AS reqDtlSeq
+				, FN_GET_CODE_NM('REQ_PROG_CD', HIS.REQ_STAT_CD) AS progress			
 				, DATE_FORMAT(HIS.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 				, FN_GET_USER_NM(HIS.REG_SEQ) AS regNm
 			FROM TB_REQ REQ
@@ -219,7 +221,9 @@
 			WHERE REQ.REQ_SEQ = #{reqSeq}
 			UNION ALL    
 			SELECT
-				HIS.progress AS progress	
+				REQ.REQ_SEQ AS reqSeq
+				, null AS reqDtlSeq
+				, HIS.progress AS progress	
 				, HIS.regDt AS regDt
 				, HIS.regNm AS regNm
 			FROM TB_REQ REQ
@@ -238,7 +242,9 @@
 			WHERE REQ.REQ_SEQ = #{reqSeq}   
 			UNION ALL    
 			SELECT
-				CONCAT(FN_GET_CODE_NM('BUSI_ROLL_CD', DTL.BUSI_ROLL_CD), BINARY ' (', FN_GET_CODE_NM('REQ_PROG_CD', HIS.REQ_DTL_STAT_CD), BINARY ')') AS progress
+				DTL.REQ_SEQ AS reqSeq
+				, DTL.REQ_DTL_SEQ AS reqDtlSeq
+				, CONCAT(FN_GET_CODE_NM('BUSI_ROLL_CD', DTL.BUSI_ROLL_CD), BINARY ' (', FN_GET_CODE_NM('REQ_PROG_CD', HIS.REQ_DTL_STAT_CD), BINARY ')') AS progress
 				, DATE_FORMAT(HIS.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 				, FN_GET_USER_NM(HIS.REG_SEQ) AS regNm
 			FROM TB_REQ_DTL DTL

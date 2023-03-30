@@ -14,6 +14,12 @@ import lombok.ToString;
 @AllArgsConstructor
 public class ProgressInfo {
 	
+	@Schema(description = "요청사항 SEQ") 
+	private Long reqSeq;
+	
+	@Schema(description = "요청사항 상세 SEQ") 
+	private Long reqDtlSeq;
+	
 	@Schema(description = "진행")
 	private String progress;
 	
