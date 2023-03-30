@@ -27,8 +27,8 @@
 			, FN_GET_CODE_NM('BUSI_ROLL_CD', DTL.BUSI_ROLL_CD) AS busiRoll 
 			, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = REQ.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn
 			, DTL.USE_YN AS useYn
-			, DATE_FORMAT(DTL.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
-			, FN_GET_USER_NM(DTL.REG_SEQ) AS regNm	
+			, DATE_FORMAT(REQ.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
+			, FN_GET_USER_NM(REQ.REG_SEQ) AS regNm	
 			, 'TB_REQ' AS fileRefTb
 			, 'REQ_SEQ' AS fileRefCol				
 			, LOGIN.USER_SEQ AS loginUserSeq
