@@ -30,6 +30,9 @@ import com.iwi.iwms.api.req.domain.ReqDtlInfo;
 import com.iwi.iwms.api.req.domain.ReqInfo;
 import com.iwi.iwms.api.req.service.ReqDtlService;
 import com.iwi.iwms.api.req.service.ReqService;
+import com.iwi.iwms.api.stats.domain.ReqRegStatsInfo;
+import com.iwi.iwms.api.stats.domain.StatsInfo;
+import com.iwi.iwms.api.stats.service.StatsService;
 import com.iwi.iwms.api.user.domain.UserInfo;
 import com.iwi.iwms.api.user.domain.UserSiteInfo;
 import com.iwi.iwms.api.user.service.UserService;
@@ -38,6 +41,7 @@ import com.iwi.iwms.utils.PredicateMap;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,6 +72,8 @@ public class PageController {
 	private final CompService compService;
 	
 	private final AuthService authService;
+	
+	private final StatsService statsService;
     
 	/**
 	 * 메뉴 홈
@@ -202,14 +208,22 @@ public class PageController {
 				.build());
     }
     
-    @Operation(summary = "유지보수 - 현황 (No data)", description = "유지보수 현황")
+    @Operation(summary = "유지보수 - 현황", description = "유지보수 현황")
     @GetMapping(value = "/maintain/statistics")
-    public ResponseEntity<Response<Void>> maintainDashboard(HttpServletRequest request
+    public ResponseEntity<Response<StatsInfo>> maintainStatistics(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+
+		Map<String, Object> map = PredicateMap.make(request, loginUserInfo);		
+		Map<String, Object> progStat = statsService.listStatsReq(map);
+		List<ReqRegStatsInfo> regStat = statsService.listStatsReqRegByMonth(map);
+		
+		StatsInfo statsInfo = StatsInfo.builder()
+			.progStat(progStat)
+			.regStat(regStat)
+			.build();
     	
-		// TODO 유지보수 현황 비지니스 로직 없음
-    	
-		return ResponseEntity.ok(Response.<Void>builder()
+		return ResponseEntity.ok(Response.<StatsInfo>builder()
+				.data(statsInfo)
 				.loginUserInfo(loginUserInfo)
 				.build());
     }
