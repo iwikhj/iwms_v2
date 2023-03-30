@@ -184,7 +184,6 @@
 	<!-- 요청사항 등록 -->	
 	<insert id="insertReq" parameterType="com.iwi.iwms.api.req.domain.Req"
 		useGeneratedKeys="true" keyProperty="reqSeq">
-		
 		INSERT INTO TB_REQ
 		(
 		    REQ_NO
