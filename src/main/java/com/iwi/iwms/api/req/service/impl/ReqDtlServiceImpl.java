@@ -84,17 +84,28 @@ public class ReqDtlServiceImpl implements ReqDtlService {
         	throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "담당자는 필수 입력 사항입니다.");
 		} else if(CollectionUtils.isEmpty(reqDtl.getTgtMms())) {
         	throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "작업 공수는 필수 입력 사항입니다.");
-		} else if(reqDtl.getReqDtlUserSeqs().size() < reqDtl.getTgtMms().size()) {
-        	throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "담당자보다 작업 공수가 더 많이 입력되었습니다.");
-		}  else if(reqDtl.getReqDtlUserSeqs().size() != reqDtl.getTgtMms().size()) {
-        	throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "작업 공수는 필수 입력 사항입니다.");
+		} else if(CollectionUtils.isEmpty(reqDtl.getTasks())) {
+        	throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "작업 내용은 필수 입력 사항입니다.");
 		} 
+		
+		boolean flag = false;
+		
+		if(reqDtl.getReqDtlUserSeqs().size() == reqDtl.getTgtMms().size()) {
+			if(reqDtl.getReqDtlUserSeqs().size() == reqDtl.getTasks().size()) {
+				flag = true;
+			}
+		}
+		
+		if(!flag) {
+        	throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "담당자, 작업 공수, 작업 내용이 잘못 입력 되었습니다.");
+		}
 		
 		ReqDtlStatCode status = ReqDtlStatCode.RECEIPT;	//RECEIPT
 		
 		for(int i = 0; i < reqDtl.getReqDtlUserSeqs().size(); i++) {
 			long reqDtlUserSeq = reqDtl.getReqDtlUserSeqs().get(i);
 			int tgtMm = reqDtl.getTgtMms().get(i);
+			String task = reqDtl.getTasks().get(i);
 			
 			List<UserSiteInfo> siteList = userService.listSiteByUserSeq(reqDtlUserSeq);
 			if(!siteList.stream().anyMatch(v -> v.getSiteSeq() == reqInfo.getSiteSeq())) {
@@ -103,6 +114,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 					
 			reqDtl.setReqDtlUserSeq(reqDtlUserSeq);
 			reqDtl.setTgtMm(tgtMm);
+			reqDtl.setTask(task);
 			reqDtl.setStatCd(status.getCode());
 			reqDtlMapper.insertReqDtl(reqDtl);
 			

@@ -36,8 +36,14 @@ public class ReqDtl {
 	@Schema(description = "예정 공수")
 	private List<Integer> tgtMms;
 	
+	@Schema(description = "작업 내용")
+	private List<String> tasks;
+	
 	@Schema(hidden = true, description = "예정 공수")
 	private Integer tgtMm;
+	
+	@Schema(hidden = true, description = "작업 내용")
+	private String task;
 	
 	@Schema(description = "처리 시간: 처리완료일때만 입력")
 	private Integer procHh;

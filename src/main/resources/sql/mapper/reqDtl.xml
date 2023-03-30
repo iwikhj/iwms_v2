@@ -100,6 +100,7 @@
 			, BUSI_ROLL_CD
 			, REQ_DTL_STAT_CD
 			, TGT_MM
+			, TASK
 			, USE_YN
 			, REG_SEQ
 		) VALUES (
@@ -116,6 +117,7 @@
 			, (SELECT BUSI_ROLL_CD FROM TB_USER WHERE USER_SEQ = #{reqDtlUserSeq})
 			, #{statCd}
 			, #{tgtMm}
+			, #{task}
 			, #{useYn}
 			, #{loginUserSeq}
 		)		
@@ -178,6 +180,7 @@
 		UPDATE TB_REQ_DTL 
 		SET
 			TGT_MM = #{tgtMm}
+			, TASK = #{task}
 			, USE_YN = #{useYn}
 			, UPT_DT = CURRENT_TIMESTAMP
 			, UPT_SEQ = #{loginUserSeq}
