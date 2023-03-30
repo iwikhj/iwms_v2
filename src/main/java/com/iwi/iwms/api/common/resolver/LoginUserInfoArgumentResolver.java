@@ -44,7 +44,7 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
 
 		//Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		Authentication authentication = Optional.ofNullable((Authentication) webRequest.getUserPrincipal())
-			.orElseThrow(() -> new CommonException(ErrorCode.AUTHENTICATION_FAILED, "인증되지 않은 사용자입니다."));
+			.orElseThrow(() -> new CommonException(ErrorCode.AUTHENTICATION_FAILED, "미인증 사용자입니다."));
 	
 		String ssoKey = authentication.getName();
 		
