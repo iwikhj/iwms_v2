@@ -51,8 +51,8 @@ public class AuthenticationFilter extends GenericFilterBean {
 		HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
         
-    	passAuthentication("bfb1e1d6-9018-4b50-8c69-f48c939b763b", Arrays.asList("ROLE_IWMS_ADMIN"));
-    	//passAuthentication("f983803e-4d8e-45ec-a0c9-8fbef7c8263f", Arrays.asList("ROLE_IWMS_ENG"));
+    	passAuthentication("7afcc9a8-6364-4a4d-b7cf-ad36ab62da53", Arrays.asList("ROLE_IWMS_ADMIN"));
+    	//passAuthentication("55fd148f-8e00-4243-93d3-be518c287ce9", Arrays.asList("ROLE_IWMS_ENG"));
 		request = ignoreRequestHeader(servletRequest, request, HttpHeaders.AUTHORIZATION);
 		printLog(request, AuthCode.INVALID);
 		

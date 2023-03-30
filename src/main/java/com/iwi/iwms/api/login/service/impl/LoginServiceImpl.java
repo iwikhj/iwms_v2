@@ -5,6 +5,7 @@ import java.util.Optional;
 
 import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwi.iwms.api.common.errors.CommonException;
@@ -37,6 +38,7 @@ public class LoginServiceImpl implements LoginService{
     
     private final ObjectMapper objectMapper;
     
+    @Transactional(rollbackFor = {Exception.class})
 	@Override
 	public AccessTokenResponse login(Login login) {
 		// 등록된 ID 확인
@@ -68,6 +70,12 @@ public class LoginServiceImpl implements LoginService{
 		String key = userInfo.getSsoKey();
 		log.info("USERNAME: [{}], KEY: [{}]", login.getUsername(), key);
 		
+		// 사용자의 접속 정보 저장 및 LOGIN_ERR_CNT 초기화
+		userMapper.updateLoginSuccess(User.builder()
+				.loginIp(login.getLoginIp())
+				.userSeq(userInfo.getUserSeq())
+				.build());	
+		
 		// 로그인 사용자 정보 불러오기
 		LoginUserInfo loginUserInfo = userMapper.getLoginUser(key);
 		
@@ -82,12 +90,6 @@ public class LoginServiceImpl implements LoginService{
 		redisProvider.setHash(key, "user", loginUserInfo, timeout);
 		redisProvider.setHash(key, "refreshToken", accessTokenResponse.getRefreshToken(), timeout);
 		
-		// 로그인 성공. 사용자의 접속 정보 저장 및 LOGIN_ERR_CNT 초기화
-		userMapper.updateLoginSuccess(User.builder()
-				.loginIp(login.getLoginIp())
-				.userSeq(userInfo.getUserSeq())
-				.build());		
-		
 		return accessTokenResponse;
 	}
 	
@@ -101,7 +103,7 @@ public class LoginServiceImpl implements LoginService{
         }
 		
         LoginUserInfo loginUserInfo = objectMapper.convertValue(redisProvider.getHash(introspect.getSub(), "user"), LoginUserInfo.class);
-        if(loginUserInfo == null || !loginUserInfo.getLoginIp().equals(reissue.getLoginIp())) {
+        if(loginUserInfo == null || loginUserInfo.getLoginIp() == null || reissue.getLoginIp() == null || !loginUserInfo.getLoginIp().equals(reissue.getLoginIp())) {
         	throw new CommonException(ErrorCode.AUTHENTICATION_REISSUE_FAILED, "로그인 아이피와 요청 아이피가 일치하지 않습니다.");
         }
         

@@ -164,7 +164,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public LoginUserInfo getLoginUser(String ssoKey) {
 		return Optional.ofNullable(userMapper.getLoginUser(ssoKey))
-				.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "로그인 사용자를 정보를 찾을 수 없습니다."));				
+				.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "로그인 정보를 찾을 수 없습니다."));				
 	}
 
 	@Override
