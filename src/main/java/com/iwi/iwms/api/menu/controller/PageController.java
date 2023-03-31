@@ -41,7 +41,6 @@ import com.iwi.iwms.utils.PredicateMap;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -214,12 +213,12 @@ public class PageController {
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
 
 		Map<String, Object> map = PredicateMap.make(request, loginUserInfo);		
-		Map<String, Object> progStat = statsService.listStatsReq(map);
-		List<ReqRegStatsInfo> regStat = statsService.listStatsReqRegByMonth(map);
+		Map<String, Object> progStats = statsService.listStatsReq(map);
+		List<ReqRegStatsInfo> regStats = statsService.listStatsReqRegByMonth(map);
 		
 		StatsInfo statsInfo = StatsInfo.builder()
-			.progStat(progStat)
-			.regStat(regStat)
+			.progStats(progStats)
+			.regStats(regStats)
 			.build();
     	
 		return ResponseEntity.ok(Response.<StatsInfo>builder()

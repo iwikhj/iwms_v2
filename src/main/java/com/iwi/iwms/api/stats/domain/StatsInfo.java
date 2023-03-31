@@ -20,9 +20,9 @@ import lombok.ToString;
 public class StatsInfo {
 	
 	@Schema(description = "업무 현황") 
-	private Map<String, Object> progStat;
+	private Map<String, Object> progStats;
 	
 	@Schema(description = "월별 등록 건수") 
-	private List<ReqRegStatsInfo> regStat;
+	private List<ReqRegStatsInfo> regStats;
 	
 }

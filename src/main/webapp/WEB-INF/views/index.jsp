@@ -178,7 +178,7 @@
 	}
 	
 	function del() {
-		callAjax("/notices/5", "delete").then(success => {
+		callAjax("/notices/11", "delete").then(success => {
 			console.log("delete success, ", success);
 		}, err => {
 			console.error("delete fail, ", err);
