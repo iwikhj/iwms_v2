@@ -58,34 +58,30 @@ public class AuthenticationFilter extends GenericFilterBean {
 		chain.doFilter(request, response);
 		*/
         
-        if("OPTIONS".equalsIgnoreCase(request.getMethod())) {
-            response.setStatus(HttpServletResponse.SC_OK);
-        } else {
-         	String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-        	if(token == null) {
-        		printLog(request, AuthCode.INVALID);
-        		responseError(response, ErrorCode.AUTHENTICATION_HEADER_NOT_EXISTS);
-        		return;
-        	}
-            
-        	token = resolveToken(token);
-            AuthCode tokenStatus = tokenValidation(token);
-         
-            printLog(request, tokenStatus);
-            
-            if(AuthCode.VERIFIED.equals(tokenStatus)) {
-            	//ok
-            } else if(AuthCode.EXPIRED.equals(tokenStatus)) {
-        		responseError(response, ErrorCode.AUTHENTICATION_EXPIRED);
-        		return;
-        		
-            } else if(AuthCode.INVALID.equals(tokenStatus)) {
-        		responseError(response, ErrorCode.AUTHENTICATION_HEADER_MALFORMED);
-        		return;
-            }
-            
-            chain.doFilter(request, response);
+     	String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+    	if(token == null) {
+    		printLog(request, AuthCode.INVALID);
+    		responseError(response, ErrorCode.AUTHENTICATION_HEADER_NOT_EXISTS);
+    		return;
+    	}
+        
+    	token = resolveToken(token);
+        AuthCode tokenStatus = tokenValidation(token);
+     
+        printLog(request, tokenStatus);
+        
+        if(AuthCode.VERIFIED.equals(tokenStatus)) {
+        	//ok
+        } else if(AuthCode.EXPIRED.equals(tokenStatus)) {
+    		responseError(response, ErrorCode.AUTHENTICATION_EXPIRED);
+    		return;
+    		
+        } else if(AuthCode.INVALID.equals(tokenStatus)) {
+    		responseError(response, ErrorCode.AUTHENTICATION_HEADER_MALFORMED);
+    		return;
         }
+        
+        chain.doFilter(request, response);
 	}
     
     private String resolveToken(String token) {
