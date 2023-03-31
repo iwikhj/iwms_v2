@@ -102,7 +102,7 @@ public class NoticeServiceImpl implements NoticeService {
 		
 		// 첨부파일 삭제(디렉토리까지)
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(notice.getFileInfo());
-		if(attachedFiles != null && attachedFiles.size() > 0) {
+		if(!CollectionUtils.isEmpty(attachedFiles)) {
 			fileService.deleteAttachAll(attachedFiles);
 		}
 		return result;

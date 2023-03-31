@@ -1,9 +1,14 @@
 package com.iwi.iwms.api.user.domain;
 
+import java.util.List;
+
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import org.springframework.web.multipart.MultipartFile;
+
+import com.iwi.iwms.api.file.domain.UploadFile;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,7 +28,7 @@ import lombok.ToString;
 public class User {
 	
 	@Schema(hidden = true, description = "사용자 SEQ")
-	private long userSeq;
+	private Long userSeq;
 
 	@NotNull(message = "사용자 아이디는 필수 입력 사항입니다")
 	@Schema(description = "사용자 아이디")
@@ -87,6 +92,12 @@ public class User {
 	@Schema(hidden = true, description = "마지막 로그인 IP") 
 	private String loginIp;
 	
+	@Schema(description = "프로필 사진 파일")
+	private MultipartFile file;
+	
+	@Schema(hidden = true, description = "프로필 파일 정보") 
+	private UploadFile fileInfo;
+	
 	@Schema(description = "사용 여부", defaultValue = "Y", allowableValues = {"Y", "N"}) 
 	private String useYn;
 
@@ -95,6 +106,14 @@ public class User {
 	
 	public User of(final LoginUserInfo loginUserInfo) {
 		this.loginUserSeq = loginUserInfo.getUserSeq();
+		
+		this.fileInfo = new UploadFile();
+		this.fileInfo.setFileRefTb("TB_USER");
+		this.fileInfo.setFileRefCol("USER_SEQ");
+		if(this.userSeq != null && this.userSeq != 0) {
+			this.fileInfo.setFileRefSeq(this.userSeq);
+		}
+		this.fileInfo.setLoginUserSeq(loginUserInfo.getUserSeq());
 		return this;
 	}
 	

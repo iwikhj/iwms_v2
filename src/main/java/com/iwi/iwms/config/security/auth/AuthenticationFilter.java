@@ -47,43 +47,45 @@ public class AuthenticationFilter extends GenericFilterBean {
     
 	@Override
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
-		
 		HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-        
+        /*
     	passAuthentication("7afcc9a8-6364-4a4d-b7cf-ad36ab62da53", Arrays.asList("ROLE_IWMS_ADMIN"));
     	//passAuthentication("55fd148f-8e00-4243-93d3-be518c287ce9", Arrays.asList("ROLE_IWMS_ENG"));
 		request = ignoreRequestHeader(servletRequest, request, HttpHeaders.AUTHORIZATION);
 		printLog(request, AuthCode.INVALID);
 		
 		chain.doFilter(request, response);
-		
-        /*
-     	String token = request.getHeader(HttpHeaders.AUTHORIZATION);
-    	if(token == null) {
-    		printLog(request, AuthCode.INVALID);
-    		responseError(response, ErrorCode.AUTHENTICATION_HEADER_NOT_EXISTS);
-    		return;
-    	}
+		*/
         
-    	token = resolveToken(token);
-        AuthCode tokenStatus = tokenValidation(token);
-     
-        printLog(request, tokenStatus);
-        
-        if(AuthCode.VERIFIED.equals(tokenStatus)) {
-        	//ok
-        } else if(AuthCode.EXPIRED.equals(tokenStatus)) {
-    		responseError(response, ErrorCode.AUTHENTICATION_EXPIRED);
-    		return;
-    		
-        } else if(AuthCode.INVALID.equals(tokenStatus)) {
-    		responseError(response, ErrorCode.AUTHENTICATION_HEADER_MALFORMED);
-    		return;
+        if("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+        } else {
+         	String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+        	if(token == null) {
+        		printLog(request, AuthCode.INVALID);
+        		responseError(response, ErrorCode.AUTHENTICATION_HEADER_NOT_EXISTS);
+        		return;
+        	}
+            
+        	token = resolveToken(token);
+            AuthCode tokenStatus = tokenValidation(token);
+         
+            printLog(request, tokenStatus);
+            
+            if(AuthCode.VERIFIED.equals(tokenStatus)) {
+            	//ok
+            } else if(AuthCode.EXPIRED.equals(tokenStatus)) {
+        		responseError(response, ErrorCode.AUTHENTICATION_EXPIRED);
+        		return;
+        		
+            } else if(AuthCode.INVALID.equals(tokenStatus)) {
+        		responseError(response, ErrorCode.AUTHENTICATION_HEADER_MALFORMED);
+        		return;
+            }
+            
+            chain.doFilter(request, response);
         }
-        
-        chain.doFilter(request, response);
-        */
 	}
     
     private String resolveToken(String token) {

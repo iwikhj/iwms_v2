@@ -1,5 +1,6 @@
 package com.iwi.iwms.api.user.service.impl;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -7,11 +8,15 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import com.iwi.iwms.api.auth.domain.AuthInfo;
 import com.iwi.iwms.api.auth.service.AuthService;
 import com.iwi.iwms.api.common.errors.CommonException;
 import com.iwi.iwms.api.common.errors.ErrorCode;
+import com.iwi.iwms.api.file.domain.UploadFile;
+import com.iwi.iwms.api.file.domain.UploadFileInfo;
+import com.iwi.iwms.api.file.service.FileService;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.user.domain.User;
 import com.iwi.iwms.api.user.domain.UserInfo;
@@ -31,11 +36,15 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
+	private static final String UPLOAD_PATH_PREFIX = "profile/";
+	
 	private final UserMapper userMapper;
 	
 	private final AuthService authService;
 	
 	private final AuthProvider keycloakProvider;
+	
+	private final FileService fileService;
 	
 	@Override
 	public List<UserInfo> listUser(Map<String, Object> map) {
@@ -85,8 +94,20 @@ public class UserServiceImpl implements UserService {
 			user.setAuthSeq(authInfo.getAuthSeq());
 			user.setSsoKey(ssoKey);
 			userMapper.insertUser(user);
+			
+			// 프로필 파일 저장
+			if(user.getFile() != null && !user.getFile().isEmpty()) {
+				UploadFile uploadFile = user.getFileInfo();
+				uploadFile.setFileRefSeq(user.getUserSeq());
+				uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + user.getUserSeq());
+				fileService.insertAttachFiles(Arrays.asList(user.getFile()), uploadFile);
+			}
+		} catch(CommonException e) {
+			keycloakProvider.deleteUser(ssoKey);
+			throw new CommonException(e.getCode(), e.getReason());
 		} catch(Exception e) {
 			keycloakProvider.deleteUser(ssoKey);
+			throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, e.getMessage());
 		}
 	}
 
@@ -116,6 +137,31 @@ public class UserServiceImpl implements UserService {
 			}
 		}
 		
+		boolean hasExistsFile = userUpdate.getFileSeq() != null;
+		boolean hasFile = userUpdate.getFile() != null && !userUpdate.getFile().isEmpty();
+		
+		if(hasExistsFile) {
+			// 프로필 파일 삭제
+			List<UploadFileInfo> attachedFiles = fileService.listFileByRef(userUpdate.getFileInfo());
+			if(!CollectionUtils.isEmpty(attachedFiles)) {
+				fileService.deleteAttachFiles(attachedFiles, null);
+			}
+			
+			// 프로필 파일 저장
+			if(hasFile) {
+				UploadFile uploadFile = userUpdate.getFileInfo();
+				uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + userUpdate.getUserSeq());
+				fileService.insertAttachFiles(Arrays.asList(userUpdate.getFile()), uploadFile);
+			}
+		} else {
+			// 프로필 파일 저장
+			if(hasFile) {
+				UploadFile uploadFile = userUpdate.getFileInfo();
+				uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + userUpdate.getUserSeq());
+				fileService.insertAttachFiles(Arrays.asList(userUpdate.getFile()), uploadFile);
+			}
+		}
+		
 		return result;
 	}
 
@@ -129,6 +175,12 @@ public class UserServiceImpl implements UserService {
 		if(result > 0) {
 			//인증 서버의 사용자 삭제
 			keycloakProvider.deleteUser(userInfo.getSsoKey());
+			
+			// 프로필 파일 삭제(디렉토리까지)
+			List<UploadFileInfo> attachedFiles = fileService.listFileByRef(user.getFileInfo());
+			if(!CollectionUtils.isEmpty(attachedFiles)) {
+				fileService.deleteAttachAll(attachedFiles);
+			}
 		}
 		return result;
 	}

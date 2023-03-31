@@ -49,13 +49,15 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
 		String ssoKey = authentication.getName();
 		
 		//if(request.getRequestURI().indexOf("logout") != -1) {
-		//	redis.delete(ssoKey);
+		//	redisProvider.delete(ssoKey);
 		//	return null;
 		//}
 		
-		return userService.getLoginUser(ssoKey);
 		//return Optional.ofNullable(objectMapper.convertValue(redisProvider.getHash(ssoKey, "user"), LoginUserInfo.class))
 		//			.orElseThrow(() -> new CommonException(ErrorCode.AUTHORIZATION_FAILED, "로그인 정보를 찾을 수 없습니다."));
+		
+		LoginUserInfo loginUserInfo = objectMapper.convertValue(redisProvider.getHash(ssoKey, "user"), LoginUserInfo.class);
+		return loginUserInfo == null ? userService.getLoginUser(ssoKey) : loginUserInfo;
 	}
 
 }

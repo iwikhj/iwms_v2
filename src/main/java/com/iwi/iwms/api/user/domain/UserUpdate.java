@@ -4,6 +4,9 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
+import org.springframework.web.multipart.MultipartFile;
+
+import com.iwi.iwms.api.file.domain.UploadFile;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -75,6 +78,15 @@ public class UserUpdate {
 	@Schema(description = "검증 여부", defaultValue = "N",  allowableValues = {"Y", "N"}) 
 	private String verifyYn;
 	
+	@Schema(description = "프로필 사진 파일")
+	private MultipartFile file;
+	
+	@Schema(hidden = true, description = "프로필 파일 정보") 
+	private UploadFile fileInfo;	
+	
+	@Schema(description = "저장된 프로필 파일 SEQ")
+	private Long fileSeq;
+	
 	@Schema(description = "사용 여부", defaultValue = "Y", allowableValues = {"Y", "N"}) 
 	private String useYn;
 	
@@ -83,6 +95,12 @@ public class UserUpdate {
 	
 	public UserUpdate of(final LoginUserInfo loginUserInfo) {
 		this.loginUserSeq = loginUserInfo.getUserSeq();
+		
+		this.fileInfo = new UploadFile();
+		this.fileInfo.setFileRefTb("TB_USER");
+		this.fileInfo.setFileRefCol("USER_SEQ");
+		this.fileInfo.setFileRefSeq(this.userSeq);
+		this.fileInfo.setLoginUserSeq(loginUserInfo.getUserSeq());
 		return this;
 	}
 	

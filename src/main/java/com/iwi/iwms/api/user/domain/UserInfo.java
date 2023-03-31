@@ -1,5 +1,9 @@
 package com.iwi.iwms.api.user.domain;
 
+import java.util.List;
+
+import com.iwi.iwms.api.file.domain.UploadFileInfo;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -97,6 +101,9 @@ public class UserInfo {
 	
 	@Schema(description = "마지막 로그인 시간") 
 	private String lastLoginDt;
+	
+	@Schema(description = "프로필 파일 정보")
+	private UploadFileInfo profileFile;
 	
 	@Schema(description = "작성자 여부") 
 	private String ownerYn;

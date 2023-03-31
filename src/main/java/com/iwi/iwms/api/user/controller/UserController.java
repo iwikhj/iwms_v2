@@ -86,7 +86,7 @@ public class UserController {
 	
 	@PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
     @Operation(summary = "사용자 등록", description = "사용자 등록<br/> - 신규 사용자등록 시 비밀번호는 아이디와 동일합니다")
-	@PostMapping(value = "", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> insertUser(HttpServletRequest request
     		, @Parameter(hidden = true) LoginUserInfo loginUserInfo
 			, @ModelAttribute @Valid User user) {
@@ -100,7 +100,7 @@ public class UserController {
     
 	@PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
     @Operation(summary = "사용자 수정", description = "사용자 수정")
-	@PutMapping(value = "/{userSeq}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+	@PutMapping(value = "/{userSeq}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<ApiResponse<Boolean>> updateUser(HttpServletRequest request
 			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
 			, @PathVariable long userSeq

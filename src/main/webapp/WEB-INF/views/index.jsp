@@ -16,12 +16,18 @@
 	<h4>공지사항 삭제</h4>
 	<button type="button" onclick="del()">delete</button>
 	
+	<h4>사용자 수정</h4>
+	<button type="button" onclick="put()">put</button>
+	<input type="file" name="file">
+	
 	<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
 	
 	<script>
 	var conf = {
-		rootPath: "/iwms/v1"
+		rootPath: "http://192.168.0.77/iwms/v1"
 	}
+	
+	localStorage.setItem("accessToken", "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJmN0pKd2g3aEZDTEt2OVhEaE5NOEFNTlZpRkRZTGZxVmdqUGpXMUN1bEhZIn0.eyJleHAiOjE2ODAyMzQwODIsImlhdCI6MTY4MDIzMjI4MiwianRpIjoiMjIwMDUzOGQtNzRlMy00ODY4LWIyNzMtYWJiN2Q3MDYzMzVjIiwiaXNzIjoiaHR0cDovL3JlZ2lzdHJ5Lml3aS5jby5rcjo4MTgwL3JlYWxtcy9tYXN0ZXIiLCJhdWQiOiJpd21zIiwic3ViIjoiNjE2OTJjZGYtODAwNy00MGIxLWI2YjEtOThjMjNlNzRmZTUyIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiaXdtcyIsInNlc3Npb25fc3RhdGUiOiJlNjYyNThlYi0zODQ5LTQ1ZTYtODQ2MC0yOWE3NDI1MDBkZDgiLCJhY3IiOiIxIiwic2NvcGUiOiJpd21zIiwic2lkIjoiZTY2MjU4ZWItMzg0OS00NWU2LTg0NjAtMjlhNzQyNTAwZGQ4IiwidXNlcl9uYW1lIjoiaXdpMSIsImF1dGhvcml0aWVzIjpbIlJPTEVfSVdNU19QTSJdfQ.nARXefvPoUBIPVYeHky4Y4K2rYwPOKkAmshxku1ZlGQ_UHPTPlpWYteW_obHdNPpscW1_QIpCqbtoow61-LgMbOw1FcnehisU4rF1TRDqh3Y4qM63O9_7New8x_qQEmRIDv473asyT_DnrBqetaCTjgiBLsDIDeVCISkQk_azVM6D43yHDAEjZbXUPY8YVArqVDxABKQX2UUPesB5tsmyu0e2VR2cB2f_F79NNaHf8o0VF9vVOwPoseg77AaEp5dhPBRt7FSYeHPwyoZtw1NUxjKXQZ0aKwm5xH9oAzJrTPvUFcg2otJb2yHWNpWa2SNF-eso82JWmiruo6okUgXcw"),
 	
 	$.ajaxPrefilter(function(options, originalOptions, jqXHR ) {
 		options.headers = {"Authorization": "Bearer " + localStorage.getItem("accessToken")},
@@ -141,6 +147,33 @@
 			console.log("post success, ", success);
 		}, err => {
 			console.error("post fail, ", err);
+		});
+	}
+	
+	
+	function put() {
+		var formData = new FormData();
+		formData.append("userNm", "22사용자 이름 수정");
+		formData.append("userEmail", "test@nvaer.ocm");
+		formData.append("authCd", "ROLE_IWMS_ADMIN");
+		formData.append("compSeq", 1);
+		formData.append("deptSeq", 2);
+		formData.append("userGbCd", "01");
+		formData.append("busiRollCd", "DV");
+		formData.append("VERIFY_YN", "N");
+		formData.append("useYn", "Y");
+		
+		
+		var files = document.getElementsByName("file")[0].files;
+		
+		for(var i = 0; i < files.length; i++) {
+			formData.append("file", files[i]);	
+		}
+		
+		callAjax("/users/24", "put", formData).then(success => {
+			console.log("put success, ", success);
+		}, err => {
+			console.error("put fail, ", err);
 		});
 	}
 	

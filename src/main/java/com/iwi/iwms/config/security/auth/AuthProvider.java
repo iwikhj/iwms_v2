@@ -5,6 +5,7 @@ import java.util.Arrays;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ProcessingException;
 import javax.ws.rs.core.Response;
 
@@ -84,7 +85,7 @@ public class AuthProvider {
 			throw new CommonException(ErrorCode.LOGIN_FAILED_INCORRECT_ID_PW);
 		} catch(Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
-		}
+		}  
 	}
 	
 	/**
@@ -236,9 +237,11 @@ public class AuthProvider {
             userResource.update(idmUser);
             log.info("Updated a user by userId: {}", ssoKey);
             
+		} catch(NotFoundException e) {
+			throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "인증 서버에서 사용자를 찾을 수 없습니다.");
 		} catch(Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
-		}           
+		}          
 	}
 	
 	/**
@@ -270,9 +273,11 @@ public class AuthProvider {
             userResource.roles().realmLevel().add(Arrays.asList(newRoleRep));
             log.info("Assign roles: {}", newRoleRep);
             
+		} catch(NotFoundException e) {
+			throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "인증 서버에서 사용자를 찾을 수 없습니다.");
 		} catch(Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
-		}        
+		}     
 	}
 	
 	/**
@@ -303,9 +308,11 @@ public class AuthProvider {
             userResource.resetPassword(passwordRep);
             log.info("Changed password.");
             
+		} catch(NotFoundException e) {
+			throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "인증 서버에서 사용자를 찾을 수 없습니다.");
 		} catch(Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
-		} 
+		}  
 	}
 	
 	/**
@@ -329,6 +336,8 @@ public class AuthProvider {
             userResource.remove();
             log.info("Deleted a user by userId: {}", ssoKey);
             
+		} catch(NotFoundException e) {
+			throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "인증 서버에서 사용자를 찾을 수 없습니다.");
 		} catch(Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
 		}  
