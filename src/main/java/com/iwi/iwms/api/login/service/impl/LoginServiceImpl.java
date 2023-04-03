@@ -101,7 +101,7 @@ public class LoginServiceImpl implements LoginService{
         if(introspect == null || !introspect.isActive()) {
 			throw new CommonException(ErrorCode.AUTHENTICATION_REISSUE_FAILED, "리플레시 토큰 검증 실패.");
         }
-		
+        
         LoginUserInfo loginUserInfo = objectMapper.convertValue(redisProvider.getHash(introspect.getSub(), "user"), LoginUserInfo.class);
         if(loginUserInfo == null || loginUserInfo.getLoginIp() == null || reissue.getLoginIp() == null || !loginUserInfo.getLoginIp().equals(reissue.getLoginIp())) {
         	throw new CommonException(ErrorCode.AUTHENTICATION_REISSUE_FAILED, "로그인 아이피와 요청 아이피가 일치하지 않습니다.");

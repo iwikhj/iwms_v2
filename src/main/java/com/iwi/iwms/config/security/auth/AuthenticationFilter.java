@@ -175,7 +175,7 @@ public class AuthenticationFilter extends GenericFilterBean {
 	private void printLog(HttpServletRequest request, AuthCode authCode) {
 		try {
 			String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-			String bearerToken = StringUtils.hasText(header) ? header : "";
+			String token = StringUtils.hasText(header) ? header : "";
 			String remoteAddr = StringUtils.hasText(request.getRemoteAddr()) ? request.getRemoteAddr() : " ";
 			String url = StringUtils.hasText(request.getRequestURI()) ? request.getRequestURI().toString() : "";
 			String method = StringUtils.hasText(request.getMethod()) ? request.getMethod() : " ";
@@ -185,8 +185,8 @@ public class AuthenticationFilter extends GenericFilterBean {
 			String fullUrl = url + (StringUtils.hasText(queryString) ? ("?" + queryString) : "");
 			
 	        StringJoiner sj = new StringJoiner(">, <", "<", ">");
-	        sj.add("Status:" + authCode.name());
-	        sj.add("Token len:" + bearerToken.length());
+	        sj.add("Token length:" + token.length());
+	        sj.add("Token status:" + authCode.name());
 	        sj.add("IP:" + remoteAddr);
 	        sj.add("Method:" + method);
 	        sj.add("URI:" + fullUrl);

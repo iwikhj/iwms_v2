@@ -8,6 +8,13 @@
 </head>
 <body>
 	<h1>Hello test!</h1>
+	
+    <div>
+        <a href="http://localhost/iwms/v1/naver-login">
+            <button>네이버 로그인</button>
+        </a>
+    </div>
+    	
 	<h4>공지사항 목록</h4>
 	<button type="button" onclick="get()">get</button>
 	<h4>공지사항 등록</h4>
