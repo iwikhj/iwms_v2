@@ -68,5 +68,4 @@ public class LoginController {
 				.data(token)
 				.build());
 	}
-
 }

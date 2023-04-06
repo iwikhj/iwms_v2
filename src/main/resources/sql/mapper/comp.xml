@@ -9,10 +9,15 @@
 			ROW_NUMBER() OVER(ORDER BY COMP.COMP_SEQ) AS rowNum
 			, COMP.COMP_SEQ AS compSeq
 			, COMP.COMP_NM AS compNm
+			, COMP.COMP_CEO_NM AS compCeoNm
 			, COMP.COMP_GB_CD AS compGbCd
 			, FN_GET_CODE_NM('COMP_GB_CD', COMP.COMP_GB_CD) AS compGb
 			, COMP.COMP_TEL AS compTel
+			, COMP.COMP_EM_TEL AS compEmTel
+			, COMP.COMP_STD_YMD AS compStdYmd
+			, COMP.COMP_END_YMD AS compEndYmd
 			, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = COMP.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn				
+			, COMP.COMP_STOP_REASON AS compStopReason
 			, COMP.USE_YN AS useYn
 			, COMP.DEL_YN AS delYn
 			, DATE_FORMAT(COMP.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
@@ -65,10 +70,15 @@
 		SELECT 
 			COMP.COMP_SEQ AS compSeq
 			, COMP.COMP_NM AS compNm
+			, COMP.COMP_CEO_NM AS compCeoNm
 			, COMP.COMP_GB_CD AS compGbCd
 			, FN_GET_CODE_NM('COMP_GB_CD', COMP.COMP_GB_CD) AS compGb
 			, COMP.COMP_TEL AS compTel
-			, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = COMP.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn				
+			, COMP.COMP_EM_TEL AS compEmTel
+			, COMP.COMP_STD_YMD AS compStdYmd
+			, COMP.COMP_END_YMD AS compEndYmd
+			, CASE WHEN LOGIN.AUTH_SEQ = 1 OR LOGIN.USER_SEQ = COMP.REG_SEQ THEN 'Y' ELSE 'N' END AS ownerYn	
+			, COMP.COMP_STOP_REASON AS compStopReason
 			, COMP.USE_YN AS useYn
 			, COMP.DEL_YN AS delYn
 			, DATE_FORMAT(COMP.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
@@ -135,14 +145,24 @@
 		INSERT INTO TB_COMPANY
 		(
 		    COMP_NM
+		    , COMP_CEO_NM
 		    , COMP_GB_CD
 			, COMP_TEL
+			, COMP_EM_TEL
+			, COMP_STD_YMD
+			, COMP_END_YMD
+			, COMP_STOP_REASON
 			, USE_YN
 			, REG_SEQ
 		) VALUES (
 		    #{compNm}
+		    , #{compCeoNm}
 			, #{compGbCd}
 			, #{compTel}
+			, #{compEmTel}
+			, #{compStdYmd}
+			, #{compEndYmd}
+			, #{compStopReason}
 			, #{useYn}
 			, #{loginUserSeq}
 		)		
@@ -153,8 +173,13 @@
 		UPDATE TB_COMPANY 
 		SET
 		    COMP_NM = #{compNm}
+		    , COMP_CEO_NM = #{compCeoNm}
 			, COMP_GB_CD = #{compGbCd}
 			, COMP_TEL = #{compTel}
+			, COMP_EM_TEL = #{compEmTel}
+			, COMP_STD_YMD = #{compStdYmd}
+			, COMP_END_YMD = #{compEndYmd}
+			, COMP_STOP_REASON = #{compStopReason}
 			, USE_YN = #{useYn}
 			, UPT_DT = CURRENT_TIMESTAMP
 			, UPT_SEQ = #{loginUserSeq}

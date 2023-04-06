@@ -67,11 +67,7 @@ public class RedisProvider {
 	
 	public Object getHash(String key, String hashKey) {
     	try {
-    		if(redisTemplate.opsForHash().hasKey(key, hashKey)) {
-    			return redisTemplate.opsForHash().get(key, hashKey);
-    		} else {
-				throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "리소스를 불러올 수 없습니다. [" + key + "]");
-    		}
+    		return redisTemplate.opsForHash().get(key, hashKey);
     	} catch(RedisConnectionFailureException e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
     	}

@@ -95,7 +95,7 @@ public class SecurityConfig {
 	@Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
 	    return (web) -> web.ignoring()
-	    		.antMatchers("/", root + "/login", root + "/reissue", "/apidocs/**", "/swagger-ui/**")
+	    		.antMatchers("/", root + "/login", root + "/reissue", "/apidocs/**", "/swagger-ui/**", "/naver/**")
 	    		.requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 

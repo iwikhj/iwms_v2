@@ -25,14 +25,26 @@ public class CompInfo {
 	@Schema(description = "소속 이름")
 	private String compNm;
 	
+	@Schema(description = "대표자명")
+	private String compCeoNm;
+	
 	@Schema(description = "소속 구분 코드") 
 	private String compGbCd;
 	
 	@Schema(description = "소속 구분") 
 	private String compGb;
 	
-	@Schema(description = "소속 전화번호")
+	@Schema(description = "연락처")
 	private String compTel;
+	
+	@Schema(description = "비상연락처")
+	private String compEmTel;
+	
+	@Schema(description = "계약 시작일")
+	private String compStdYmd;
+	
+	@Schema(description = "계약 종료일")
+	private String compEndYmd;
 	
 	@Schema(description = "소속 부서 목록")
 	private List<DeptInfo> depts;
@@ -42,6 +54,9 @@ public class CompInfo {
 	
 	@Schema(description = "작성자 여부") 
 	private String ownerYn;
+	
+	@Schema(description = "정지사유") 
+	private String compStopReason;
 	
 	@Schema(description = "삭제 여부") 
 	private String delYn;	

@@ -3,7 +3,6 @@ package com.iwi.iwms.config.security.auth;
 import java.util.Arrays;
 
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.ProcessingException;
@@ -79,8 +78,6 @@ public class AuthProvider {
 	        AccessTokenResponse accessTokenResponse = tokenManager.grantToken();
 	        
 	        return accessTokenResponse;
-		} catch(ProcessingException | InternalServerErrorException e) {
-			throw new CommonException(ErrorCode.LOGIN_FAILED_INCORRECT_ID_PW);
 		} catch(NotAuthorizedException e) {
 			throw new CommonException(ErrorCode.LOGIN_FAILED_INCORRECT_ID_PW);
 		} catch(Exception e) {

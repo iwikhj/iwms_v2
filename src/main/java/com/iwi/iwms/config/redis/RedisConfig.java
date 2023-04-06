@@ -40,22 +40,24 @@ public class RedisConfig {
         RedisTemplate<String, Object> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
         
-        //일반적인 key:value의 경우 직렬화
+        //기본: key 직렬화
+        //value는 GenericJackson2JsonRedisSerializer로 json 직렬화
         redisTemplate.setKeySerializer(new StringRedisSerializer());
-        redisTemplate.setValueSerializer(new StringRedisSerializer());
+        //redisTemplate.setValueSerializer(new StringRedisSerializer());
         
-        //Hash를 사용할 경우 직렬화
-        //redisTemplate.setHashKeySerializer(new StringRedisSerializer());
+        //Hash: key:hashKey 직렬화
+        //value는 GenericJackson2JsonRedisSerializer로 json 직렬화
+        redisTemplate.setHashKeySerializer(new StringRedisSerializer());
         //redisTemplate.setHashValueSerializer(new StringRedisSerializer());
 
-        //모든 경우
+        //디폴트 직렬화
         //redisTemplate.setDefaultSerializer(new StringRedisSerializer());
         
-        //Json으로 직렬화 
+        //Hash value만 Json으로 직렬화 
         var serializer = new GenericJackson2JsonRedisSerializer(objectMapper);
-        redisTemplate.setValueSerializer(serializer);
         redisTemplate.setHashValueSerializer(serializer);
-        
+        redisTemplate.setValueSerializer(serializer);
+
         return redisTemplate;
     }
     
