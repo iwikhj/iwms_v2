@@ -2,6 +2,8 @@ package com.iwi.iwms.api.common.resolver;
 
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -29,7 +31,7 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
     
     private final ObjectMapper objectMapper;
     
-    private final UserService userService;
+	//private final UserService userService;
 	
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
@@ -39,25 +41,25 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
 	@Override
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
-		//HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+		HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
 		//String userId = (String)((ServletWebRequest) webRequest).getRequest().getAttribute("u");
 
 		//Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		Authentication authentication = Optional.ofNullable((Authentication) webRequest.getUserPrincipal())
-			.orElseThrow(() -> new CommonException(ErrorCode.AUTHENTICATION_FAILED, "미인증 사용자입니다."));
+			.orElseThrow(() -> new CommonException(ErrorCode.AUTHENTICATION_FAILED, "로그인이 필요한 서비스입니다."));
 	
 		String ssoKey = authentication.getName();
 		
-		//if(request.getRequestURI().indexOf("logout") != -1) {
-		//	redisProvider.delete(ssoKey);
-		//	return null;
-		//}
+		if(request.getRequestURI().indexOf("logout") != -1) {
+			redisProvider.delete(ssoKey);
+			return null;
+		}
 		
-		//return Optional.ofNullable(objectMapper.convertValue(redisProvider.getHash(ssoKey, "user"), LoginUserInfo.class))
-		//			.orElseThrow(() -> new CommonException(ErrorCode.AUTHORIZATION_FAILED, "로그인 정보를 찾을 수 없습니다."));
+		return Optional.ofNullable(objectMapper.convertValue(redisProvider.getHash(ssoKey, "user"), LoginUserInfo.class))
+					.orElseThrow(() -> new CommonException(ErrorCode.AUTHENTICATION_FAILED, "로그인이 필요한 서비스입니다."));
 		
-		LoginUserInfo loginUserInfo = objectMapper.convertValue(redisProvider.getHash(ssoKey, "user"), LoginUserInfo.class);
-		return loginUserInfo == null ? userService.getLoginUser(ssoKey) : loginUserInfo;
+		//LoginUserInfo loginUserInfo = objectMapper.convertValue(redisProvider.getHash(ssoKey, "user"), LoginUserInfo.class);
+		//return loginUserInfo == null ? userService.getLoginUser(ssoKey) : loginUserInfo;
 	}
 
 }

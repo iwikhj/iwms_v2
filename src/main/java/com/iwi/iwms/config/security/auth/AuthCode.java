@@ -5,9 +5,10 @@ import lombok.Getter;
 @Getter
 public enum AuthCode {
 
-	VERIFIED("Verified"),
-	EXPIRED("Expired"),
-	INVALID("Invalid")
+	TOKEN_VERIFIED("Verified token"),
+	TOKEN_EXPIRED("Expired token"),
+	TOKEN_INVALID("Invalid token"),
+	TOKEN_NOT_FOUND("Not found token")
     ;
 	
 	private String message;

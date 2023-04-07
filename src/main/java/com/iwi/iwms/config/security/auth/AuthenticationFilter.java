@@ -49,40 +49,39 @@ public class AuthenticationFilter extends GenericFilterBean {
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-      
+        
         /*
     	passAuthentication("7afcc9a8-6364-4a4d-b7cf-ad36ab62da53", Arrays.asList("ROLE_IWMS_ADMIN"));
     	//passAuthentication("55fd148f-8e00-4243-93d3-be518c287ce9", Arrays.asList("ROLE_IWMS_ENG"));
 		request = ignoreRequestHeader(servletRequest, request, HttpHeaders.AUTHORIZATION);
-		printLog(request, AuthCode.INVALID);
+		printLog(request, AuthCode.TOKEN_VERIFIED);
 		
 		chain.doFilter(request, response);
-		*/
+         */
 
-     	String token = request.getHeader(HttpHeaders.AUTHORIZATION);
+        String token = request.getHeader(HttpHeaders.AUTHORIZATION);
     	if(token == null) {
-    		printLog(request, AuthCode.INVALID);
+    		printLog(request, AuthCode.TOKEN_NOT_FOUND);
     		responseError(response, ErrorCode.AUTHENTICATION_HEADER_NOT_EXISTS);
     		return;
     	}
         
-    	token = resolveToken(token);
-        AuthCode tokenStatus = tokenValidation(token);
-     
+        AuthCode tokenStatus = tokenValidation(resolveToken(token));
         printLog(request, tokenStatus);
         
-        if(AuthCode.VERIFIED.equals(tokenStatus)) {
+        if(AuthCode.TOKEN_VERIFIED.equals(tokenStatus)) {
         	//ok
-        } else if(AuthCode.EXPIRED.equals(tokenStatus)) {
+        } else if(AuthCode.TOKEN_EXPIRED.equals(tokenStatus)) {
     		responseError(response, ErrorCode.AUTHENTICATION_EXPIRED);
     		return;
     		
-        } else if(AuthCode.INVALID.equals(tokenStatus)) {
+        } else if(AuthCode.TOKEN_INVALID.equals(tokenStatus)) {
     		responseError(response, ErrorCode.AUTHENTICATION_HEADER_MALFORMED);
     		return;
         }
         
         chain.doFilter(request, response);
+       
 	}
     
     private String resolveToken(String token) {
@@ -95,20 +94,17 @@ public class AuthenticationFilter extends GenericFilterBean {
     private AuthCode tokenValidation(String token) {
         try {
         	jwtDecoder.decode(token);
-        	return AuthCode.VERIFIED;
+        	return AuthCode.TOKEN_VERIFIED;
 		} catch(JwtValidationException e) {
-			log.info("JwtValidationException: {}", e.getMessage()); 
 			boolean expired = e.getErrors().stream()
-					.anyMatch(v -> (v.getErrorCode().equals("invalid_token") && v.getDescription().indexOf("expired") != -1));
-			
-			if(expired) {
-				return AuthCode.EXPIRED;
-			}
+					.anyMatch(v -> v.getErrorCode().equals("invalid_token") && v.getDescription().indexOf("expired") != -1);
+			if(expired) 
+				return AuthCode.TOKEN_EXPIRED;
 		} catch(BadJwtException e) {
 		} catch(JwtException e) {
 		} catch(Exception e) {}
         
-        return AuthCode.INVALID;
+        return AuthCode.TOKEN_INVALID;
     }
     
     private void passAuthentication(String ssoId, List<String> roles) {
@@ -175,22 +171,19 @@ public class AuthenticationFilter extends GenericFilterBean {
     
 	private void printLog(HttpServletRequest request, AuthCode authCode) {
 		try {
-			String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-			String token = StringUtils.hasText(header) ? header : "";
-			String remoteAddr = StringUtils.hasText(request.getRemoteAddr()) ? request.getRemoteAddr() : " ";
-			String url = StringUtils.hasText(request.getRequestURI()) ? request.getRequestURI().toString() : "";
-			String method = StringUtils.hasText(request.getMethod()) ? request.getMethod() : " ";
-			String queryString = StringUtils.hasText(request.getQueryString()) ? request.getQueryString() : "";
-			String referer = StringUtils.hasText(request.getHeader("Referer")) ? request.getHeader("Referer") : " ";
-			String agent = StringUtils.hasText(request.getHeader("User-Agent")) ? request.getHeader("User-Agent") : " ";;
+			String ip = request.getRemoteAddr();
+			StringBuffer url = request.getRequestURL();
+			String method = request.getMethod();
+			String queryString = request.getQueryString();
+			String referer = request.getHeader("Referer");
+			String agent = request.getHeader("User-Agent");
 			String fullUrl = url + (StringUtils.hasText(queryString) ? ("?" + queryString) : "");
 			
 	        StringJoiner sj = new StringJoiner(">, <", "<", ">");
-	        sj.add("Token length:" + token.length());
-	        sj.add("Token status:" + authCode.name());
-	        sj.add("IP:" + remoteAddr);
+	        sj.add("Status:" + authCode.getMessage());
+	        sj.add("IP:" + ip);
 	        sj.add("Method:" + method);
-	        sj.add("URI:" + fullUrl);
+	        sj.add("URL:" + fullUrl);
 	        sj.add("Referer:" + referer);
 	        sj.add("User-Agent:" + agent);
 

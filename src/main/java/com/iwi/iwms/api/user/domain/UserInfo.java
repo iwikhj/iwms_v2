@@ -1,7 +1,5 @@
 package com.iwi.iwms.api.user.domain;
 
-import java.util.List;
-
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;

@@ -81,7 +81,11 @@ public class ExceptionHandlers {
 	    		.message(message)
 	    		.build();
     	
-    	log.warn("[ERROR] {} {}", e.getClass().getName(), er.toString());
+    	if(e.getStackTrace().length > 0) {
+        	StackTraceElement ste = e.getStackTrace()[0];
+        	log.warn("[EXCEPTION] {}.{} [line:{}] {}", ste.getClassName(), ste.getMethodName(), ste.getLineNumber(), er.toString());
+    	}
+    	
         return new ResponseEntity<ErrorResponse>(er, code.getStatus());
     }
 }

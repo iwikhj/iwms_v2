@@ -67,6 +67,11 @@ public class UserServiceImpl implements UserService {
 	}
 	
 	@Override
+	public UserInfo getUserById(String userId) {
+		return userMapper.getUserById(userId);
+	}
+	
+	@Override
 	public boolean checkExistsUserId(String userId) {
 		return keycloakProvider.existsUsername(userId);
 	}
@@ -212,6 +217,16 @@ public class UserServiceImpl implements UserService {
 		}
 		return result;
 	}
+	
+	@Override
+	public int updateLoginSuccess(User user) {
+		return userMapper.updateLoginSuccess(user);
+	}
+
+	@Override
+	public int updateLoginFailure(User user) {
+		return userMapper.updateLoginFailure(user);
+	}
 
 	@Override
 	public LoginUserInfo getLoginUser(String ssoKey) {
@@ -228,5 +243,4 @@ public class UserServiceImpl implements UserService {
 	public List<UserSiteInfo> listSiteByUserSeq(long userSeq) {
 		return userMapper.listSiteByUserSeq(userSeq);
 	}
-
 }

@@ -1,7 +1,5 @@
 package com.iwi.iwms.api.req.domain;
 
-import javax.validation.constraints.NotNull;
-
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;

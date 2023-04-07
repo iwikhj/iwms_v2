@@ -19,6 +19,8 @@ public interface UserService {
 
 	UserInfo getUserBySeq(long userSeq, long loginUserSeq);
 	
+	UserInfo getUserById(String userId);
+	
 	boolean checkExistsUserId(String userId);
 	
 	void insertUser(User user);
@@ -30,6 +32,10 @@ public interface UserService {
 	int passwordChange(UserPwd userPwd);
 	
 	int passwordReset(UserPwd userPwd);
+	
+	int updateLoginSuccess(User user);
+	
+	int updateLoginFailure(User user);
 	
 	LoginUserInfo getLoginUser(String ssoKey);
 	

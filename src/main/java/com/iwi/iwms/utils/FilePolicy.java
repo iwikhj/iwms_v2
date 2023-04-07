@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.util.UUID;
 
 import org.apache.tomcat.util.http.fileupload.IOUtils;
-import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
 
 public class FilePolicy {

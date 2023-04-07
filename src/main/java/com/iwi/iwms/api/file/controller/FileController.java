@@ -24,11 +24,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
 import com.iwi.iwms.api.file.service.FileService;
-import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.filestorage.FileStorageResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

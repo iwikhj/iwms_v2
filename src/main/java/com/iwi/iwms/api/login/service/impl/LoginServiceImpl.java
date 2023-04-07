@@ -1,11 +1,9 @@
 package com.iwi.iwms.api.login.service.impl;
 
 import java.time.Duration;
-import java.util.Optional;
 
 import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwi.iwms.api.common.errors.CommonException;
@@ -16,7 +14,7 @@ import com.iwi.iwms.api.login.domain.Reissue;
 import com.iwi.iwms.api.login.service.LoginService;
 import com.iwi.iwms.api.user.domain.User;
 import com.iwi.iwms.api.user.domain.UserInfo;
-import com.iwi.iwms.api.user.mapper.UserMapper;
+import com.iwi.iwms.api.user.service.UserService;
 import com.iwi.iwms.config.redis.RedisProvider;
 import com.iwi.iwms.config.security.auth.AuthProvider;
 import com.iwi.iwms.config.security.auth.IntrospectResponse;
@@ -30,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class LoginServiceImpl implements LoginService{
 
-	private final UserMapper userMapper;
+	private final UserService userService;
 	
 	private final AuthProvider authProvider;
 	
@@ -38,12 +36,13 @@ public class LoginServiceImpl implements LoginService{
     
     private final ObjectMapper objectMapper;
     
-    @Transactional(rollbackFor = {Exception.class})
 	@Override
 	public AccessTokenResponse login(Login login) {
 		// 등록된 ID 확인
-		UserInfo userInfo = Optional.ofNullable(userMapper.getUserById(login.getUsername()))
-				.orElseThrow(() -> new CommonException(ErrorCode.LOGIN_FAILED_INCORRECT_ID_PW));				
+    	UserInfo userInfo = userService.getUserById(login.getUsername());
+		if(userInfo == null) {
+			throw new CommonException(ErrorCode.LOGIN_FAILED_INCORRECT_ID_PW);
+		}
 		
 		// 사용불가 ID
 		if(userInfo.getUseYn().equals("N")) {
@@ -60,10 +59,12 @@ public class LoginServiceImpl implements LoginService{
 		try {
 			accessTokenResponse = authProvider.grantToken(login.getUsername(), login.getPassword());
 		} catch(CommonException e) {
-			// 패스워드 불일치로 로그인 실패. LOGIN_ERR_CNT 증가
-			userMapper.updateLoginFailure(User.builder()
-					.userId(userInfo.getUserId())
-					.build());			
+			if(ErrorCode.LOGIN_FAILED_INCORRECT_ID_PW == e.getCode()) {
+				// 패스워드 불일치로 로그인 실패. LOGIN_ERR_CNT 증가
+				userService.updateLoginFailure(User.builder()
+						.userId(userInfo.getUserId())
+						.build());	
+			}
 			throw new CommonException(e.getCode(), e.getReason());
 		}
 		
@@ -71,13 +72,13 @@ public class LoginServiceImpl implements LoginService{
 		log.info("USERNAME: [{}], KEY: [{}]", login.getUsername(), key);
 		
 		// 사용자의 접속 정보 저장 및 LOGIN_ERR_CNT 초기화
-		userMapper.updateLoginSuccess(User.builder()
+		userService.updateLoginSuccess(User.builder()
 				.loginIp(login.getLoginIp())
 				.userSeq(userInfo.getUserSeq())
 				.build());	
 		
 		// 로그인 사용자 정보 불러오기
-		LoginUserInfo loginUserInfo = userMapper.getLoginUser(key);
+		LoginUserInfo loginUserInfo = userService.getLoginUser(key);
 		
 		// 로그인 사용자 정보 Redis 서버에 key가 존재하는지 확인하고 있으면 삭제
 		if(redisProvider.hasKey(key)) {

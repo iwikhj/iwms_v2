@@ -81,7 +81,7 @@ public class AuthProvider {
 		} catch(NotAuthorizedException e) {
 			throw new CommonException(ErrorCode.LOGIN_FAILED_INCORRECT_ID_PW);
 		} catch(Exception e) {
-			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Keycloak] " + e.getMessage());
 		}  
 	}
 	
@@ -129,7 +129,7 @@ public class AuthProvider {
             
             return usersResource.list().stream().anyMatch(v -> v.getUsername().equals(username));
 		} catch(Exception e) {
-			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Keycloak] " + e.getMessage());
 		}        
 	}
 	
@@ -199,7 +199,7 @@ public class AuthProvider {
 			if(ssoKey != null) {
 				this.deleteUser(ssoKey);
 			}
-			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Keycloak] " + e.getMessage());
 		}
 	}
 	
@@ -237,7 +237,7 @@ public class AuthProvider {
 		} catch(NotFoundException e) {
 			throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "인증 서버에서 사용자를 찾을 수 없습니다.");
 		} catch(Exception e) {
-			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Keycloak] " + e.getMessage());
 		}          
 	}
 	
@@ -273,7 +273,7 @@ public class AuthProvider {
 		} catch(NotFoundException e) {
 			throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "인증 서버에서 사용자를 찾을 수 없습니다.");
 		} catch(Exception e) {
-			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Keycloak] " + e.getMessage());
 		}     
 	}
 	
@@ -308,7 +308,7 @@ public class AuthProvider {
 		} catch(NotFoundException e) {
 			throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "인증 서버에서 사용자를 찾을 수 없습니다.");
 		} catch(Exception e) {
-			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Keycloak] " + e.getMessage());
 		}  
 	}
 	
@@ -336,7 +336,7 @@ public class AuthProvider {
 		} catch(NotFoundException e) {
 			throw new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "인증 서버에서 사용자를 찾을 수 없습니다.");
 		} catch(Exception e) {
-			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Keycloak] " + e.getMessage());
 		}  
 	}
 }

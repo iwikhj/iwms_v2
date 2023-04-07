@@ -229,7 +229,7 @@
 			AND USER.DEL_YN = 'N'			
 			AND USER.USE_YN = 'Y'
 			AND PROJ.PROJ_SEQ = #{projSeq}
-			AND USER.USER_GB_CD = '01'
+			AND USER.USER_GB_CD IN ('00','01')
 		ORDER BY USER.USER_SEQ
 	</select>
 

@@ -28,7 +28,7 @@ public class RedisProvider {
     	try {
         	redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.MILLISECONDS);
     	} catch(RedisConnectionFailureException e) {
-			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Redis] " + e.getMessage());
     	}    	
     }
 
@@ -36,7 +36,7 @@ public class RedisProvider {
     	try {
     		return redisTemplate.opsForValue().get(key);
     	} catch(RedisConnectionFailureException e) {
-			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+    		throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Redis] " + e.getMessage());
     	}
     }
 
@@ -44,7 +44,7 @@ public class RedisProvider {
     	try {
         	return redisTemplate.delete(key);
     	} catch(RedisConnectionFailureException e) {
-			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+    		throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Redis] " + e.getMessage());
     	}
     }
 
@@ -52,7 +52,7 @@ public class RedisProvider {
     	try {
         	return redisTemplate.hasKey(key);
     	} catch(RedisConnectionFailureException e) {
-			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+    		throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Redis] " + e.getMessage());
     	}
     }
 	
@@ -61,7 +61,7 @@ public class RedisProvider {
     		redisTemplate.opsForHash().put(key, hashKey, value);
     		redisTemplate.expire(key, timeout, TimeUnit.MILLISECONDS);
     	} catch(RedisConnectionFailureException e) {
-			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+    		throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Redis] " + e.getMessage());
     	}		
 	}
 	
@@ -69,7 +69,7 @@ public class RedisProvider {
     	try {
     		return redisTemplate.opsForHash().get(key, hashKey);
     	} catch(RedisConnectionFailureException e) {
-			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+    		throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Redis] " + e.getMessage());
     	}
 	}
 

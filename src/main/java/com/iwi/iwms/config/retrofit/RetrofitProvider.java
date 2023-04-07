@@ -30,7 +30,7 @@ public class RetrofitProvider {
 			throw new CommonException(e.getCode(), e.getReason());
         } catch (Exception e) {
         	//e.printStackTrace();
-			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, e.getMessage());
+			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Keycloak] " + e.getMessage());
         }
     }
 }
