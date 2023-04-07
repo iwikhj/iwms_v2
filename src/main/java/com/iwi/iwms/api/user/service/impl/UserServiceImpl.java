@@ -19,6 +19,7 @@ import com.iwi.iwms.api.file.domain.UploadFileInfo;
 import com.iwi.iwms.api.file.service.FileService;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.user.domain.User;
+import com.iwi.iwms.api.user.domain.UserFindId;
 import com.iwi.iwms.api.user.domain.UserInfo;
 import com.iwi.iwms.api.user.domain.UserProjInfo;
 import com.iwi.iwms.api.user.domain.UserPwd;
@@ -232,6 +233,12 @@ public class UserServiceImpl implements UserService {
 	public LoginUserInfo getLoginUser(String ssoKey) {
 		return Optional.ofNullable(userMapper.getLoginUser(ssoKey))
 				.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "로그인 정보를 찾을 수 없습니다."));				
+	}
+	
+	@Override
+	public String getUserIdByNameTelComp(UserFindId userFindId) {
+		return Optional.ofNullable(userMapper.getUserIdByNameTelComp(userFindId))
+				.orElseThrow(() -> new CommonException(ErrorCode.RESOURCES_NOT_EXISTS, "등록된 사용자를 찾을 수 없습니다."));		
 	}
 
 	@Override

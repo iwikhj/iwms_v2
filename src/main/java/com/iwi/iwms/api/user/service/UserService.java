@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.user.domain.User;
+import com.iwi.iwms.api.user.domain.UserFindId;
 import com.iwi.iwms.api.user.domain.UserInfo;
 import com.iwi.iwms.api.user.domain.UserProjInfo;
 import com.iwi.iwms.api.user.domain.UserPwd;
@@ -38,6 +39,8 @@ public interface UserService {
 	int updateLoginFailure(User user);
 	
 	LoginUserInfo getLoginUser(String ssoKey);
+	
+	String getUserIdByNameTelComp(UserFindId userFindId);
 	
 	List<UserProjInfo> listProjByUserSeq(long userSeq);
 

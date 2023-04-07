@@ -24,6 +24,7 @@ import com.iwi.iwms.api.common.response.ApiListResponse;
 import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.user.domain.User;
+import com.iwi.iwms.api.user.domain.UserFindId;
 import com.iwi.iwms.api.user.domain.UserInfo;
 import com.iwi.iwms.api.user.domain.UserProjInfo;
 import com.iwi.iwms.api.user.domain.UserPwd;
@@ -150,6 +151,18 @@ public class UserController {
     	
 		return ResponseEntity.ok(ApiResponse.<UserInfo>builder()
 				.data(user)
+				.build());
+    }
+    
+    @Operation(summary = "아이디 찾기", description = "이름, 전화번호, 소속이 일치하는 사용자 아이디 찾기")
+    @PostMapping(value = "/find-id", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ApiResponse<String>> findId(HttpServletRequest request
+    		, @ModelAttribute @Valid UserFindId userFindId) {
+
+    	String userId = userService.getUserIdByNameTelComp(userFindId);
+    	
+		return ResponseEntity.ok(ApiResponse.<String>builder()
+				.data(userId)
 				.build());
     }
     

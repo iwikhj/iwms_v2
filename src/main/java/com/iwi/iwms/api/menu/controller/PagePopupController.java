@@ -66,6 +66,24 @@ public class PagePopupController {
 	
 	private final AuthService authService;
 	
+    @Operation(summary = "로그인 - 아이디 찾기 팝업", description = "아이디 찾기 팝업")
+    @GetMapping(value = "/login/find-id")
+    public ResponseEntity<ApiResponse<Void>> findIdPopup(HttpServletRequest request) {
+    	
+    	//참조 데이터
+    	Map<String, Object> ref = new HashMap<>();
+    	
+    	Map<String, Object> map = new HashMap<>();
+    	map.put("useYn", "Y");
+		List<CompInfo> compList = compService.listComp(map);
+    	
+    	ref.put("compList", compList);
+
+		return ResponseEntity.ok(ApiResponse.<Void>builder()
+				.ref(ref)
+				.build());
+    }
+    
     @Operation(summary = "유지보수 - 유지보수 등록 및 수정 팝업", description = "유지보수 등록 및 수정 팝업")
     @GetMapping(value = "/maintain/request")
     public ResponseEntity<ApiResponse<ReqInfo>> requestPopup(HttpServletRequest request
@@ -136,7 +154,7 @@ public class PagePopupController {
 		List<CompInfo> compList = compService.listComp(map);
 		List<DeptInfo> deptList = null;
 		
-    	if(!CollectionUtils.isEmpty(compList) && compList.size() > 0) {
+    	if(!CollectionUtils.isEmpty(compList)) {
     		map.put("compSeq", compList.get(0).getCompSeq());
     		deptList = compService.listDept(map);
     	}
@@ -214,6 +232,5 @@ public class PagePopupController {
 				.ref(ref)
 				.build());
     }
-    
     
 }
