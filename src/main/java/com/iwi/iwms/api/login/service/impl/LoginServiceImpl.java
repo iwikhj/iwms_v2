@@ -87,7 +87,7 @@ public class LoginServiceImpl implements LoginService{
 		
 		// 로그인 사용자 정보 Redis 서버 저장
 		// key의 만료시간은 리플레시 토큰의 만료시간과 동일하게 설정
-		long timeout = Duration.ofSeconds(accessTokenResponse.getRefreshExpiresIn()).toMillis();
+		long timeout = accessTokenResponse.getRefreshExpiresIn();
 		redisProvider.setHash(key, "user", loginUserInfo, timeout);
 		redisProvider.setHash(key, "refreshToken", accessTokenResponse.getRefreshToken(), timeout);
 		

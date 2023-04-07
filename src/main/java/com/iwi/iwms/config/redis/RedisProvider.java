@@ -26,7 +26,7 @@ public class RedisProvider {
 		 * opsForHash  Hash
 		 */
     	try {
-        	redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.MILLISECONDS);
+        	redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.SECONDS);
     	} catch(RedisConnectionFailureException e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Redis] " + e.getMessage());
     	}    	
@@ -59,7 +59,7 @@ public class RedisProvider {
 	public void setHash(String key, String hashKey, Object value, long timeout) {
     	try {
     		redisTemplate.opsForHash().put(key, hashKey, value);
-    		redisTemplate.expire(key, timeout, TimeUnit.MILLISECONDS);
+    		redisTemplate.expire(key, timeout, TimeUnit.SECONDS);
     	} catch(RedisConnectionFailureException e) {
     		throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Redis] " + e.getMessage());
     	}		
