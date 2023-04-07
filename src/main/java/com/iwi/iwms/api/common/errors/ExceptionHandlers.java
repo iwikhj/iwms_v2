@@ -82,8 +82,8 @@ public class ExceptionHandlers {
 	    		.build();
     	
     	if(e.getStackTrace().length > 0) {
-        	StackTraceElement ste = e.getStackTrace()[0];
-        	log.warn("[EXCEPTION] {}.{} [line:{}] {}", ste.getClassName(), ste.getMethodName(), ste.getLineNumber(), er.toString());
+        	StackTraceElement stackTrace = e.getStackTrace()[0];
+        	log.warn("[EXCEPTION] {}.{} [line:{}] {}", stackTrace.getClassName(), stackTrace.getMethodName(), stackTrace.getLineNumber(), er.toString());
     	}
     	
         return new ResponseEntity<ErrorResponse>(er, code.getStatus());
