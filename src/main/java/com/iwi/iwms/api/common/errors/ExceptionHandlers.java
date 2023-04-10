@@ -1,9 +1,13 @@
 package com.iwi.iwms.api.common.errors;
 
+import java.beans.PropertyEditorSupport;
+import java.util.List;
+
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -11,6 +15,7 @@ import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +27,18 @@ public class ExceptionHandlers {
     @InitBinder
     public void initBinder(WebDataBinder binder) {
         binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
+        
+        // MultipartFile null 처리
+        binder.registerCustomEditor(MultipartFile.class, new PropertyEditorSupport() {
+        	@Override
+        	public void setAsText(String text) throws IllegalArgumentException {}
+        });
+        
+        // List<MultipartFile> null 처리
+        binder.registerCustomEditor(List.class, new PropertyEditorSupport() {
+        	@Override
+        	public void setAsText(String text) throws IllegalArgumentException {}
+        });
     }
     
     @ExceptionHandler(CommonException.class)

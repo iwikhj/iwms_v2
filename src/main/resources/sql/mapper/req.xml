@@ -38,7 +38,8 @@
 			AND DHIS.REQ_DTL_HIS_SEQ = (SELECT MAX(REQ_DTL_HIS_SEQ) FROM TB_REQ_DTL_HIS WHERE REQ_DTL_SEQ = DTL.REQ_DTL_SEQ)	
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE REQ.DEL_YN = 'N' AND REQ.USE_YN = 'Y' END)		
-			AND (
+			AND 
+			(
 				SELECT
 					COUNT(*)
 				FROM TB_PROJ_USER
@@ -55,9 +56,11 @@
 	<!-- 요청사항 목록 조회 -->		
 	<select id="listReq" parameterType="hashMap"
 		resultMap="resultReqMap">
+		/* listReq */
 		SELECT 
 			*
-		FROM (
+		FROM 
+		(
 			<include refid="selectReq"></include>
 		) t1
 		WHERE 1 = 1		
@@ -94,9 +97,11 @@
 	<!-- 요청사항 수 -->
 	<select id="countReq" parameterType="hashMap"
 		resultType="int">
+		/* countReq */
 		SELECT 
 			COUNT(*)
-		FROM (
+		FROM 
+		(
 			<include refid="selectReq"></include>
 		) t1	
 		WHERE 1 = 1			
@@ -135,6 +140,7 @@
 	<!-- 요청사항 단일 조회 -->	
 	<select id="getReqBySeq" parameterType="hashMap"
 		resultMap="resultGetReqMap">
+		/* getReqBySeq */
 		SELECT
 			REQ.REQ_SEQ AS reqSeq
 			, REQ.REQ_NO AS reqNo	
@@ -168,26 +174,29 @@
 	<!-- 요청사항 최종 상태 -->		
 	<select id="getFinalStatBySeq" parameterType="long"
 		resultType="string">
+		/* getFinalStatBySeq */
 		SELECT
 			FN_GET_CODE_NM(SUBSTRING(finalStatCd, 3), LEFT(finalStatCd, 2)) AS finalStat     
-		FROM (
+		FROM 
+		(
 			SELECT 	
 				MIN(CASE WHEN DTL.REQ_DTL_STAT_CD IS NULL THEN CONCAT(HIS.REQ_STAT_CD, 'REQ_STAT_CD') ELSE CONCAT(DTL.REQ_DTL_STAT_CD, 'REQ_DTL_STAT_CD')  END) AS finalStatCd
 			FROM TB_REQ REQ
 			INNER JOIN TB_REQ_HIS HIS ON REQ.REQ_SEQ = HIS.REQ_SEQ
 				AND HIS.REQ_HIS_SEQ = (SELECT MAX(REQ_HIS_SEQ) FROM TB_REQ_HIS WHERE REQ_SEQ = REQ.REQ_SEQ)	
 			LEFT JOIN TB_REQ_DTL DTL ON REQ.REQ_SEQ = DTL.REQ_SEQ	
-	           WHERE REQ.REQ_SEQ = #{reqSeq}
+			WHERE REQ.REQ_SEQ = #{reqSeq}
 		) t1
 	</select>	
 	
 	<!-- 요청사항 등록 -->	
 	<insert id="insertReq" parameterType="com.iwi.iwms.api.req.domain.Req"
 		useGeneratedKeys="true" keyProperty="reqSeq">
+		/* insertReq */
 		INSERT INTO TB_REQ
 		(
-		    REQ_NO
-		    , SITE_SEQ
+			REQ_NO
+			, SITE_SEQ
 			, REQ_YMD
 			, REQ_TYPE_CD
 			, REQ_GB_CD
@@ -197,13 +206,13 @@
 			, USE_YN
 			, REG_SEQ
 		) VALUES (
-		    (
+			(
 				SELECT 
 					CONCAT('R', DATE_FORMAT(CURRENT_TIMESTAMP, "%y"), '-', LPAD(COALESCE(MAX(SUBSTR(S_REQ.REQ_NO, 5)), 0) + 1, 6, 0))
 				FROM TB_REQ AS S_REQ
 				WHERE S_REQ.REQ_NO LIKE CONCAT('R', DATE_FORMAT(CURRENT_TIMESTAMP, "%y"), '%')
 				LIMIT 1		    
-		    )
+			)
 			, #{siteSeq}
 			, DATE_FORMAT(CURRENT_TIMESTAMP, "%Y%m%d")
 			, #{reqTypeCd}
@@ -218,9 +227,10 @@
 
 	<!-- 요청사항 수정 -->
 	<update id="updateReq" parameterType="com.iwi.iwms.api.req.domain.Req">
+		/* updateReq */
 		UPDATE TB_REQ 
 		SET
-		   REQ_TYPE_CD = #{reqTypeCd}
+			REQ_TYPE_CD = #{reqTypeCd}
 			, REQ_GB_CD = #{reqGbCd}
 			, REQ_END_YMD = #{reqEndYmd}
 			, REQ_TITLE = #{reqTitle}
@@ -233,6 +243,7 @@
 	
 	<!-- 요청사항 삭제 -->
 	<delete id="deleteReq" parameterType="com.iwi.iwms.api.req.domain.Req">
+		/* deleteReq */
 		DELETE 
 		FROM TB_REQ
 		WHERE REQ_SEQ = #{reqSeq}	 
@@ -240,10 +251,11 @@
 	
 	<!-- 요청사항 이력 등록 -->	
 	<insert id="insertReqHis" parameterType="com.iwi.iwms.api.req.domain.His">
+		/* insertReqHis */
 		INSERT INTO TB_REQ_HIS
 		(
-		    REQ_SEQ
-		    , REQ_STAT_CD
+			REQ_SEQ
+			, REQ_STAT_CD
 			, REQ_STAT_CMT
 			, REG_SEQ
 		) VALUES (
@@ -262,6 +274,7 @@
 	<!-- 작업 담당자 배정을 위한 부서 목록 조회 -->
 	<select id="listDeptForTask" parameterType="long"
 		resultMap="resultDeptTask">
+		/* listDeptForTask */
 		SELECT 
 			DEPT.COMP_SEQ AS compSeq
 			, COMP.COMP_NM AS compNm	
@@ -274,7 +287,7 @@
 		LEFT JOIN TB_PROJ PROJ ON PROJ.PROJ_SEQ = #{projSeq}
 		WHERE DEPT.USE_YN = 'Y'
 			AND COMP.DEL_YN = 'N'
-            AND COMP.USE_YN = 'Y'
+			AND COMP.USE_YN = 'Y'
 			AND COMP.COMP_GB_CD = '01'
 		ORDER BY DEPT.DEPT_ORDER_NO
 	</select>	
@@ -282,16 +295,17 @@
 	<!-- 부서별 프로젝트에 등록된 작업자 목록 조회 -->
 	<select id="listDeptUserByProjSeq" parameterType="hashMap"
 		resultType="com.iwi.iwms.api.comp.domain.DeptUserInfo">
+		/* listDeptUserByProjSeq */
 		SELECT 
 			USER.USER_SEQ AS userSeq
-            , USER.USER_NM AS userNm
-            , USER.POSI_NM AS posiNm
+			, USER.USER_NM AS userNm
+			, USER.POSI_NM AS posiNm
 			, FN_GET_CODE_NM('BUSI_ROLL_CD', USER.BUSI_ROLL_CD)  AS busiRoll
 		FROM TB_USER USER
 		INNER JOIN TB_PROJ_USER PU ON USER.USER_SEQ = PU.USER_SEQ
 		WHERE USER.DEL_YN = 'N'
-            AND USER.USE_YN = 'Y'
-            AND USER.DEPT_SEQ = #{deptSeq}
-            AND PU.PROJ_SEQ = #{projSeq}
+			AND USER.USE_YN = 'Y'
+			AND USER.DEPT_SEQ = #{deptSeq}
+			AND PU.PROJ_SEQ = #{projSeq}
 	</select>		
 </mapper>

@@ -5,6 +5,7 @@
 	<!-- 프로젝트 목록 조회 -->	
 	<select id="listProj" parameterType="hashMap"
 		resultType="com.iwi.iwms.api.comp.domain.ProjInfo">
+		/* listProj */
 		SELECT 
 			ROW_NUMBER() OVER(ORDER BY PROJ.PROJ_SEQ) AS rowNum
 			, PROJ.PROJ_SEQ AS projSeq
@@ -48,6 +49,7 @@
 	<!-- 프로젝트 수 -->	
 	<select id="countProj" parameterType="hashMap"
 		resultType="int">
+		/* countProj */
 		SELECT 
 			COUNT(*)
 		FROM TB_PROJ PROJ
@@ -82,6 +84,7 @@
 	<!-- 프로젝트 단일 조회 -->	
 	<select id="getProjBySeq" parameterType="hashMap"
 		resultMap="resultProjMap">
+		/* getProjBySeq */
 		SELECT 
 			ROW_NUMBER() OVER(ORDER BY PROJ.PROJ_SEQ) AS rowNum
 			, PROJ.PROJ_SEQ AS projSeq
@@ -108,6 +111,7 @@
 	<!-- 프로젝트별 사용자 목록 조회 -->	
 	<select id="listUserByProjSeq" parameterType="long"
 		resultType="com.iwi.iwms.api.comp.domain.ProjUserInfo">
+		/* listUserByProjSeq */
 		SELECT 
 			COMP.COMP_NM AS compNm			
 			, USER.USER_SEQ AS userSeq
@@ -117,10 +121,10 @@
 			, USER.BUSI_ROLL_CD AS busiRollCd
 			, FN_GET_CODE_NM('BUSI_ROLL_CD', USER.BUSI_ROLL_CD) AS busiRoll
 			, DEPT.DEPT_NM AS deptNm
-            , USER.POSI_NM AS posiNm
-            , 'Y' AS assignYn
+			, USER.POSI_NM AS posiNm
+			, 'Y' AS assignYn
 		FROM TB_USER USER
-        INNER JOIN TB_COMPANY COMP ON USER.COMP_SEQ = COMP.COMP_SEQ
+		INNER JOIN TB_COMPANY COMP ON USER.COMP_SEQ = COMP.COMP_SEQ
 		LEFT JOIN TB_DEPT DEPT ON USER.DEPT_SEQ = DEPT.DEPT_SEQ  		
 		INNER JOIN TB_PROJ_USER PU ON USER.USER_SEQ = PU.USER_SEQ
 		WHERE USER.DEL_YN = 'N'
@@ -130,19 +134,19 @@
 	</select>	
 
 	<!-- 프로젝트 등록 -->
-	<insert id="insertProj" parameterType="com.iwi.iwms.api.comp.domain.Proj"
-		useGeneratedKeys="true" keyProperty="projSeq">
+	<insert id="insertProj" parameterType="com.iwi.iwms.api.comp.domain.Proj">
+		/* insertProj */
 		INSERT INTO TB_PROJ
 		(
-		    COMP_SEQ
-		    , PROJ_NM
-		    , PROJ_SW_NM
-		    , PROJ_STD_YMD
-		    , PROJ_END_YMD
+			COMP_SEQ
+			, PROJ_NM
+			, PROJ_SW_NM
+			, PROJ_STD_YMD
+			, PROJ_END_YMD
 			, USE_YN
 			, REG_SEQ
 		) VALUES (
-		    #{compSeq}
+			#{compSeq}
 			, #{projNm}
 			, #{projSwNm}
 			, #{projStdYmd}
@@ -154,9 +158,10 @@
 
 	<!-- 프로젝트 수정 -->
 	<update id="updateProj" parameterType="com.iwi.iwms.api.comp.domain.Proj">
+		/* updateProj */
 		UPDATE TB_PROJ 
 		SET
-		    PROJ_NM = #{projNm}
+			PROJ_NM = #{projNm}
 			, PROJ_SW_NM = #{projSwNm}
 			, PROJ_STD_YMD = #{projStdYmd}
 			, PROJ_END_YMD = #{projEndYmd}
@@ -168,6 +173,7 @@
 
 	<!-- 프로젝트 삭제 -->	
 	<delete id="deleteProj" parameterType="com.iwi.iwms.api.comp.domain.Proj">
+		/* deleteProj */
 		DELETE 
 		FROM TB_PROJ
 		WHERE PROJ_SEQ = #{projSeq}	 
@@ -176,6 +182,7 @@
 	<!-- 프로젝트 고객사 담당자 목록 조회 -->	
 	<select id="listCustProjUser" parameterType="long"
 		resultType="com.iwi.iwms.api.comp.domain.ProjUserInfo">
+		/* listCustProjUser */
 		SELECT 
 			COMP.COMP_NM AS compNm			
 			, USER.USER_SEQ AS userSeq
@@ -185,12 +192,12 @@
 			, USER.BUSI_ROLL_CD AS busiRollCd
 			, FN_GET_CODE_NM('BUSI_ROLL_CD', USER.BUSI_ROLL_CD) AS busiRoll
 			, DEPT.DEPT_NM AS deptNm
-            , USER.POSI_NM AS posiNm
-            , CASE WHEN PU.USER_SEQ IS NOT NULL THEN 'Y' ELSE 'N' END AS assignYn
+			, USER.POSI_NM AS posiNm
+			, CASE WHEN PU.USER_SEQ IS NOT NULL THEN 'Y' ELSE 'N' END AS assignYn
 		FROM TB_USER USER
 		INNER JOIN TB_COMPANY COMP ON USER.COMP_SEQ = COMP.COMP_SEQ
-        INNER JOIN TB_PROJ PROJ ON COMP.COMP_SEQ = PROJ.COMP_SEQ     
-        LEFT JOIN TB_PROJ_USER PU ON USER.USER_SEQ = PU.USER_SEQ 
+		INNER JOIN TB_PROJ PROJ ON COMP.COMP_SEQ = PROJ.COMP_SEQ     
+		LEFT JOIN TB_PROJ_USER PU ON USER.USER_SEQ = PU.USER_SEQ 
 			AND PROJ.PROJ_SEQ = PU.PROJ_SEQ
 		LEFT JOIN TB_DEPT DEPT ON USER.DEPT_SEQ = DEPT.DEPT_SEQ   	
 		WHERE COMP.DEL_YN = 'N'
@@ -206,6 +213,7 @@
 	<!-- 프로젝트 수행사 담당자 목록 조회 -->	
 	<select id="listPerfProjUser" parameterType="long"
 		resultType="com.iwi.iwms.api.comp.domain.ProjUserInfo">
+		/* listPerfProjUser */
 		SELECT 
 			COMP.COMP_NM AS compNm			
 			, USER.USER_SEQ AS userSeq
@@ -215,12 +223,12 @@
 			, USER.BUSI_ROLL_CD AS busiRollCd
 			, FN_GET_CODE_NM('BUSI_ROLL_CD', USER.BUSI_ROLL_CD) AS busiRoll
 			, DEPT.DEPT_NM AS deptNm
-            , USER.POSI_NM AS posiNm
-            , CASE WHEN PU.USER_SEQ IS NOT NULL THEN 'Y' ELSE 'N' END AS assignYn
+			, USER.POSI_NM AS posiNm
+			, CASE WHEN PU.USER_SEQ IS NOT NULL THEN 'Y' ELSE 'N' END AS assignYn
 		FROM TB_USER USER
 		INNER JOIN TB_COMPANY COMP ON USER.COMP_SEQ = COMP.COMP_SEQ
 		INNER JOIN TB_PROJ PROJ ON USER.COMP_SEQ = USER.COMP_SEQ     
-        LEFT JOIN TB_PROJ_USER PU ON USER.USER_SEQ = PU.USER_SEQ 
+		LEFT JOIN TB_PROJ_USER PU ON USER.USER_SEQ = PU.USER_SEQ 
 			AND PU.PROJ_SEQ = #{projSeq}
 		LEFT JOIN TB_DEPT DEPT ON USER.DEPT_SEQ = DEPT.DEPT_SEQ   
 		WHERE COMP.DEL_YN = 'N'
@@ -235,17 +243,18 @@
 
 	<!-- 프로젝트 사용자 등록 -->
 	<insert id="updateProjUser" parameterType="com.iwi.iwms.api.comp.domain.ProjUser">
+		/* updateProjUser */
 		INSERT INTO TB_PROJ_USER
 		(
-		    PROJ_SEQ
-		    , USER_SEQ
-		    , BUSI_ROLL_CD
+			PROJ_SEQ
+			, USER_SEQ
+			, BUSI_ROLL_CD
 			, REG_SEQ
 		) 
 		VALUES 
 		<foreach collection="usersSeq" item="item" separator="," >
 		(
-		    #{projSeq}
+			#{projSeq}
 			, #{item}
 			, (SELECT BUSI_ROLL_CD FROM TB_USER WHERE USER_SEQ = #{item})
 			, #{loginUserSeq}
@@ -255,6 +264,7 @@
 	
 	<!-- 프로로젝트별 사용자 삭제 -->	
 	<delete id="deleteProjUser" parameterType="com.iwi.iwms.api.comp.domain.ProjUser">
+		/* deleteProjUser */
 		DELETE PU 
 		FROM TB_PROJ_USER AS PU
 		INNER JOIN TB_USER USER ON PU.USER_SEQ = USER.USER_SEQ
@@ -292,6 +302,7 @@
 	<!-- 사이트 목록 조회 -->	
 	<select id="listSite" parameterType="hashMap"
 		resultType="com.iwi.iwms.api.comp.domain.SiteInfo">
+		/* listSite */
 		<include refid="selectSite"></include>
 			AND SITE.PROJ_SEQ = #{projSeq}
 		<if test='useYn != null and useYn != ""'>
@@ -306,6 +317,7 @@
 	<!-- 사이트 수 -->	
 	<select id="countSite" parameterType="hashMap"
 		resultType="int">
+		/* countSite */
 		SELECT 
 			COUNT(*)
 		FROM TB_SITE SITE
@@ -322,23 +334,24 @@
 	<!-- 사이트 단일 조회 -->	
 	<select id="getSiteBySeq" parameterType="hashMap"
 		resultType="com.iwi.iwms.api.comp.domain.SiteInfo">
+		/* getSiteBySeq */
 		<include refid="selectSite"></include>
 			AND SITE.SITE_SEQ = #{siteSeq}
 	</select>
 
 	<!-- 사이트 등록 -->
-	<insert id="insertSite" parameterType="com.iwi.iwms.api.comp.domain.Site"
-		useGeneratedKeys="true" keyProperty="siteSeq">
+	<insert id="insertSite" parameterType="com.iwi.iwms.api.comp.domain.Site">
+		/* insertSite */
 		INSERT INTO TB_SITE
 		(
-		    PROJ_SEQ
-		    , SITE_NM
-		    , SITE_SW_NM
-		    , SITE_GB_CD
+			PROJ_SEQ
+			, SITE_NM
+			, SITE_SW_NM
+			, SITE_GB_CD
 			, USE_YN
 			, REG_SEQ
 		) VALUES (
-		   #{projSeq}
+			#{projSeq}
 			, #{siteNm}
 			, #{siteSwNm}
 			, #{siteGbCd}
@@ -349,9 +362,10 @@
 
 	<!-- 사이트 수정 -->
 	<update id="updateSite" parameterType="com.iwi.iwms.api.comp.domain.Site">
+		/* updateSite */
 		UPDATE TB_SITE 
 		SET
-		    SITE_NM = #{siteNm}
+			SITE_NM = #{siteNm}
 			, SITE_SW_NM = #{siteSwNm}
 			, SITE_GB_CD = #{siteGbCd}
 			, USE_YN = #{useYn}
@@ -362,6 +376,7 @@
 
 	<!-- 사이트 삭제 -->	
 	<delete id="deleteSite" parameterType="com.iwi.iwms.api.comp.domain.Site">
+		/* deleteSite */
 		DELETE 
 		FROM TB_SITE
 		WHERE SITE_SEQ = #{siteSeq}	 

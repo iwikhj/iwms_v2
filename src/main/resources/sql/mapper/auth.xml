@@ -5,6 +5,7 @@
 	<!-- 권한 목록 조회 -->
 	<select id="listAuth" parameterType="hashMap"
 		resultType="com.iwi.iwms.api.auth.domain.AuthInfo">
+		/* listAuth */
 		SELECT 
 			AUTH.AUTH_SEQ AS authSeq
 			, AUTH.AUTH_CD AS authCd
@@ -30,6 +31,7 @@
 	<!-- 권한 수 -->
 	<select id="countAuth" parameterType="hashMap"
 		resultType="int">
+		/* countAuth */
 		SELECT 
 			COUNT(*)
 		FROM TB_AUTH AUTH
@@ -49,6 +51,7 @@
 	<!-- 권한 상세 조회 -->
 	<select id="getAuthBySeq" parameterType="hashMap"
 		resultMap="resultAuthMap">
+		/* getAuthBySeq */
 		SELECT 
 			AUTH.AUTH_SEQ AS authSeq
 			, AUTH.AUTH_CD AS authCd
@@ -68,6 +71,7 @@
 	<!-- 권한 코드로 단일 조회 -->
 	<select id="getAuthByAuthCd" parameterType="String"
 		resultType="com.iwi.iwms.api.auth.domain.AuthInfo">
+		/* getAuthByAuthCd */
 		SELECT 
 			AUTH.AUTH_SEQ AS authSeq
 			, AUTH.AUTH_CD AS authCd
@@ -79,9 +83,10 @@
 
 	<!-- 권한 수정 -->
 	<update id="updateAuth" parameterType="com.iwi.iwms.api.auth.domain.Auth">
+		/* updateAuth */
 		UPDATE TB_AUTH 
 		SET
-		    AUTH_NM = #{authNm}
+			AUTH_NM = #{authNm}
 			, USE_YN = #{useYn}
 			, UPT_DT = CURRENT_TIMESTAMP
 			, UPT_SEQ = #{loginUserSeq}
@@ -118,6 +123,7 @@
 	<!-- 권한 메뉴 조회 -->
 	<select id="getAuthMenuByAuthSeq" parameterType="long"
 		resultMap="resultAuthMenuMap">
+		/* getAuthMenuByAuthSeq */
 		<include refid="selectAuthMenu"></include>
 			AND MENU.UP_MENU_SEQ IS NULL		
 		ORDER BY MENU.MENU_ORDER_NO
@@ -126,6 +132,7 @@
 	<!-- 권한 하위 메뉴 조회 -->
 	<select id="listAuthMenuByUpMenu" parameterType="com.iwi.iwms.api.auth.domain.AuthMenuInfo"
 		resultType="com.iwi.iwms.api.auth.domain.AuthMenuInfo">
+		/* listAuthMenuByUpMenu */
 		<include refid="selectAuthMenu"></include>
 			AND MENU.UP_MENU_SEQ = #{menuSeq}
 		ORDER BY MENU.MENU_ORDER_NO
@@ -133,10 +140,11 @@
 
 	<!-- 메뉴 권한 수정 -->
 	<update id="updateAuthMenu" parameterType="com.iwi.iwms.api.auth.domain.AuthMenu">
+		/* updateAuthMenu */
 		UPDATE TB_AUTH_MENU
 		SET
-		    READ_YN = #{readYn}
-		    , WRITE_YN = #{writeYn}
+			READ_YN = #{readYn}
+			, WRITE_YN = #{writeYn}
 			, EXEC_YN = #{execYn}
 			, USE_YN = #{useYn}
 			, UPT_DT = CURRENT_TIMESTAMP

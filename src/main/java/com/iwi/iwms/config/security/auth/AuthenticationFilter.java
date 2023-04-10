@@ -1,7 +1,6 @@
 package com.iwi.iwms.config.security.auth;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -49,7 +48,7 @@ public class AuthenticationFilter extends GenericFilterBean {
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-       
+
         /*
     	passAuthentication("7afcc9a8-6364-4a4d-b7cf-ad36ab62da53", Arrays.asList("ROLE_IWMS_ADMIN"));
     	//passAuthentication("55fd148f-8e00-4243-93d3-be518c287ce9", Arrays.asList("ROLE_IWMS_ENG"));
@@ -62,7 +61,7 @@ public class AuthenticationFilter extends GenericFilterBean {
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
     	if(token == null) {
     		printLog(request, AuthCode.TOKEN_NOT_FOUND);
-    		responseError(response, ErrorCode.AUTHENTICATION_HEADER_NOT_EXISTS);
+    		sendError(response, ErrorCode.AUTHENTICATION_HEADER_NOT_EXISTS);
     		return;
     	}
         
@@ -72,11 +71,11 @@ public class AuthenticationFilter extends GenericFilterBean {
         if(AuthCode.TOKEN_VERIFIED.equals(tokenStatus)) {
         	//ok
         } else if(AuthCode.TOKEN_EXPIRED.equals(tokenStatus)) {
-    		responseError(response, ErrorCode.AUTHENTICATION_EXPIRED);
+        	sendError(response, ErrorCode.AUTHENTICATION_EXPIRED);
     		return;
     		
         } else if(AuthCode.TOKEN_INVALID.equals(tokenStatus)) {
-    		responseError(response, ErrorCode.AUTHENTICATION_HEADER_MALFORMED);
+        	sendError(response, ErrorCode.AUTHENTICATION_HEADER_MALFORMED);
     		return;
         }
         
@@ -161,6 +160,7 @@ public class AuthenticationFilter extends GenericFilterBean {
             @Override
             public String getHeader(String name) {
                 if (header.equalsIgnoreCase(name)) {
+                	// TODO If you want to change the header value, you can put it here.
                     return null;
                 }
                 return super.getHeader(name);
@@ -190,7 +190,7 @@ public class AuthenticationFilter extends GenericFilterBean {
 		} catch(Exception e) {}
 	}
     
-    private void responseError(HttpServletResponse response, ErrorCode code) throws IOException {
+    private void sendError(HttpServletResponse response, ErrorCode code) throws IOException {
     	String er = ErrorResponse.builder()
 	    		.code(code)
 	    		.build()
@@ -198,6 +198,7 @@ public class AuthenticationFilter extends GenericFilterBean {
 		
         response.setStatus(code.getStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setCharacterEncoding("UTF-8");
         response.getWriter().write(er);
     }
 }

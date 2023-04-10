@@ -11,6 +11,7 @@
 	<!-- 요청사항 코멘트 단일 조회 -->				
 	<select id="getReqCmtBySeq" parameterType="hashMap"
 		resultMap="resultReqCmtMap">
+		/* getReqCmtBySeq */
 		SELECT
 			CMT.REQ_SEQ AS reqSeq
 			, CMT.REQ_CMT_SEQ AS cmtSeq
@@ -34,10 +35,11 @@
 	<!-- 요청사항 코멘트 등록 -->		
 	<insert id="insertReqCmt" parameterType="com.iwi.iwms.api.req.domain.Cmt"
 				useGeneratedKeys="true" keyProperty="cmtSeq">
+		/* insertReqCmt */		
 		INSERT INTO TB_REQ_CMT
 		(
-		    REQ_SEQ
-		    , REQ_HIS_SEQ
+			REQ_SEQ
+			, REQ_HIS_SEQ
 			, REQ_CMT
 			, USE_YN
 			, REG_SEQ
@@ -52,6 +54,7 @@
 
 	<!-- 요청사항 코멘트 수정 -->		
 	<update id="updateReqCmt" parameterType="com.iwi.iwms.api.req.domain.Cmt">
+		/* updateReqCmt */
 		UPDATE TB_REQ_CMT 
 		SET
 			REQ_CMT = #{cmt}
@@ -63,6 +66,7 @@
 
 	<!-- 요청사항 코멘트 삭제 -->		
 	<delete id="deleteReqCmt" parameterType="com.iwi.iwms.api.req.domain.Cmt">
+		/* deleteReqCmt */
 		DELETE 
 		FROM TB_REQ_CMT
 		WHERE REQ_CMT_SEQ = #{cmtSeq}	 

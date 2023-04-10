@@ -5,9 +5,10 @@
 	<!-- 업무 현황 -->
 	<select id="listStatsReq" parameterType="hashMap"
 		resultType="com.iwi.iwms.api.stats.domain.ReqStatsInfo">
+		/* listStatsReq */
 		SELECT 
 			COUNT(*) AS count
-            , CASE WHEN DTL.REQ_DTL_SEQ IS NULL THEN HIS.REQ_STAT_CD ELSE DTL.REQ_DTL_STAT_CD END AS stat
+			, CASE WHEN DTL.REQ_DTL_SEQ IS NULL THEN HIS.REQ_STAT_CD ELSE DTL.REQ_DTL_STAT_CD END AS stat
 		FROM TB_REQ REQ
 		INNER JOIN TB_SITE SITE ON REQ.SITE_SEQ = SITE.SITE_SEQ
 		INNER JOIN TB_REQ_HIS HIS ON REQ.REQ_SEQ = HIS.REQ_SEQ
@@ -16,7 +17,8 @@
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE REQ.DEL_YN = 'N' AND REQ.USE_YN = 'Y' END)		
 			AND CASE WHEN DTL.REQ_DTL_SEQ IS NULL THEN HIS.REQ_STAT_CD ELSE DTL.REQ_DTL_STAT_CD END NOT IN ('09', '19')
-			AND (
+			AND 
+			(
 				SELECT
 					COUNT(*)
 				FROM TB_PROJ_USER
@@ -29,7 +31,9 @@
 	<!-- 월별 유지보수 등록 건수 -->
 	<select id="listStatsReqRegByMonth" statementType="CALLABLE" parameterType="hashMap"
 		resultType="com.iwi.iwms.api.stats.domain.ReqRegStatsInfo">
-		CALL SP_STATS_BY_MONTH (
+		/* listStatsReqRegByMonth */
+		CALL SP_STATS_BY_MONTH 
+		(
 			#{statsStartYmd, mode=IN, jdbcType=VARCHAR}
 			, #{statsEndYmd, mode=IN, jdbcType=VARCHAR}
 			, #{date, mode=OUT, jdbcType=VARCHAR}

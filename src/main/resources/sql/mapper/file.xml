@@ -18,6 +18,7 @@
 	<!-- 참조 파일 목록 조회 -->	
 	<select id="listFileByRef" parameterType="com.iwi.iwms.api.file.domain.UploadFile"
 		resultType="com.iwi.iwms.api.file.domain.UploadFileInfo">
+		/* listFileByRef */
 		<include refid="selectFile"></include>
 			AND FILE.FILE_REF_TB = #{fileRefTb}
 			AND FILE.FILE_REF_COL = #{fileRefCol}
@@ -28,24 +29,25 @@
 	<!-- 참조 파일 단일 조회 -->		
 	<select id="getFileBySeq" parameterType="long"
 		resultType="com.iwi.iwms.api.file.domain.UploadFileInfo">
+		/* getFileBySeq */
 		<include refid="selectFile"></include>
 			AND FILE.FILE_SEQ = #{fileSeq}
 	</select>	
 
 	<!-- 참조 파일 등록 -->			
-	<insert id="insertFile" parameterType="com.iwi.iwms.api.file.domain.UploadFile"
-		useGeneratedKeys="true" keyProperty="fileSeq">
+	<insert id="insertFile" parameterType="com.iwi.iwms.api.file.domain.UploadFile">
+		/* insertFile */
 		INSERT INTO TB_FILE
 		(
-		    FILE_REF_TB
-		    , FILE_REF_COL
+			FILE_REF_TB
+			, FILE_REF_COL
 			, FILE_REF_SEQ
 			, FILE_ORG_NM
 			, FILE_REAL_NM
 			, FILE_REAL_PATH
 			, REG_SEQ
 		) VALUES (
-		    #{fileRefTb}
+			#{fileRefTb}
 			, #{fileRefCol}
 			, #{fileRefSeq}
 			, #{fileOrgNm}
@@ -57,6 +59,7 @@
 
 	<!-- 참조 파일 삭제 -->	
 	<delete id="deleteFile" parameterType="long">
+		/* deleteFile */
 		DELETE 
 		FROM TB_FILE
 		WHERE FILE_SEQ = #{fileSeq}	 
@@ -64,6 +67,7 @@
 
 	<!-- 참조 파일 정렬 업데이트 -->	
 	<update id="updateOrderNum" parameterType="com.iwi.iwms.api.file.domain.UploadFile">
+		/* updateOrderNum */
 		UPDATE TB_FILE FILE,
 			(SELECT 
 				@ROWNUM:=@ROWNUM + 1 AS ROWNUM
