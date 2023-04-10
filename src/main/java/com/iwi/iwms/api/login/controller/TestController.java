@@ -26,7 +26,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
@@ -47,11 +46,10 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Social login test", description = "IWMS 소셜 로그인 관리")
 @RequiredArgsConstructor
 @Controller
-@RequestMapping("/naver")
-public class NaverController {
+public class TestController {
 	
 	@Operation(hidden = true)
-    @GetMapping(value = "/login")
+    @GetMapping(value = "/naver/login")
 	public ModelAndView swagger(@Parameter(hidden = true) Locale locale) throws Exception {
         
 		SecureRandom random = new SecureRandom();
@@ -70,7 +68,7 @@ public class NaverController {
 	}
 
 	@Operation(hidden = true)
-	@GetMapping(value = "/token")
+	@GetMapping(value = "/naver/token")
 	@ResponseBody
 	public ResponseEntity<ApiResponse<Map<String, Object>>> naverToken(HttpServletRequest request
 			, @RequestParam(value = "code", required = false) String code
@@ -107,7 +105,7 @@ public class NaverController {
 	}
 	
 	@Operation(hidden = true)
-	@GetMapping(value = "/profile")
+	@GetMapping(value = "/naver/profile")
 	@ResponseBody
 	public ResponseEntity<ApiResponse<Map<String, Object>>> naverProfile(HttpServletRequest request
 			, @RequestParam(value = "token", required = false) String token) throws JsonMappingException, JsonProcessingException {
