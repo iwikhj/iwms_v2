@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
@@ -43,7 +44,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-@Tag(name = "Social login test", description = "IWMS 소셜 로그인 관리")
+@Tag(name = "Social login test", description = "IWMS 소셜 로그인 테스트")
 @RequiredArgsConstructor
 @Controller
 public class TestController {
@@ -132,15 +133,15 @@ public class TestController {
 
 	private HttpEntity<MultiValueMap<String, String>> makeTokenRequest(MultiValueMap<String, String> params) {
 	    HttpHeaders headers = new HttpHeaders();
-	    headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+	    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 	    HttpEntity<MultiValueMap<String, String>> naverTokenRequest = new HttpEntity<>(params, headers);
 	    return naverTokenRequest;
 	}
-	
+
 	private HttpEntity<MultiValueMap<String, String>> makeProfileRequest(String naverToken) {
 	    HttpHeaders headers = new HttpHeaders();
-	    headers.add("Authorization", "Bearer "+ naverToken);
-	    headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+	    headers.setBearerAuth(naverToken);
+	    headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
 	    HttpEntity<MultiValueMap<String, String>> naverProfileRequest = new HttpEntity<>(headers);
 	    return naverProfileRequest;
 	}

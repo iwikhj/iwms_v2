@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.MethodParameter;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -27,11 +28,14 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResolver {
 	
+	@Value("${app.path}/${app.version}/pages")
+	String pages;
+	
     private final RedisProvider redisProvider;
     
     private final ObjectMapper objectMapper;
     
-	private final UserService userService;
+	//private final UserService userService;
 	
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
@@ -42,24 +46,27 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
 	public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer,
 			NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
 		HttpServletRequest request = webRequest.getNativeRequest(HttpServletRequest.class);
+		String uri = request.getRequestURI();
 		//String userId = (String)((ServletWebRequest) webRequest).getRequest().getAttribute("u");
 
 		//Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		Authentication authentication = Optional.ofNullable((Authentication) webRequest.getUserPrincipal())
-			.orElseThrow(() -> new CommonException(ErrorCode.AUTHENTICATION_FAILED, "로그인 해주세요."));
+				.orElseThrow(() -> new CommonException(ErrorCode.AUTHENTICATION_FAILED, "로그인 해주세요."));
 	
 		String ssoKey = authentication.getName();
 		
-		if(request.getRequestURI().indexOf("logout") != -1) {
+		if(uri.indexOf("logout") != -1) {
 			redisProvider.delete(ssoKey);
 			return null;
 		}
 		
-		return Optional.ofNullable(objectMapper.convertValue(redisProvider.getHash(ssoKey, "user"), LoginUserInfo.class))
-					.orElseThrow(() -> new CommonException(ErrorCode.AUTHENTICATION_FAILED, "로그인 해주세요."));
+		LoginUserInfo loginUserInfo = Optional.ofNullable(objectMapper.convertValue(redisProvider.getHash(ssoKey, "user"), LoginUserInfo.class))
+				.orElseThrow(() -> new CommonException(ErrorCode.AUTHENTICATION_FAILED, "로그인 해주세요."));
+ 
+		loginUserInfo.setMenuSelected(pages, uri);
 		
+    	return loginUserInfo;
 		//LoginUserInfo loginUserInfo = objectMapper.convertValue(redisProvider.getHash(ssoKey, "user"), LoginUserInfo.class);
 		//return loginUserInfo == null ? userService.getLoginUser(ssoKey) : loginUserInfo;
 	}
-
 }

@@ -1,6 +1,7 @@
 package com.iwi.iwms.api.login.domain;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.iwi.iwms.api.auth.domain.AuthMenuInfo;
 
@@ -68,4 +69,34 @@ public class LoginUserInfo {
 	
 	@Schema(description = "메뉴 목록")
 	private List<AuthMenuInfo> menus;
+	
+	public void setMenuSelected(String pages, String uri) {
+		//Mapping이 pages가 아니면 무시
+    	if(uri.indexOf(pages) != -1) {
+    		
+    		//전체 URI에서 /pages까지 경로 제거
+    	   	String page = uri.replaceFirst(pages, "");
+    	   	
+    	   	//URI에서 /detail이후 경로 제외
+    	   	page = page.substring(0, page.lastIndexOf("/detail") == -1 ? page.length() : page.lastIndexOf("/detail"));
+    	   	
+    	   	//gnb menu 추출
+    	   	String gnbMenu = page.lastIndexOf("/") == 0 ? page : page.substring(0, page.lastIndexOf("/"));
+    	   	
+    	   	//lnb menu 추출
+    		String lnbMenu = page;
+    	   	
+    	   	this.getMenus().stream()
+	    	   		.filter(v -> v.getPageUrl().equals(gnbMenu))
+	    	   		.map(v -> {
+	    	   			v.setSelectedYn("Y");
+	    	   			v.getSubMenus().stream()
+	    	   				.filter(s -> s.getPageUrl().equals(lnbMenu))
+	    	   				.map(s -> {s.setSelectedYn("Y"); return s;})
+	    	   				.collect(Collectors.toList());    	   			
+	    	   			return v;
+	    	   		})
+	    	   		.collect(Collectors.toList());
+    	}	
+	}
 }

@@ -50,12 +50,12 @@ public class AuthMenuInfo {
 	@Schema(description = "실행 권한")
 	private String execYn;
 	
-	@Schema(description = "하위 메뉴") 
-	private List<AuthMenuInfo> subMenus;
-	
 	@Schema(description = "사용 여부") 
 	private String useYn;
 	
 	@Schema(description = "선택 여부") 
 	private String selectedYn;
+	
+	@Schema(description = "하위 메뉴") 
+	private List<AuthMenuInfo> subMenus;
 }

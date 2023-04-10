@@ -73,7 +73,7 @@ public class PageController {
 	private final AuthService authService;
 	
 	private final StatsService statsService;
-    
+	
 	/**
 	 * 메뉴 홈
 	 */
