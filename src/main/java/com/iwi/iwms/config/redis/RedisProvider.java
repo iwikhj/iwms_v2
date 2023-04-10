@@ -17,14 +17,15 @@ public class RedisProvider {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
+	/*
+	 * opsForValue String 
+	 * opsForList  List 
+	 * opsForSet   Set 
+	 * opsForZSet  Sorted Set
+	 * opsForHash  Hash
+	 */
+    
     public void set(String key, Object value, long timeout) {
-		/*
-		 * opsForValue String 
-		 * opsForList  List 
-		 * opsForSet   Set 
-		 * opsForZSet  Sorted Set
-		 * opsForHash  Hash
-		 */
     	try {
         	redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.SECONDS);
     	} catch(RedisConnectionFailureException e) {
@@ -56,9 +57,16 @@ public class RedisProvider {
     	}
     }
 	
-	public void setHash(String key, String hashKey, Object value, long timeout) {
+	public void setHash(String key, String hashKey, Object value) {
     	try {
     		redisTemplate.opsForHash().put(key, hashKey, value);
+    	} catch(RedisConnectionFailureException e) {
+    		throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Redis] " + e.getMessage());
+    	}		
+	}
+	
+	public void setTtl(String key, long timeout) {
+    	try {
     		redisTemplate.expire(key, timeout, TimeUnit.SECONDS);
     	} catch(RedisConnectionFailureException e) {
     		throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Redis] " + e.getMessage());

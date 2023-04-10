@@ -1,5 +1,6 @@
 package com.iwi.iwms.api.file.service;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -8,7 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.iwi.iwms.api.file.domain.UploadFile;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
-import com.iwi.iwms.filestorage.FileStorageResponse;
 
 public interface FileService {
 
@@ -20,7 +20,7 @@ public interface FileService {
 	
 	void deleteAttachAll(List<UploadFileInfo> attachedFiles);
 	
-	FileStorageResponse upload(MultipartFile multipartFile, Path path);
+	File upload(MultipartFile multipartFile, Path path);
 	
 	UploadFileInfo getFileBySeq(long fileSeq);
 	

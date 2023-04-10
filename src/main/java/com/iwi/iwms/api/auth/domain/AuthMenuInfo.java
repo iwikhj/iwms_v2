@@ -55,4 +55,7 @@ public class AuthMenuInfo {
 	
 	@Schema(description = "사용 여부") 
 	private String useYn;
+	
+	@Schema(description = "선택 여부") 
+	private String selectedYn;
 }

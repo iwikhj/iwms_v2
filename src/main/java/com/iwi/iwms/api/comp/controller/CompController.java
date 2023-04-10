@@ -39,7 +39,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RestController
 @PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
-@RequestMapping("${app.root}/${app.version}/companies")
+@RequestMapping("${app.path}/${app.version}/companies")
 public class CompController {
 	
 	private final CompService compService; 

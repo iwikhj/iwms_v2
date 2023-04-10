@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Login", description = "IWMS 로그인 관리")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("${app.root}/${app.version}")
+@RequestMapping("${app.path}/${app.version}")
 public class LoginController {
 	
 	private final LoginService loginService;

@@ -49,15 +49,15 @@ public class AuthenticationFilter extends GenericFilterBean {
 	public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain chain) throws IOException, ServletException {
 		HttpServletRequest request = (HttpServletRequest) servletRequest;
         HttpServletResponse response = (HttpServletResponse) servletResponse;
-        /*
+        
     	passAuthentication("7afcc9a8-6364-4a4d-b7cf-ad36ab62da53", Arrays.asList("ROLE_IWMS_ADMIN"));
     	//passAuthentication("55fd148f-8e00-4243-93d3-be518c287ce9", Arrays.asList("ROLE_IWMS_ENG"));
 		request = ignoreRequestHeader(servletRequest, request, HttpHeaders.AUTHORIZATION);
 		printLog(request, AuthCode.TOKEN_VERIFIED);
 		
 		chain.doFilter(request, response);
-         */
-        
+         
+         /*
         String token = request.getHeader(HttpHeaders.AUTHORIZATION);
     	if(token == null) {
     		printLog(request, AuthCode.TOKEN_NOT_FOUND);
@@ -80,7 +80,7 @@ public class AuthenticationFilter extends GenericFilterBean {
         }
         
         chain.doFilter(request, response);
-       
+        */
 	}
     
     private String resolveToken(String token) {

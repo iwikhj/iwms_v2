@@ -10,7 +10,7 @@
 	<h1>Hello test!</h1>
 	
     <div>
-        <a href="http://localhost/iwms/v1/naver-login">
+        <a href="http://localhost/naver/login">
             <button>네이버 로그인</button>
         </a>
     </div>
@@ -31,7 +31,7 @@
 	
 	<script>
 	var conf = {
-		rootPath: "http://localhost/iwms/v1"
+		rootPath: "http://192.168.0.77/iwms/v1"
 	}
 	
 	localStorage.setItem("accessToken", "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJmN0pKd2g3aEZDTEt2OVhEaE5NOEFNTlZpRkRZTGZxVmdqUGpXMUN1bEhZIn0.eyJleHAiOjE2ODAyMzYyNjIsImlhdCI6MTY4MDIzNDQ2MiwianRpIjoiOTViNTFlMDEtYmM3NS00MTljLTg4N2ItZWI5MTZhZWU1MjdhIiwiaXNzIjoiaHR0cDovL3JlZ2lzdHJ5Lml3aS5jby5rcjo4MTgwL3JlYWxtcy9tYXN0ZXIiLCJhdWQiOiJpd21zIiwic3ViIjoiNjE2OTJjZGYtODAwNy00MGIxLWI2YjEtOThjMjNlNzRmZTUyIiwidHlwIjoiQmVhcmVyIiwiYXpwIjoiaXdtcyIsInNlc3Npb25fc3RhdGUiOiJjNDRjMWRhZi0wZTVlLTQ3NTEtODI4MC0yMmI0MzExZTFhYzEiLCJhY3IiOiIxIiwic2NvcGUiOiJpd21zIiwic2lkIjoiYzQ0YzFkYWYtMGU1ZS00NzUxLTgyODAtMjJiNDMxMWUxYWMxIiwidXNlcl9uYW1lIjoiaXdpMSIsImF1dGhvcml0aWVzIjpbIlJPTEVfSVdNU19QTSJdfQ.RJ3l5dbZNHqv8m013J_LHFTGf8yW4L5hmmwVLRp_c_XqNNlM1Mn2xhHDPXLxbX3pHMl8Im6Gb7t2VvrUDCF_2D3e6NfOef3EpMz3gT2sdunh20V0fqTOgPA_Wl4ixR_ggR5AWnviwngXagS6aQ3zPvwNSBJF_n0_96qFzaZ1p_Py5TkwCEOX8R1AapIkI1oNHZesOkVfeZebLzjV1eefdH87avImilbs1IqdeeJe8k0gwdz2vHvghKjBtvZIjvwhMPPReu34jZ7KCObz1-33ZZ2Mes69hp5FZtYRO-UsrTbbEgCb4udY0XflkzgQ2sGck_75K2eE_fUTEFphJ6yGhw");

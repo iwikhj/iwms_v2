@@ -20,13 +20,13 @@ import io.swagger.v3.oas.models.security.SecurityScheme;
 public class SpringDocConfig {
 	
 	@Value("${app.version}") 
-	private String appVersion;
+	private String version;
 	
     @Bean
     public OpenAPI openApi() {
         Info info = new Info()
             .title("openapi docs")
-            .version(appVersion)
+            .version(version)
             .description("잘못된 부분이나 오류 발생 시 <a href='#' title='khj@iwi.co.kr'>담당 개발자</a>에게 문의 바랍니다.");
 
 	    // Security 스키마 설정

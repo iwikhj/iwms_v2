@@ -1,16 +1,15 @@
 package com.iwi.iwms.filestorage.service;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
 import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.iwi.iwms.filestorage.FileStorageResponse;
-
 public interface FileStorageService {
 	
-	FileStorageResponse store(final MultipartFile multipartFile, final Path path, final String filename);
+	File store(final MultipartFile multipartFile, final Path path);
 
 	Path move(final Path source, final Path target);
 	

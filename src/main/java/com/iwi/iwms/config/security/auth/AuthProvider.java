@@ -58,8 +58,8 @@ public class AuthProvider {
 	
 	/**
 	 * 토큰 발급
-	 * @param String username
-	 * @param String password
+	 * @param username
+	 * @param password
 	 * @return AccessTokenResponse
 	 * @exception ProcessingException | InternalServerErrorException: 인증 서버 접속 오류
 	 * @exception NotAuthorizedException: 인증 실패
@@ -87,7 +87,7 @@ public class AuthProvider {
 	
 	/**
 	 * 액세스 토큰 재발급
-	 * @param String refreshToken
+	 * @param refreshToken
 	 * @return ReissueResponse
 	 */
 	public ReissueResponse reissue(@NotNull String refreshToken) {
@@ -97,7 +97,7 @@ public class AuthProvider {
 	
 	/**
 	 * 토큰 검사
-	 * @param String token
+	 * @param token
 	 * @return IntrospectResponse
 	 */
 	public IntrospectResponse tokenIntrospect(String token) {
@@ -112,8 +112,8 @@ public class AuthProvider {
 	
 	/**
 	 * 사용자 아이디 중복 체크
-	 * @param String username
-	 * @return boolean
+	 * @param username
+	 * @return {true} If the id has already been registered; {false} otherwise 
 	 */
 	public boolean existsUsername(String username) {
 		try (Keycloak keycloak = KeycloakBuilder.builder()
@@ -135,13 +135,13 @@ public class AuthProvider {
 	
 	/**
 	 * 인증서버 사용자 등록
-	 * @param String username
-	 * @param String password
-	 * @param String firstName
-	 * @param String lastName
-	 * @param String email
-	 * @param String roles
-	 * @return String
+	 * @param username
+	 * @param password
+	 * @param firstName
+	 * @param lastName
+	 * @param email
+	 * @param roles
+	 * @return ssoKey
 	 */
 	public String insertUser(@NotNull String username, @NotNull String password, String firstName, String lastName, String email, @NotNull String role) {
 		String ssoKey = null;
@@ -205,10 +205,10 @@ public class AuthProvider {
 	
 	/**
 	 * 인증서버 사용자 정보 변경
-	 * @param String ssoKey
-	 * @param String firstName
-	 * @param String lastName
-	 * @param String email
+	 * @param ssoKey
+	 * @param firstName
+	 * @param lastName
+	 * @param email
 	 */
 	public void updateUser(String ssoKey, String firstName, String lastName, String email) {
 		try (Keycloak keycloak = KeycloakBuilder.builder()
@@ -243,9 +243,9 @@ public class AuthProvider {
 	
 	/**
 	 * 인증서버 사용자 권한 변경
-	 * @param String ssoKey
-	 * @param String oldRole
-	 * @param String newRole
+	 * @param ssoKey
+	 * @param oldRole
+	 * @param newRole
 	 */
 	public void updateRole(@NotNull String ssoKey, @NotNull String oldRole, @NotNull String newRole) {
 		try (Keycloak keycloak = KeycloakBuilder.builder()
@@ -279,8 +279,8 @@ public class AuthProvider {
 	
 	/**
 	 * 인증서버 사용자 비밀번호 변경
-	 * @param String ssoKey
-	 * @param String password
+	 * @param ssoKey
+	 * @param password
 	 */
 	public void changePassword(@NotNull String ssoKey, @NotNull String password) {
 		try (Keycloak keycloak = KeycloakBuilder.builder()
@@ -314,7 +314,7 @@ public class AuthProvider {
 	
 	/**
 	 * 인증서버 사용자 삭제
-	 * @param String ssoKey
+	 * @param ssoKey
 	 */
 	public void deleteUser(@NotNull String ssoKey) {
 		try (Keycloak keycloak = KeycloakBuilder.builder()

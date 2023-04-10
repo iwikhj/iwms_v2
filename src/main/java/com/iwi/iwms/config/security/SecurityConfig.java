@@ -30,26 +30,18 @@ import com.iwi.iwms.config.security.auth.AuthorizationAccessDeniedHandler;
 import com.nimbusds.jose.shaded.json.JSONArray;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
 @RequiredArgsConstructor
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
-
-	@Value("${app.root}/${app.version}")
-	private String root;
 	
-	private String jwkSetUri;
+	@Value("${app.path}/${app.version}")
+	private String PATH;
 	
-	@Value("${keycloak.jwk-set-uri}")
-    private void setJwkSetUri(String jwkSetUri
-				    		, @Value("${keycloak.auth-server-url}") String authServerUrl
-				    		, @Value("${keycloak.realm}") String realm) {
-		this.jwkSetUri = authServerUrl + "/realms/" + realm + jwkSetUri;
-    }
+	@Value("${keycloak.auth-server-url}/realms/${keycloak.realm}/${keycloak.jwk-set-uri}")
+	private String JWT_SET_URI;
 	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -86,16 +78,17 @@ public class SecurityConfig {
                 .antMatchers(matcher.getUrl()).hasAuthority(matcher.getAuthority());
         }
         */
+		
 		http
 		 	.authorizeRequests()
-		 	.antMatchers(HttpMethod.POST, root + "/auths/**").hasRole("IWMS_ADMIN")
-		 	.antMatchers(root + "/notices/**").hasAnyRole("IWMS_PM");
+		 	.antMatchers(HttpMethod.POST, this.PATH + "/auths/**").hasRole("IWMS_ADMIN")
+		 	.antMatchers(this.PATH + "/notices/**").hasAnyRole("IWMS_PM");
 	}
 	
 	@Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
 	    return (web) -> web.ignoring()
-	    		.antMatchers("/", root + "/login", root + "/reissue", "/apidocs/**", "/swagger-ui/**", "/naver/**")
+	    		.antMatchers("/", this.PATH + "/login", this.PATH + "/reissue", "/apidocs/**", "/swagger-ui/**", "/naver/**")
 	    		.requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
@@ -116,6 +109,6 @@ public class SecurityConfig {
 	
 	@Bean
 	JwtDecoder jwtDecoder() {
-		return NimbusJwtDecoder.withJwkSetUri(this.jwkSetUri).build();
+		return NimbusJwtDecoder.withJwkSetUri(this.JWT_SET_URI).build();
 	}
 }

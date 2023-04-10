@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Statistics", description = "IWMS 유지보수 통계")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("${app.root}/${app.version}/statistics")
+@RequestMapping("${app.path}/${app.version}/statistics")
 public class StatsController {
 
 	private final StatsService statsService;

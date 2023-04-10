@@ -43,7 +43,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Page popup", description = "IWMS 페이지별 팝업 정보")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("${app.root}/${app.version}/popup")
+@RequestMapping("/${app.version}/popup")
 public class PagePopupController {
 	
 	private static final int DEFAULT_PAGE = 1;

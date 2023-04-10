@@ -80,16 +80,17 @@ public class LoginServiceImpl implements LoginService{
 		// 로그인 사용자 정보 불러오기
 		LoginUserInfo loginUserInfo = userService.getLoginUser(key);
 		
-		// 로그인 사용자 정보 Redis 서버에 key가 존재하는지 확인하고 있으면 삭제
+		// Redis에 key가 존재하는지 확인하고 있으면 삭제
 		if(redisProvider.hasKey(key)) {
 			redisProvider.delete(key);
 		}
 		
-		// 로그인 사용자 정보 Redis 서버 저장
-		// key의 만료시간은 리플레시 토큰의 만료시간과 동일하게 설정
-		long timeout = accessTokenResponse.getRefreshExpiresIn();
-		redisProvider.setHash(key, "user", loginUserInfo, timeout);
-		redisProvider.setHash(key, "refreshToken", accessTokenResponse.getRefreshToken(), timeout);
+		// 로그인 사용자 정보 Redis 등록
+		redisProvider.setHash(key, "user", loginUserInfo);
+		redisProvider.setHash(key, "refreshToken", accessTokenResponse.getRefreshToken());
+		
+		// TTL 설정. 리플레시 토큰의 만료시간과 동일하게 설정(초)
+		redisProvider.setTtl(key, accessTokenResponse.getRefreshExpiresIn());
 		
 		return accessTokenResponse;
 	}

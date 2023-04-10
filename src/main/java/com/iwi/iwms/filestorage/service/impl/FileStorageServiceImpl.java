@@ -7,11 +7,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
-import org.apache.tika.Tika;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -20,8 +18,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.iwi.iwms.api.common.errors.CommonException;
 import com.iwi.iwms.api.common.errors.ErrorCode;
-import com.iwi.iwms.filestorage.FileStorageResponse;
 import com.iwi.iwms.filestorage.service.FileStorageService;
+import com.iwi.iwms.utils.FilePolicy;
 
 import lombok.RequiredArgsConstructor;
 
@@ -29,15 +27,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class FileStorageServiceImpl implements FileStorageService {
 	
-	@Value("${app.root}/${app.version}")
-	private String root;
-	
-	private final Tika tika = new Tika();
-	
 	private Path uploadPath;
 	
     @Value("${file.storage.upload-path}")
-    private void setRootPath(String uploadPath) throws IOException {
+    private void setUploadPath(String uploadPath) throws IOException {
 		this.uploadPath = Paths.get(uploadPath).toAbsolutePath();
 		//this.rootPath = Paths.get(System.getProperty("user.dir")).resolve(uploadPath.substring(1)).toAbsolutePath());
 		if (!Files.exists(this.uploadPath)) {
@@ -46,30 +39,19 @@ public class FileStorageServiceImpl implements FileStorageService {
     }
 	
 	@Override
-	public FileStorageResponse store(MultipartFile multipartFile, Path path, String filename) {
+	public File store(MultipartFile multipartFile, Path path) {
         try {
         	Path forder = uploadPath.resolve(path).normalize();
         	if (!Files.exists(forder)) {
         		Files.createDirectories(forder);
         	}
         	
-        	String originalFilename = multipartFile.getOriginalFilename();
+        	String filename = FilePolicy.rename(multipartFile.getOriginalFilename());
         	
         	Path target = forder.resolve(filename);
-        	File file = target.toFile();
-        	
         	multipartFile.transferTo(target);
         	
-          	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    		
-        	return FileStorageResponse.builder()
-        		.originalFilename(originalFilename)
-        		.filename(filename)
-        		.link(root + "/files/link/" + path.toString().replace("\\", "/") + "/" + filename)
-        		.type(tika.detect(file))
-        		.size(file.length())
-        		.lastModified(sdf.format(file.lastModified()))
-        		.build();
+        	return target.toFile();
         	
         } catch (IOException e) {
         	throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "파일 스토리지 오류. " + e.getMessage());

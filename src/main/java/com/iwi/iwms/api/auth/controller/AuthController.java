@@ -37,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @RestController
 @PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
-@RequestMapping("${app.root}/${app.version}/auths")
+@RequestMapping("${app.path}/${app.version}/auths")
 public class AuthController {
 	
 	private final AuthService authService;

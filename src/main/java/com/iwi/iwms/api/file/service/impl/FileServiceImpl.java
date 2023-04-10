@@ -1,5 +1,6 @@
 package com.iwi.iwms.api.file.service.impl;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -16,7 +17,6 @@ import com.iwi.iwms.api.file.domain.UploadFile;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
 import com.iwi.iwms.api.file.mapper.FileMapper;
 import com.iwi.iwms.api.file.service.FileService;
-import com.iwi.iwms.filestorage.FileStorageResponse;
 import com.iwi.iwms.filestorage.service.FileStorageService;
 import com.iwi.iwms.utils.FilePolicy;
 
@@ -42,11 +42,10 @@ public class FileServiceImpl implements FileService {
 	public void insertAttachFiles(List<MultipartFile> multipartFiles, UploadFile uploadFile) {
 		multipartFiles.stream()
 			.forEach(multipartFile -> {
+				File file = fileStorageService.store(multipartFile, Paths.get(uploadFile.getFileRealPath()));
 				uploadFile.setFileOrgNm(multipartFile.getOriginalFilename());
-				uploadFile.setFileRealNm(FilePolicy.rename(multipartFile.getOriginalFilename()));
-				
+				uploadFile.setFileRealNm(file.getName());
 				fileMapper.insertFile(uploadFile);
-				fileStorageService.store(multipartFile, Paths.get(uploadFile.getFileRealPath()), uploadFile.getFileRealNm());
 			});
 	
 		fileMapper.updateOrderNum(uploadFile);
@@ -80,8 +79,8 @@ public class FileServiceImpl implements FileService {
 	}
 	
 	@Override
-	public FileStorageResponse upload(MultipartFile multipartFile, Path path) {
-		return fileStorageService.store(multipartFile, path, FilePolicy.rename(multipartFile.getOriginalFilename()));
+	public File upload(MultipartFile multipartFile, Path path) {
+		return fileStorageService.store(multipartFile, path);
 	}
 	
 	@Override

@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.tika.Tika;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
@@ -35,8 +37,10 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "File", description = "IWMS 파일 관리")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("${app.root}/${app.version}/files")
+@RequestMapping("${app.path}/${app.version}/files")
 public class FileController {
+	
+	private final Tika tika = new Tika();
 	
 	private final FileService fileService;
 	
@@ -44,17 +48,26 @@ public class FileController {
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<ApiResponse<FileStorageResponse>> upload(HttpServletRequest request
 			//, @Parameter(hidden = true) LoginUserInfo loginUserInfo	
-			, @RequestParam(value = "file", required = true) MultipartFile multipartFile) {
+			, @RequestParam(value = "file", required = true) MultipartFile multipartFile) throws IOException {
     	
     	String ms = String.valueOf(System.currentTimeMillis()) ;
-    	String path1 = ms.substring(0, 3);
-    	String path2 = ms.substring(3, 6);
+    	String firstPath = ms.substring(0, 3);
+    	String secondPath = ms.substring(3, 6);
     	
-		Path path = Paths.get(path1).resolve(path2);
-		FileStorageResponse fileStorageResponse = fileService.upload(multipartFile, path);
+		Path path = Paths.get(firstPath).resolve(secondPath);
+		File file = fileService.upload(multipartFile, path);
+		
+      	SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		
 		return ResponseEntity.ok(ApiResponse.<FileStorageResponse>builder()
-				.data(fileStorageResponse)
+				.data(FileStorageResponse.builder()
+						.originalFilename(multipartFile.getOriginalFilename())
+						.filename(file.getName())
+						.link(request.getRequestURI().replaceFirst("upload", "link").concat("/" + path.toString().replace("\\", "/") + "/" + file.getName()))
+						.type(tika.detect(file))
+						.size(file.length())	
+						.lastModified(sdf.format(file.lastModified()))
+						.build())
 				.build());
     }
     
