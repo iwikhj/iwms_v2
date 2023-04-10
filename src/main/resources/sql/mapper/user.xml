@@ -237,6 +237,15 @@
 		SET
 			LOGIN_ERR_CNT = LOGIN_ERR_CNT + 1
 		WHERE USER_ID = #{userId}	
+	</update>	
+	
+	<!-- 알림 확인 일시 갱신 -->
+	<update id="updateNotiCheck" parameterType="long">
+		/* updateNotiCheck */
+		UPDATE TB_USER 
+		SET
+			NOTI_CHECK_DT = CURRENT_TIMESTAMP
+		WHERE USER_SEQ = #{userSeq}	
 	</update>		
 
 	<resultMap id="resultLoginUserMap" type="com.iwi.iwms.api.login.domain.LoginUserInfo">

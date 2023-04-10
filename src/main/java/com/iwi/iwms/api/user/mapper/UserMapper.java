@@ -37,6 +37,8 @@ public interface UserMapper {
 	
 	int updateLoginFailure(User user);
 	
+	int updateNotiCheck(long userSeq);
+	
 	LoginUserInfo getLoginUser(String ssoKey);
 	
 	String getUserIdByNameTelComp(UserFindId userFindId);
