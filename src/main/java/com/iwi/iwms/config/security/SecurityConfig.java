@@ -38,7 +38,7 @@ import lombok.RequiredArgsConstructor;
 public class SecurityConfig {
 	
 	@Value("${app.path}/${app.version}")
-	private String PATH;
+	private String DEFAULT_PATH;
 	
 	@Value("${keycloak.auth-server-url}/realms/${keycloak.realm}/${keycloak.jwk-set-uri}")
 	private String JWT_SET_URI;
@@ -82,14 +82,17 @@ public class SecurityConfig {
 		//sample
 		http
 		 	.authorizeRequests()
-		 	.antMatchers(HttpMethod.POST, this.PATH + "/auths/**").hasRole("IWMS_ADMIN")
-		 	.antMatchers(this.PATH + "/notices/**").hasAnyRole("IWMS_PM");
+		 	.antMatchers(HttpMethod.POST, this.DEFAULT_PATH + "/auths/**").hasRole("IWMS_ADMIN")
+		 	.antMatchers(this.DEFAULT_PATH + "/notices/**").hasAnyRole("IWMS_PM");
 	}
 	
 	@Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
 	    return (web) -> web.ignoring()
-	    		.antMatchers("/", this.PATH + "/login", this.PATH + "/reissue", "/apidocs/**", "/swagger-ui/**", "/naver/**")
+	    		.antMatchers("/apidocs/**", "/swagger-ui/**")
+	    		.antMatchers(this.DEFAULT_PATH + "/login", this.DEFAULT_PATH + "/reissue")
+	    		.antMatchers(this.DEFAULT_PATH + "/popup/login/**")
+	    		.antMatchers("/", "/naver/**")
 	    		.requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
