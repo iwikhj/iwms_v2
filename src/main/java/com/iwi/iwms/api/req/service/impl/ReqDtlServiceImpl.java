@@ -151,7 +151,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 			Path path = Paths.get(UPLOAD_PATH_PREFIX)
 					.resolve(String.valueOf(reqDtlInfo.getReqSeq()))
 					.resolve(String.valueOf(reqDtlInfo.getReqDtlSeq()));
-			fileService.deletePath(path);
+			fileService.deleteFolder(path);
 		}
 		return result;
 	}

@@ -79,6 +79,7 @@ public class SecurityConfig {
         }
         */
 		
+		//sample
 		http
 		 	.authorizeRequests()
 		 	.antMatchers(HttpMethod.POST, this.PATH + "/auths/**").hasRole("IWMS_ADMIN")

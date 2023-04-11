@@ -21,8 +21,7 @@
 	</select>
 
 	<!-- 공통 코드 등록 -->	
-	<insert id="insertCode" parameterType="com.iwi.iwms.api.code.domain.Code"
-		useGeneratedKeys="true" keyProperty="codeSeq">
+	<insert id="insertCode" parameterType="com.iwi.iwms.api.code.domain.Code">
 		/* insertCode */
 		INSERT INTO TB_CODE
 		(

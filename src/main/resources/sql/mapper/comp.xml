@@ -144,8 +144,7 @@
 	</select>		
 	
 	<!-- 소속 등록 -->
-	<insert id="insertComp" parameterType="com.iwi.iwms.api.comp.domain.Comp"
-		useGeneratedKeys="true" keyProperty="compSeq">
+	<insert id="insertComp" parameterType="com.iwi.iwms.api.comp.domain.Comp">
 		/* insertComp */
 		INSERT INTO TB_COMPANY
 		(

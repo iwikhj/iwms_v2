@@ -18,7 +18,6 @@ import com.iwi.iwms.api.file.domain.UploadFileInfo;
 import com.iwi.iwms.api.file.mapper.FileMapper;
 import com.iwi.iwms.api.file.service.FileService;
 import com.iwi.iwms.filestorage.service.FileStorageService;
-import com.iwi.iwms.utils.FilePolicy;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +38,7 @@ public class FileServiceImpl implements FileService {
 	
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
-	public void insertAttachFiles(List<MultipartFile> multipartFiles, UploadFile uploadFile) {
+	public void insertFiles(List<MultipartFile> multipartFiles, UploadFile uploadFile) {
 		multipartFiles.stream()
 			.forEach(multipartFile -> {
 				File file = fileStorageService.store(multipartFile, Paths.get(uploadFile.getFileRealPath()));
@@ -53,9 +52,9 @@ public class FileServiceImpl implements FileService {
 
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
-	public void deleteAttachFiles(List<UploadFileInfo> oldAttachedFiles, List<Long> currentAttachedFilesSeq) {
-		oldAttachedFiles.stream()
-			.filter(v -> currentAttachedFilesSeq == null || !currentAttachedFilesSeq.contains(v.getFileSeq()))
+	public void deleteFiles(List<UploadFileInfo> uploadedFilesInfo, List<Long> excludeFilesSeq) {
+		uploadedFilesInfo.stream()
+			.filter(v -> excludeFilesSeq == null || excludeFilesSeq.size() == 0 || !excludeFilesSeq.contains(v.getFileSeq()))
 			.forEach(v -> {
 				fileMapper.deleteFile(v.getFileSeq());
 				fileStorageService.delete(Paths.get(v.getFileRealPath()).resolve(v.getFileRealNm()));
@@ -64,17 +63,7 @@ public class FileServiceImpl implements FileService {
 	
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
-	public void deleteAttachAll(List<UploadFileInfo> attachedFiles) {
-		attachedFiles.stream()
-			.forEach(v -> {
-				fileMapper.deleteFile(v.getFileSeq());
-			});
-		fileStorageService.deleteAll(Paths.get(attachedFiles.get(0).getFileRealPath()));
-	}
-	
-	@Transactional(rollbackFor = {Exception.class})
-	@Override
-	public void deletePath(Path path) {
+	public void deleteFolder(Path path) {
 		fileStorageService.deleteAll(path);
 	}
 	

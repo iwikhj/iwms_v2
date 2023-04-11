@@ -58,19 +58,19 @@ public class AuthProvider {
 	
 	/**
 	 * 토큰 발급
-	 * @param username
+	 * @param id
 	 * @param password
 	 * @return AccessTokenResponse
 	 * @exception ProcessingException | InternalServerErrorException: 인증 서버 접속 오류
 	 * @exception NotAuthorizedException: 인증 실패
 	 */
-	public AccessTokenResponse grantToken(@NotNull String username, @NotNull String password) {
+	public AccessTokenResponse grantToken(@NotNull String id, @NotNull String password) {
 		try (Keycloak keycloak = KeycloakBuilder.builder()
         		.serverUrl(authServerUrl)
         		.realm(realm)
                 .grantType(OAuth2Constants.PASSWORD)
                 .clientId(authClientId)
-                .username(username)
+                .username(id)
                 .password(password)
                 .build()) {
 			
@@ -100,7 +100,7 @@ public class AuthProvider {
 	 * @param token
 	 * @return IntrospectResponse
 	 */
-	public IntrospectResponse tokenIntrospect(String token) {
+	public IntrospectResponse tokenIntrospect(@NotNull String token) {
 		if(!StringUtils.hasText(token)) {
 			return IntrospectResponse.builder()
 					.active(false)
@@ -111,11 +111,11 @@ public class AuthProvider {
 	}
 	
 	/**
-	 * 사용자 아이디 중복 체크
+	 * 아이디 중복 체크
 	 * @param username
 	 * @return {true} If the id has already been registered; {false} otherwise 
 	 */
-	public boolean existsUsername(String username) {
+	public boolean idDuplicateCheck(@NotNull String id) {
 		try (Keycloak keycloak = KeycloakBuilder.builder()
         		.serverUrl(authServerUrl)
         		.realm(realm)
@@ -127,7 +127,10 @@ public class AuthProvider {
             RealmResource realmResource = keycloak.realm(realm);
             UsersResource usersResource = realmResource.users();
             
-            return usersResource.list().stream().anyMatch(v -> v.getUsername().equals(username));
+            boolean result = usersResource.list().stream().anyMatch(v -> v.getUsername().equals(id));
+            log.info("Is this a duplicate ID? {}", result);
+            
+            return result;
 		} catch(Exception e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Keycloak] " + e.getMessage());
 		}        
@@ -135,15 +138,13 @@ public class AuthProvider {
 	
 	/**
 	 * 인증서버 사용자 등록
-	 * @param username
+	 * @param id
 	 * @param password
-	 * @param firstName
-	 * @param lastName
-	 * @param email
-	 * @param roles
+	 * @param name
+	 * @param role
 	 * @return ssoKey
 	 */
-	public String insertUser(@NotNull String username, @NotNull String password, String firstName, String lastName, String email, @NotNull String role) {
+	public String insertUser(@NotNull String id, @NotNull String password, String name, @NotNull String role) {
 		String ssoKey = null;
 		
 		try (Keycloak keycloak = KeycloakBuilder.builder()
@@ -160,11 +161,9 @@ public class AuthProvider {
             // Define user
             UserRepresentation idmUser = new UserRepresentation();
             idmUser.setEnabled(true);
-            idmUser.setUsername(username);
-            idmUser.setFirstName(StringUtils.hasText(firstName) ? firstName : "");
-            idmUser.setLastName(StringUtils.hasText(lastName) ? lastName : "");
-            idmUser.setEmail(StringUtils.hasText(email) ? email : "");
-            idmUser.setEmailVerified(false);
+            idmUser.setUsername(id);
+            idmUser.setFirstName(name);
+            idmUser.setLastName("iwms");
     		
             Response response = usersResource.create(idmUser);
             log.info("Response: {} {}", response.getStatus(), response.getStatusInfo());
@@ -204,13 +203,11 @@ public class AuthProvider {
 	}
 	
 	/**
-	 * 인증서버 사용자 정보 변경
+	 * 인증서버 사용자 이름 변경
 	 * @param ssoKey
-	 * @param firstName
-	 * @param lastName
-	 * @param email
+	 * @param name
 	 */
-	public void updateUser(String ssoKey, String firstName, String lastName, String email) {
+	public void updateUser(@NotNull String ssoKey, @NotNull String name) {
 		try (Keycloak keycloak = KeycloakBuilder.builder()
         		.serverUrl(authServerUrl)
         		.realm(realm)
@@ -225,10 +222,7 @@ public class AuthProvider {
             
             // Define user
             UserRepresentation idmUser = new UserRepresentation();
-            idmUser.setFirstName(StringUtils.hasText(firstName) ? firstName : "");
-            idmUser.setLastName(StringUtils.hasText(lastName) ? lastName : "");
-            idmUser.setEmail(StringUtils.hasText(email) ? email : "");
-            idmUser.setEmailVerified(false);        
+            idmUser.setFirstName(name);
             
             // update user
             userResource.update(idmUser);

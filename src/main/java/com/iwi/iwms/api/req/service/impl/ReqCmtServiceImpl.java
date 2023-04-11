@@ -1,5 +1,6 @@
 package com.iwi.iwms.api.req.service.impl;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,14 +29,16 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ReqCmtServiceImpl implements ReqCmtService {
 
-	private static final String UPLOAD_PATH_PREFIX = "request/";
-
 	private final ReqCmtMapper reqCmtMapper;
 	
 	private final ReqService reqService;
 	
 	private final FileService fileService;
 
+	private String getUploadPath(long reqSeq, long cmtSeq) {
+		return "request/" + reqSeq + "/comment/" + cmtSeq;
+	}
+	
 	@Override
 	public CmtInfo getReqCmtBySeq(long cmtSeq, long loginUserSeq) {
 		Map<String, Object> map = new HashMap<>();
@@ -57,8 +60,8 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 		if(!CollectionUtils.isEmpty(cmt.getFiles())) {
 			UploadFile uploadFile = cmt.getFileInfo();
 			uploadFile.setFileRefSeq(cmt.getCmtSeq());
-			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + cmt.getReqSeq() + "/comment/" + cmt.getCmtSeq());
-			fileService.insertAttachFiles(cmt.getFiles(), uploadFile);
+			uploadFile.setFileRealPath(this.getUploadPath(cmt.getReqSeq(), cmt.getCmtSeq()));
+			fileService.insertFiles(cmt.getFiles(), uploadFile);
 		}
 		
 		return this.getReqCmtBySeq(cmt.getCmtSeq(), cmt.getLoginUserSeq());
@@ -74,14 +77,14 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 		// 첨부파일 삭제
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(cmt.getFileInfo());
 		if(!CollectionUtils.isEmpty(attachedFiles)) {
-			fileService.deleteAttachFiles(attachedFiles, cmt.getAttachedFilesSeq());
+			fileService.deleteFiles(attachedFiles, cmt.getAttachedFilesSeq());
 		}
 		
 		// 첨부파일 저장
 		if(!CollectionUtils.isEmpty(cmt.getFiles())) {
 			UploadFile uploadFile = cmt.getFileInfo();
-			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + cmt.getReqSeq() + "/comment/" + cmt.getCmtSeq());
-			fileService.insertAttachFiles(cmt.getFiles(), uploadFile);
+			uploadFile.setFileRealPath(this.getUploadPath(cmt.getReqSeq(), cmt.getCmtSeq()));
+			fileService.insertFiles(cmt.getFiles(), uploadFile);
 		}
 		
 		return this.getReqCmtBySeq(cmt.getCmtSeq(), cmt.getLoginUserSeq());
@@ -94,12 +97,15 @@ public class ReqCmtServiceImpl implements ReqCmtService {
 	
 		int result = reqCmtMapper.deleteReqCmt(cmt);
 		
+		// 첨부파일 삭제
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(cmt.getFileInfo());
 		if(!CollectionUtils.isEmpty(attachedFiles)) {
-			fileService.deleteAttachAll(attachedFiles);
+			fileService.deleteFiles(attachedFiles, null);
 		}
+		
+		// 폴더 삭제
+		fileService.deleteFolder(Paths.get(this.getUploadPath(cmt.getReqSeq(), cmt.getCmtSeq())));
 		
 		return result;
 	}
-
 }

@@ -14,11 +14,9 @@ public interface FileService {
 
 	List<UploadFileInfo> listFileByRef(UploadFile uploadFile);
 	
-	void insertAttachFiles(List<MultipartFile> multipartFiles, UploadFile uploadFile);
+	void insertFiles(List<MultipartFile> multipartFiles, UploadFile uploadFile);
 	
-	void deleteAttachFiles(List<UploadFileInfo> oldAttachedFiles, List<Long> currentAttachedFilesSeq);
-	
-	void deleteAttachAll(List<UploadFileInfo> attachedFiles);
+	void deleteFiles(List<UploadFileInfo> uploadedFilesInfo, List<Long> excludeFilesSeq);
 	
 	File upload(MultipartFile multipartFile, Path path);
 	
@@ -26,5 +24,5 @@ public interface FileService {
 	
 	Resource getFileResource(Path path);
 	
-	void deletePath(Path path);
+	void deleteFolder(Path path);
 }

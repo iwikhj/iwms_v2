@@ -1,5 +1,6 @@
 package com.iwi.iwms.api.notice.service.impl;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,11 +28,13 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class NoticeServiceImpl implements NoticeService {
 	
-	private static final String UPLOAD_PATH_PREFIX = "notice/";
-	
 	private final NoticeMapper noticeMapper;
 	
 	private final FileService fileService;
+	
+	private String getUploadPath(long noticeSeq) {
+		return "notice/" + noticeSeq;
+	}
 	
 	@Override
 	public List<NoticeInfo> listNotice(Map<String, Object> map) {
@@ -63,8 +66,8 @@ public class NoticeServiceImpl implements NoticeService {
 		if(!CollectionUtils.isEmpty(notice.getFiles())) {
 			UploadFile uploadFile = notice.getFileInfo();
 			uploadFile.setFileRefSeq(notice.getNoticeSeq());
-			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + notice.getNoticeSeq());
-			fileService.insertAttachFiles(notice.getFiles(), uploadFile);
+			uploadFile.setFileRealPath(this.getUploadPath(notice.getNoticeSeq()));
+			fileService.insertFiles(notice.getFiles(), uploadFile);
 		}
 	}
 
@@ -79,15 +82,15 @@ public class NoticeServiceImpl implements NoticeService {
 		// 첨부파일 삭제
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(notice.getFileInfo());
 		if(!CollectionUtils.isEmpty(attachedFiles)) {
-			fileService.deleteAttachFiles(attachedFiles, notice.getAttachedFilesSeq());
+			fileService.deleteFiles(attachedFiles, notice.getAttachedFilesSeq());
 		}
 		
 		// 첨부파일 저장
 		if(!CollectionUtils.isEmpty(notice.getFiles())) {
 			log.info("첨부파일 있음");
 			UploadFile uploadFile = notice.getFileInfo();
-			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + notice.getNoticeSeq());
-			fileService.insertAttachFiles(notice.getFiles(), uploadFile);
+			uploadFile.setFileRealPath(this.getUploadPath(notice.getNoticeSeq()));
+			fileService.insertFiles(notice.getFiles(), uploadFile);
 		}
 		return result;
 	}
@@ -100,11 +103,15 @@ public class NoticeServiceImpl implements NoticeService {
 		
 		int result = noticeMapper.deleteNotice(notice);
 		
-		// 첨부파일 삭제(디렉토리까지)
+		// 첨부파일 삭제
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(notice.getFileInfo());
 		if(!CollectionUtils.isEmpty(attachedFiles)) {
-			fileService.deleteAttachAll(attachedFiles);
+			fileService.deleteFiles(attachedFiles, null);
 		}
+		
+		// 폴더 삭제
+		fileService.deleteFolder(Paths.get(this.getUploadPath(notice.getNoticeSeq())));
+		
 		return result;
 	}
 
@@ -112,5 +119,4 @@ public class NoticeServiceImpl implements NoticeService {
 	public int updateViewCnt(long noticeSeq) {
 		return noticeMapper.updateViewCnt(noticeSeq);
 	}
-
 }

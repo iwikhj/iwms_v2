@@ -51,7 +51,7 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
 
 		//Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 		Authentication authentication = Optional.ofNullable((Authentication) webRequest.getUserPrincipal())
-				.orElseThrow(() -> new CommonException(ErrorCode.AUTHENTICATION_FAILED, "로그인 해주세요."));
+				.orElseThrow(() -> new CommonException(ErrorCode.AUTHENTICATION_FAILED, "로그인 필요."));
 	
 		String ssoKey = authentication.getName();
 		
@@ -61,7 +61,7 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
 		}
 		
 		LoginUserInfo loginUserInfo = Optional.ofNullable(objectMapper.convertValue(redisProvider.getHash(ssoKey, "user"), LoginUserInfo.class))
-				.orElseThrow(() -> new CommonException(ErrorCode.AUTHENTICATION_FAILED, "로그인 해주세요."));
+				.orElseThrow(() -> new CommonException(ErrorCode.AUTHENTICATION_FAILED, "로그인 필요."));
  
 		loginUserInfo.setMenuSelected(pages, uri);
 		

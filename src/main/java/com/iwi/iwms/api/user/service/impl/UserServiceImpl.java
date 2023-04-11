@@ -1,5 +1,6 @@
 package com.iwi.iwms.api.user.service.impl;
 
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -37,8 +38,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-	private static final String UPLOAD_PATH_PREFIX = "profile/";
-	
 	private final UserMapper userMapper;
 	
 	private final AuthService authService;
@@ -46,6 +45,10 @@ public class UserServiceImpl implements UserService {
 	private final AuthProvider keycloakProvider;
 	
 	private final FileService fileService;
+	
+	private String getUploadPath(long userSeq) {
+		return "profile/" + userSeq;
+	}
 	
 	@Override
 	public List<UserInfo> listUser(Map<String, Object> map) {
@@ -74,39 +77,40 @@ public class UserServiceImpl implements UserService {
 	
 	@Override
 	public boolean checkExistsUserId(String userId) {
-		return keycloakProvider.existsUsername(userId);
+		return userMapper.getUserById(userId) != null || keycloakProvider.idDuplicateCheck(userId);
 	}
-
+	
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public void insertUser(User user) {
 		//인증 서버에 사용자 등록
-		String username = user.getUserId();
+		String id = user.getUserId();
 		String password = user.getUserId();
-		String lastName = "iwms"; 
-		String firstName = user.getUserNm(); 
-		String email = user.getUserEmail();
+		String name = user.getUserNm(); 
 		
 		AuthInfo authInfo = authService.getAuthByAuthCd(user.getAuthCd());
 		String role = authInfo.getAuthCd();
 		
-		if(keycloakProvider.existsUsername(username)) {
-			throw new CommonException(ErrorCode.DUPLICATE_ERROR, "이미 등록된 사용자 아이디입니다");
+		if(this.checkExistsUserId(id)) {
+			throw new CommonException(ErrorCode.DUPLICATE_ERROR, "이미 등록된 아이디입니다.");
 		}
 		
-		String ssoKey = keycloakProvider.insertUser(username, password, firstName, lastName, email, role);
+		String ssoKey = keycloakProvider.insertUser(id, password, name, role);
 		
 		try {
 			user.setAuthSeq(authInfo.getAuthSeq());
 			user.setSsoKey(ssoKey);
 			userMapper.insertUser(user);
 			
-			// 프로필 파일 저장
+			// 프로필 사진 파일 저장
 			if(user.getFile() != null && !user.getFile().isEmpty()) {
+				if(user.getFile().getContentType().indexOf("image") == -1) {
+					throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "프로필 사진은 이미지 파일만 업로드 가능합니다.");
+				}
 				UploadFile uploadFile = user.getFileInfo();
 				uploadFile.setFileRefSeq(user.getUserSeq());
-				uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + user.getUserSeq());
-				fileService.insertAttachFiles(Arrays.asList(user.getFile()), uploadFile);
+				uploadFile.setFileRealPath(this.getUploadPath(user.getUserSeq()));
+				fileService.insertFiles(Arrays.asList(user.getFile()), uploadFile);
 			}
 		} catch(CommonException e) {
 			keycloakProvider.deleteUser(ssoKey);
@@ -128,43 +132,47 @@ public class UserServiceImpl implements UserService {
 		int result = userMapper.updateUser(userUpdate);
 		
 		if(result > 0) {
-			//인증 서버의 사용자 이름 수정
+			//인증 서버 사용자 이름 수정
 			if(!userUpdate.getUserNm().equals(userInfo.getUserNm())) {
-				String lastName = "iwms"; 
-				String firstName = userUpdate.getUserNm(); 
-				String email = userUpdate.getUserEmail();
-				
-				keycloakProvider.updateUser(userInfo.getSsoKey(), firstName, lastName, email);
+				keycloakProvider.updateUser(userInfo.getSsoKey(), userUpdate.getUserNm());
 			}
 			
-			//인증 서버의 사용자 권한 수정
+			//인증 서버 사용자 권한 수정
 			if(userUpdate.getAuthSeq() != userInfo.getAuthSeq()) {
 				keycloakProvider.updateRole(userInfo.getSsoKey(), userInfo.getAuthCd(), userUpdate.getAuthCd());
 			}
 		}
 		
+		// 등록된 프로필 사진 파일 존재 여부
 		boolean hasExistsFile = userUpdate.getFileSeq() != null;
+		// 프로필 사진 파일 존재 여부
 		boolean hasFile = userUpdate.getFile() != null && !userUpdate.getFile().isEmpty();
 		
 		if(hasExistsFile) {
-			// 프로필 파일 삭제
-			List<UploadFileInfo> attachedFiles = fileService.listFileByRef(userUpdate.getFileInfo());
-			if(!CollectionUtils.isEmpty(attachedFiles)) {
-				fileService.deleteAttachFiles(attachedFiles, null);
+			// 프로필 사진 파일 삭제
+			List<UploadFileInfo> files = fileService.listFileByRef(userUpdate.getFileInfo());
+			if(!CollectionUtils.isEmpty(files)) {
+				fileService.deleteFiles(files, null);
 			}
 			
-			// 프로필 파일 저장
+			// 프로필 사진 파일 저장
 			if(hasFile) {
+				if(userUpdate.getFile().getContentType().indexOf("image") == -1) {
+					throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "프로필 사진은 이미지 파일만 업로드 가능합니다.");
+				}
 				UploadFile uploadFile = userUpdate.getFileInfo();
-				uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + userUpdate.getUserSeq());
-				fileService.insertAttachFiles(Arrays.asList(userUpdate.getFile()), uploadFile);
+				uploadFile.setFileRealPath(this.getUploadPath(userUpdate.getUserSeq()));
+				fileService.insertFiles(Arrays.asList(userUpdate.getFile()), uploadFile);
 			}
 		} else {
-			// 프로필 파일 저장
+			// 프로필 사진 파일 저장
 			if(hasFile) {
+				if(userUpdate.getFile().getContentType().indexOf("image") == -1) {
+					throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "프로필 사진은 이미지 파일만 업로드 가능합니다.");
+				}
 				UploadFile uploadFile = userUpdate.getFileInfo();
-				uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + userUpdate.getUserSeq());
-				fileService.insertAttachFiles(Arrays.asList(userUpdate.getFile()), uploadFile);
+				uploadFile.setFileRealPath(this.getUploadPath(userUpdate.getUserSeq()));
+				fileService.insertFiles(Arrays.asList(userUpdate.getFile()), uploadFile);
 			}
 		}
 		
@@ -179,14 +187,17 @@ public class UserServiceImpl implements UserService {
 		int result = userMapper.deleteUser(user);
 		
 		if(result > 0) {
-			//인증 서버의 사용자 삭제
+			//인증 서버 사용자 삭제
 			keycloakProvider.deleteUser(userInfo.getSsoKey());
 			
-			// 프로필 파일 삭제(디렉토리까지)
-			List<UploadFileInfo> attachedFiles = fileService.listFileByRef(user.getFileInfo());
-			if(!CollectionUtils.isEmpty(attachedFiles)) {
-				fileService.deleteAttachAll(attachedFiles);
+			// 프로필 사진 파일 삭제
+			List<UploadFileInfo> files = fileService.listFileByRef(user.getFileInfo());
+			if(!CollectionUtils.isEmpty(files)) {
+				fileService.deleteFiles(files, null);
 			}
+			
+			// 폴더 삭제
+			fileService.deleteFolder(Paths.get(getUploadPath(user.getUserSeq())));
 		}
 		return result;
 	}
@@ -199,7 +210,7 @@ public class UserServiceImpl implements UserService {
 		int result = userMapper.updatePassword(userPwd);
 		
 		if(result > 0) {
-			//인증 서버의 사용자 비밀번호 변경
+			//인증 서버 사용자 비밀번호 변경
 			keycloakProvider.changePassword(userInfo.getSsoKey(), userPwd.getUserPwd());
 		}
 		return result;
@@ -213,7 +224,7 @@ public class UserServiceImpl implements UserService {
 		int result = userMapper.updatePassword(userPwd);
 		
 		if(result > 0) {
-			//인증 서버의 사용자 비밀번호를 사용자 아이디로 초기화
+			//인증 서버 사용자 비밀번호를 사용자 아이디로 변경
 			keycloakProvider.changePassword(userInfo.getSsoKey(), userInfo.getUserId());
 		}
 		return result;

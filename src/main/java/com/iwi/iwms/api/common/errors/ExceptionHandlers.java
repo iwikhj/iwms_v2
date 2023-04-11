@@ -34,7 +34,7 @@ public class ExceptionHandlers {
         });
         
         // List<MultipartFile> null 처리
-        binder.registerCustomEditor(List.class, new PropertyEditorSupport() {
+        binder.registerCustomEditor(List.class, "files", new PropertyEditorSupport() {
         	@Override
         	public void setAsText(String text) throws IllegalArgumentException {}
         });

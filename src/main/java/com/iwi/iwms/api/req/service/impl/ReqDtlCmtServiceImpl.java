@@ -1,5 +1,6 @@
 package com.iwi.iwms.api.req.service.impl;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,14 +29,16 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 	
-	private static final String UPLOAD_PATH_PREFIX = "request/";
-	
 	private final ReqDtlCmtMapper reqDtlCmtMapper;
 	
 	private final ReqDtlService reqDtlService;
 
 	private final FileService fileService;
 
+	private String getUploadPath(long reqSeq, long reqDtlSeq, long cmtSeq) {
+		return "request/" + reqSeq + "/task/" + reqDtlSeq + "/comment/" + cmtSeq;
+	}
+	
 	@Override
 	public CmtInfo getReqDtlCmtBySeq(long cmtSeq, long loginUserSeq) {
 		Map<String, Object> map = new HashMap<>();
@@ -57,8 +60,8 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 		if(!CollectionUtils.isEmpty(cmt.getFiles())) {
 			UploadFile uploadFile = cmt.getFileInfo();
 			uploadFile.setFileRefSeq(cmt.getCmtSeq());
-			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + cmt.getReqSeq() + "/task/" + cmt.getReqDtlSeq() + "/comment/" + cmt.getCmtSeq());
-			fileService.insertAttachFiles(cmt.getFiles(), uploadFile);
+			uploadFile.setFileRealPath(this.getUploadPath(cmt.getReqSeq(), cmt.getReqDtlSeq(), cmt.getCmtSeq()));
+			fileService.insertFiles(cmt.getFiles(), uploadFile);
 		}
 		
 		return this.getReqDtlCmtBySeq(cmt.getCmtSeq(), cmt.getLoginUserSeq());
@@ -74,14 +77,14 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 		// 첨부파일 삭제
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(cmt.getFileInfo());
 		if(!CollectionUtils.isEmpty(attachedFiles)) {
-			fileService.deleteAttachFiles(attachedFiles, cmt.getAttachedFilesSeq());
+			fileService.deleteFiles(attachedFiles, cmt.getAttachedFilesSeq());
 		}
 		
 		// 첨부파일 저장
 		if(!CollectionUtils.isEmpty(cmt.getFiles())) {
 			UploadFile uploadFile = cmt.getFileInfo();
-			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + cmt.getReqSeq() + "/task/" + cmt.getReqDtlSeq() + "/comment/" + cmt.getCmtSeq());
-			fileService.insertAttachFiles(cmt.getFiles(), uploadFile);
+			uploadFile.setFileRealPath(this.getUploadPath(cmt.getReqSeq(), cmt.getReqDtlSeq(), cmt.getCmtSeq()));
+			fileService.insertFiles(cmt.getFiles(), uploadFile);
 		}
 		
 		return this.getReqDtlCmtBySeq(cmt.getCmtSeq(), cmt.getLoginUserSeq());
@@ -95,12 +98,15 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 
 		int result = reqDtlCmtMapper.deleteReqDtlCmt(cmt);
 		
-		// 첨부파일 삭제(디렉토리까지)
+		// 첨부파일 삭제
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(cmt.getFileInfo());
 		if(!CollectionUtils.isEmpty(attachedFiles)) {
-			fileService.deleteAttachAll(attachedFiles);
+			fileService.deleteFiles(attachedFiles, null);
 		}
+		
+		// 폴더 삭제
+		fileService.deleteFolder(Paths.get(this.getUploadPath(cmt.getReqSeq(), cmt.getReqDtlSeq(), cmt.getCmtSeq())));
+		
 		return result;
 	}
-
 }

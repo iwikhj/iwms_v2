@@ -141,13 +141,6 @@
 			<version>r05</version>
 			<scope>provided</scope> 
 	    </dependency>
-
-		<!-- Tika -->
-		<dependency>
-		    <groupId>org.apache.tika</groupId>
-		    <artifactId>tika-core</artifactId>
-		    <version>1.20</version>
-		</dependency>
 								
 	</dependencies>
 

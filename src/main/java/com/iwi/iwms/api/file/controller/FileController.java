@@ -3,13 +3,13 @@ package com.iwi.iwms.api.file.controller;
 import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.tika.Tika;
 import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
@@ -26,9 +26,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
 import com.iwi.iwms.api.file.service.FileService;
+import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.filestorage.FileStorageResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,8 +41,6 @@ import lombok.extern.slf4j.Slf4j;
 @RestController
 @RequestMapping("${app.path}/${app.version}/files")
 public class FileController {
-	
-	private final Tika tika = new Tika();
 	
 	private final FileService fileService;
 	
@@ -64,7 +64,7 @@ public class FileController {
 						.originalFilename(multipartFile.getOriginalFilename())
 						.filename(file.getName())
 						.link(request.getRequestURI().replaceFirst("upload", "link").concat("/" + path.toString().replace("\\", "/") + "/" + file.getName()))
-						.type(tika.detect(file))
+						.type(Files.probeContentType(file.toPath()))
 						.size(file.length())	
 						.lastModified(sdf.format(file.lastModified()))
 						.build())
@@ -85,8 +85,7 @@ public class FileController {
 		File file = resource.getFile();
 		
 		MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
-		
-		String contentType = request.getServletContext().getMimeType(file.getAbsolutePath());
+		String contentType = Files.probeContentType(file.toPath());
 		if(contentType != null) {
 			mediaType = MediaType.parseMediaType(contentType);
 		}
@@ -121,8 +120,7 @@ public class FileController {
 		File file = resource.getFile();
 		
 		MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
-		
-		String contentType = request.getServletContext().getMimeType(file.getAbsolutePath());
+		String contentType = Files.probeContentType(file.toPath());
 		if(contentType != null) {
 			mediaType = MediaType.parseMediaType(contentType);
 		}

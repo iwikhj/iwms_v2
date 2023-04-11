@@ -40,7 +40,8 @@ public class UploadFileInfo {
 	@Schema(description = "등록자") 
 	private String regNm;
 	
+	//${app.path}/${app.version}
 	public void setFileDownloadUri(String fileDownloadUri) {
-		this.fileDownloadUri = PropertyUtil.getProperty("app.root") + "/" + PropertyUtil.getProperty("app.version") + "/files/download" + fileDownloadUri;
+		this.fileDownloadUri = PropertyUtil.getProperty("app.path") + "/" + PropertyUtil.getProperty("app.version") + "/files/download" + fileDownloadUri;
 	}
 }

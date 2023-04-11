@@ -1,5 +1,6 @@
 package com.iwi.iwms.api.req.service.impl;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,12 +32,14 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ReqServiceImpl implements ReqService {
 	
-	private static final String UPLOAD_PATH_PREFIX = "request/";
-
 	private final ReqMapper reqMapper;
 	
 	private final FileService fileService;
     
+	private String getUploadPath(long reqSeq) {
+		return "request/" + reqSeq;
+	}
+	
 	@Override
 	public List<ReqInfo> listReq(Map<String, Object> map) {
 		return reqMapper.listReq(map);
@@ -85,8 +88,8 @@ public class ReqServiceImpl implements ReqService {
 			if(!CollectionUtils.isEmpty(req.getFiles())) {
 				UploadFile uploadFile = req.getFileInfo();
 				uploadFile.setFileRefSeq(req.getReqSeq());
-				uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + req.getReqSeq());
-				fileService.insertAttachFiles(req.getFiles(), uploadFile);
+				uploadFile.setFileRealPath(this.getUploadPath(req.getReqSeq()));
+				fileService.insertFiles(req.getFiles(), uploadFile);
 			}
 		}
 	}
@@ -101,14 +104,14 @@ public class ReqServiceImpl implements ReqService {
 		// 첨부파일 삭제
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(req.getFileInfo());
 		if(!CollectionUtils.isEmpty(attachedFiles)) {
-			fileService.deleteAttachFiles(attachedFiles, req.getAttachedFilesSeq());
+			fileService.deleteFiles(attachedFiles, req.getAttachedFilesSeq());
 		}
 		
 		// 첨부파일 저장
 		if(!CollectionUtils.isEmpty(req.getFiles())) {
 			UploadFile uploadFile = req.getFileInfo();
-			uploadFile.setFileRealPath(UPLOAD_PATH_PREFIX + req.getReqSeq());
-			fileService.insertAttachFiles(req.getFiles(), uploadFile);
+			uploadFile.setFileRealPath(this.getUploadPath(req.getReqSeq()));
+			fileService.insertFiles(req.getFiles(), uploadFile);
 		}
 		return result;		
 	}
@@ -120,11 +123,15 @@ public class ReqServiceImpl implements ReqService {
 		
 		int result = reqMapper.deleteReq(req);
 		
-		// 첨부파일 삭제(디렉토리까지)
+		// 첨부파일 삭제
 		List<UploadFileInfo> attachedFiles = fileService.listFileByRef(req.getFileInfo());
 		if(!CollectionUtils.isEmpty(attachedFiles)) {
-			fileService.deleteAttachAll(attachedFiles);
+			fileService.deleteFiles(attachedFiles, null);
 		}
+		
+		// 폴더 삭제
+		fileService.deleteFolder(Paths.get(this.getUploadPath(req.getReqSeq())));
+		
 		return result;
 	}
 
