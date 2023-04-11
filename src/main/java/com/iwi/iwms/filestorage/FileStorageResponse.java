@@ -20,8 +20,8 @@ public class FileStorageResponse {
 	@Schema(description = "실제 파일 이름") 
 	private String filename;
 	
-	@Schema(description = "파일 링크")
-    private String link;
+	@Schema(description = "파일 패스")
+    private String path;
 	
 	@Schema(description = "MimeType")
 	private String type;

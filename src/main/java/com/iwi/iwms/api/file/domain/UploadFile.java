@@ -1,7 +1,5 @@
 package com.iwi.iwms.api.file.domain;
 
-import org.springframework.beans.BeanUtils;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -41,10 +39,4 @@ public class UploadFile {
 	
 	@Schema(hidden = true, description = "로그인 사용자 SEQ") 
 	private long loginUserSeq;
-	
-	public static UploadFile of(UploadFileInfo uploadFileInfo) {
-		UploadFile uploadFile = new UploadFile();
-		BeanUtils.copyProperties(uploadFileInfo, uploadFile);
-		return uploadFile;
-	}
 }

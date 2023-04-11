@@ -1,5 +1,6 @@
 package com.iwi.iwms.api.file.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.iwi.iwms.utils.PropertyUtil;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,19 +21,21 @@ public class UploadFileInfo {
 	private long fileSeq;
 	
 	@Schema(description = "첨부 파일 정렬 순서")
-	private int fileOrdOrder;
+	private int fileOrderNo;
 	
 	@Schema(description = "첨부 파일 원본 이름")
 	private String fileOrgNm;
 	
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@Schema(description = "첨부 파일 저장 이름")
 	private String fileRealNm;
 	
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@Schema(description = "첨부 파일 저장 경로")
 	private String fileRealPath;
 	
-	@Schema(description = "첨부 파일 다운로드 URI")
-	private String fileDownloadUri;
+	@Schema(description = "첨부 파일 다운로드 패스")
+	private String fileDownloadPath;
 	
 	@Schema(description = "등록 일자") 
 	private String regDt;
@@ -40,8 +43,8 @@ public class UploadFileInfo {
 	@Schema(description = "등록자") 
 	private String regNm;
 	
-	//${app.path}/${app.version}
-	public void setFileDownloadUri(String fileDownloadUri) {
-		this.fileDownloadUri = PropertyUtil.getProperty("app.path") + "/" + PropertyUtil.getProperty("app.version") + "/files/download" + fileDownloadUri;
+	//${app.path}/${app.version}/files
+	public void setFileDownloadPath(String fileDownloadPath) {
+		this.fileDownloadPath = PropertyUtil.getProperty("app.path") + "/" + PropertyUtil.getProperty("app.version") + "/files/download" + fileDownloadPath;
 	}
 }

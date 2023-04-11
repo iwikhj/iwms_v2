@@ -1,5 +1,6 @@
 package com.iwi.iwms.api.user.domain;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,7 +31,8 @@ public class UserInfo {
 	
 	@Schema(description = "사용자 이메일")
 	private String userEmail;
-	
+
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@Schema(description = "인증 서버 키") 
 	private String ssoKey;	
 	

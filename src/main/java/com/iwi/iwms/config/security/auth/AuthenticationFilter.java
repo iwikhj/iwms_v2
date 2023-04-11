@@ -198,7 +198,6 @@ public class AuthenticationFilter extends GenericFilterBean {
 		
         response.setStatus(code.getStatus().value());
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setCharacterEncoding("UTF-8");
         response.getWriter().write(er);
     }
 }

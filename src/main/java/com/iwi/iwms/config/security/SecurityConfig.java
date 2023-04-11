@@ -92,6 +92,7 @@ public class SecurityConfig {
 	    		.antMatchers("/apidocs/**", "/swagger-ui/**")
 	    		.antMatchers(this.DEFAULT_PATH + "/login", this.DEFAULT_PATH + "/reissue")
 	    		.antMatchers(this.DEFAULT_PATH + "/popup/login/**")
+	    		.antMatchers(this.DEFAULT_PATH + "/files/**")
 	    		.antMatchers("/", "/naver/**")
 	    		.requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }

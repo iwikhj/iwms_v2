@@ -30,7 +30,9 @@ public class RedisProvider {
         	redisTemplate.opsForValue().set(key, value, timeout, TimeUnit.SECONDS);
     	} catch(RedisConnectionFailureException e) {
 			throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Redis] " + e.getMessage());
-    	}    	
+    	} catch(Exception e) {
+    		throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "[Redis] " + e.getMessage());
+    	}  	
     }
 
     public Object get(String key) {
@@ -38,6 +40,8 @@ public class RedisProvider {
     		return redisTemplate.opsForValue().get(key);
     	} catch(RedisConnectionFailureException e) {
     		throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Redis] " + e.getMessage());
+    	} catch(Exception e) {
+    		throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "[Redis] " + e.getMessage());
     	}
     }
 
@@ -46,6 +50,8 @@ public class RedisProvider {
         	return redisTemplate.delete(key);
     	} catch(RedisConnectionFailureException e) {
     		throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Redis] " + e.getMessage());
+    	} catch(Exception e) {
+    		throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "[Redis] " + e.getMessage());
     	}
     }
 
@@ -54,6 +60,8 @@ public class RedisProvider {
         	return redisTemplate.hasKey(key);
     	} catch(RedisConnectionFailureException e) {
     		throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Redis] " + e.getMessage());
+    	} catch(Exception e) {
+    		throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "[Redis] " + e.getMessage());
     	}
     }
 	
@@ -62,7 +70,9 @@ public class RedisProvider {
     		redisTemplate.opsForHash().put(key, hashKey, value);
     	} catch(RedisConnectionFailureException e) {
     		throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Redis] " + e.getMessage());
-    	}		
+    	} catch(Exception e) {
+    		throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "[Redis] " + e.getMessage());
+    	}	
 	}
 	
 	public void setTtl(String key, long timeout) {
@@ -70,7 +80,9 @@ public class RedisProvider {
     		redisTemplate.expire(key, timeout, TimeUnit.SECONDS);
     	} catch(RedisConnectionFailureException e) {
     		throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Redis] " + e.getMessage());
-    	}		
+    	} catch(Exception e) {
+    		throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "[Redis] " + e.getMessage());
+    	}	
 	}
 	
 	public Object getHash(String key, String hashKey) {
@@ -78,6 +90,8 @@ public class RedisProvider {
     		return redisTemplate.opsForHash().get(key, hashKey);
     	} catch(RedisConnectionFailureException e) {
     		throw new CommonException(ErrorCode.INTERNAL_SERIVCE_ERROR, "[Redis] " + e.getMessage());
+    	} catch(Exception e) {
+    		throw new CommonException(ErrorCode.INTERNAL_SERVER_ERROR, "[Redis] " + e.getMessage());
     	}
 	}
 

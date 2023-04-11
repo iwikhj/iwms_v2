@@ -5,10 +5,11 @@
 	<sql id="selectFile">
 		SELECT 
 			FILE.FILE_SEQ AS fileSeq
+			, FILE.FILE_ORDER_NO AS fileOrderNo
 			, FILE.FILE_ORG_NM AS fileOrgNm
 			, FILE.FILE_REAL_NM AS fileRealNm
 			, FILE.FILE_REAL_PATH AS fileRealPath
-			, CONCAT('/', FILE.FILE_SEQ) AS fileDownloadUri			
+			, CONCAT('/', FILE.FILE_SEQ) AS fileDownloadPath
 			, DATE_FORMAT(FILE.REG_DT, "%Y-%m-%d %H:%i:%s") AS regDt
 			, FN_GET_USER_NM(FILE.REG_SEQ) AS regNm
 		FROM TB_FILE FILE

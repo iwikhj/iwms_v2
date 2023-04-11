@@ -17,6 +17,7 @@ import com.iwi.iwms.api.login.domain.Login;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.login.domain.Reissue;
 import com.iwi.iwms.api.login.service.LoginService;
+import com.iwi.iwms.config.redis.RedisProvider;
 import com.iwi.iwms.config.security.auth.ReissueResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,6 +34,8 @@ import lombok.extern.slf4j.Slf4j;
 public class LoginController {
 	
 	private final LoginService loginService;
+	
+    private final RedisProvider redisProvider;
 	
 	@Operation(summary = "로그인", description = "사용자 로그인")
 	@PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)

@@ -60,12 +60,10 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
 			return null;
 		}
 		
-		LoginUserInfo loginUserInfo = Optional.ofNullable(objectMapper.convertValue(redisProvider.getHash(ssoKey, "user"), LoginUserInfo.class))
+		return Optional.ofNullable(objectMapper.convertValue(redisProvider.getHash(ssoKey, "user"), LoginUserInfo.class))
+				.map(v -> {v.setMenuSelected(pages, uri); return v;})
 				.orElseThrow(() -> new CommonException(ErrorCode.AUTHENTICATION_FAILED, "로그인 필요."));
- 
-		loginUserInfo.setMenuSelected(pages, uri);
 		
-    	return loginUserInfo;
 		//LoginUserInfo loginUserInfo = objectMapper.convertValue(redisProvider.getHash(ssoKey, "user"), LoginUserInfo.class);
 		//return loginUserInfo == null ? userService.getLoginUser(ssoKey) : loginUserInfo;
 	}

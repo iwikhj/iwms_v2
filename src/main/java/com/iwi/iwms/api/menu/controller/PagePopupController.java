@@ -46,10 +46,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("${app.path}/${app.version}/popup")
 public class PagePopupController {
 	
-	private static final int DEFAULT_PAGE = 1;
-	
-	private static final int DEFAULT_LIMIT = 15;
-	
 	private final CodeService codeService;
 	
 	private final NoticeService noticeService;

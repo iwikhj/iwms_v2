@@ -63,7 +63,7 @@ public class FileController {
 				.data(FileStorageResponse.builder()
 						.originalFilename(multipartFile.getOriginalFilename())
 						.filename(file.getName())
-						.link(request.getRequestURI().replaceFirst("upload", "link").concat("/" + path.toString().replace("\\", "/") + "/" + file.getName()))
+						.path(request.getRequestURI().replaceFirst("upload", "link").concat("/" + path.toString().replace("\\", "/") + "/" + file.getName()))
 						.type(Files.probeContentType(file.toPath()))
 						.size(file.length())	
 						.lastModified(sdf.format(file.lastModified()))
