@@ -17,7 +17,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwi.iwms.api.common.errors.CommonException;
 import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
-import com.iwi.iwms.api.user.service.UserService;
 import com.iwi.iwms.config.redis.RedisProvider;
 
 import lombok.RequiredArgsConstructor;
@@ -34,8 +33,6 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
     private final RedisProvider redisProvider;
     
     private final ObjectMapper objectMapper;
-    
-	//private final UserService userService;
 	
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
@@ -63,8 +60,5 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
 		return Optional.ofNullable(objectMapper.convertValue(redisProvider.getHash(ssoKey, "user"), LoginUserInfo.class))
 				.map(v -> {v.setMenuSelected(pages, uri); return v;})
 				.orElseThrow(() -> new CommonException(ErrorCode.AUTHENTICATION_FAILED, "로그인 필요."));
-		
-		//LoginUserInfo loginUserInfo = objectMapper.convertValue(redisProvider.getHash(ssoKey, "user"), LoginUserInfo.class);
-		//return loginUserInfo == null ? userService.getLoginUser(ssoKey) : loginUserInfo;
 	}
 }
