@@ -18,11 +18,11 @@ public interface FileService {
 	
 	void deleteFiles(List<UploadFileInfo> uploadedFilesInfo, List<Long> excludeFilesSeq);
 	
+	void deleteFolder(Path path);
+	
 	File upload(MultipartFile multipartFile, Path path);
 	
 	UploadFileInfo getFileBySeq(long fileSeq);
 	
 	Resource getFileResource(Path path);
-	
-	void deleteFolder(Path path);
 }

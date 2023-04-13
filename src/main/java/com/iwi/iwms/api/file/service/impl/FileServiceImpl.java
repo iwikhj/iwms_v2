@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.iwi.iwms.api.common.errors.CommonException;
@@ -18,6 +19,7 @@ import com.iwi.iwms.api.file.domain.UploadFileInfo;
 import com.iwi.iwms.api.file.mapper.FileMapper;
 import com.iwi.iwms.api.file.service.FileService;
 import com.iwi.iwms.filestorage.service.FileStorageService;
+import com.iwi.iwms.filestorage.transaction.FileTransactionListener;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,12 +41,18 @@ public class FileServiceImpl implements FileService {
 	@Transactional(rollbackFor = {Exception.class})
 	@Override
 	public void insertFiles(List<MultipartFile> multipartFiles, UploadFile uploadFile) {
+		FileTransactionListener fileTransactionListener = new FileTransactionListener();
+		TransactionSynchronizationManager.registerSynchronization(fileTransactionListener);
+		
 		multipartFiles.stream()
 			.forEach(multipartFile -> {
 				File file = fileStorageService.store(multipartFile, Paths.get(uploadFile.getFileRealPath()));
+				fileTransactionListener.add(file);
+				
 				uploadFile.setFileOrgNm(multipartFile.getOriginalFilename());
 				uploadFile.setFileRealNm(file.getName());
 				fileMapper.insertFile(uploadFile);
+				
 			});
 	
 		fileMapper.updateOrderNum(uploadFile);
@@ -82,5 +90,4 @@ public class FileServiceImpl implements FileService {
 	public Resource getFileResource(Path path) {
 		return fileStorageService.loadAsResource(path);
 	}
-
 }

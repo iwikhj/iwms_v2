@@ -47,15 +47,6 @@ public class LoginController {
 				.build());
 	}
 	
-	@Operation(summary = "로그아웃", description = "로그아웃")
-	@GetMapping(value = "/logout")
-	public ResponseEntity<Void> logout(HttpServletRequest request
-			, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
-		
-    	return ResponseEntity.ok()
-    			.build();
-	}
-	
 	@Operation(summary = "토큰 재발급", description = "토큰 재발급")
 	@PostMapping(value = "/reissue", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
 	public ResponseEntity<ApiResponse<ReissueResponse>> reissue(HttpServletRequest request
@@ -67,5 +58,14 @@ public class LoginController {
 		return ResponseEntity.ok(ApiResponse.<ReissueResponse>builder()
 				.data(token)
 				.build());
+	}
+	
+	@Operation(summary = "로그아웃", description = "로그아웃")
+	@GetMapping(value = "/logout")
+	public ResponseEntity<Void> logout(HttpServletRequest request
+			, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+		
+    	return ResponseEntity.ok()
+    			.build();
 	}
 }

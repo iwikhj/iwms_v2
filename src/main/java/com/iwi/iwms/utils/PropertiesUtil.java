@@ -6,7 +6,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 @Component
-public class PropertyUtil implements ApplicationContextAware {
+public class PropertiesUtil implements ApplicationContextAware {
 	
 	private static ApplicationContext applicationContext;
 

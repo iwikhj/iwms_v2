@@ -12,10 +12,16 @@ import com.google.common.base.Joiner;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 
 public class PredicateMap {
+	
+	private static final String LOGIN_USER_SEQ = "loginUserSeq";
+	
+	private static final String PAGE = "page";
+	
+	private static final String LIMIT = "limit";
 
 	public static Map<String, Object> make(HttpServletRequest request, LoginUserInfo loginUserInfo){
 		Map<String, Object> map = new HashMap<>();
-		map.put("loginUserSeq", loginUserInfo.getUserSeq());
+		map.put(LOGIN_USER_SEQ, loginUserInfo.getUserSeq());
 		Enumeration<?> e = request.getParameterNames();
 		while(e.hasMoreElements()){
 			String name = (String) e.nextElement();
@@ -24,7 +30,7 @@ public class PredicateMap {
 			if(!StringUtils.hasText(value))
 				continue;
 			
-			if(name.equals("page") || name.equals("limit"))
+			if(name.equals(PAGE) || name.equals(LIMIT))
 				continue;
 			
 			map.put(name, value);  

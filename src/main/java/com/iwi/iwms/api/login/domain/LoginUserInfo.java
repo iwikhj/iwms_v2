@@ -7,6 +7,7 @@ import com.iwi.iwms.api.auth.domain.AuthMenuInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -69,6 +70,11 @@ public class LoginUserInfo {
 	
 	@Schema(description = "메뉴 목록")
 	private List<AuthMenuInfo> menus;
+	
+	@Builder
+	LoginUserInfo(long userSeq) {
+		this.userSeq = userSeq;
+	}
 	
 	public void setMenuSelected(String pages, String uri) {
 		//Mapping이 pages가 아니면 무시

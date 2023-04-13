@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +14,10 @@ import org.springframework.util.CollectionUtils;
 
 import com.iwi.iwms.api.common.errors.CommonException;
 import com.iwi.iwms.api.common.errors.ErrorCode;
+import com.iwi.iwms.api.file.domain.UploadFileInfo;
 import com.iwi.iwms.api.file.service.FileService;
+import com.iwi.iwms.api.login.domain.LoginUserInfo;
+import com.iwi.iwms.api.req.domain.Cmt;
 import com.iwi.iwms.api.req.domain.His;
 import com.iwi.iwms.api.req.domain.ReqDtl;
 import com.iwi.iwms.api.req.domain.ReqDtlInfo;
@@ -34,8 +38,6 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 public class ReqDtlServiceImpl implements ReqDtlService {
 	
-	private static final String UPLOAD_PATH_PREFIX = "request/";
-
 	private final ReqDtlMapper reqDtlMapper;
 	
 	private final ReqService reqService;
@@ -43,6 +45,10 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 	private final FileService fileService;
 	
 	private final UserService userService;
+	
+	private String getUploadPath(long reqSeq, long reqDtlSeq) {
+		return "request/" + reqSeq + "/task/" + reqDtlSeq;
+	}
 	
 	@Override
 	public ReqDtlInfo getReqDtlByReqSeq(long reqSeq, long loginUserSeq) {
@@ -148,11 +154,29 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 		
 		//  요청사항 상세 디렉토리 삭제
 		if(!CollectionUtils.isEmpty(reqDtlInfo.getComments())) {
-			Path path = Paths.get(UPLOAD_PATH_PREFIX)
-					.resolve(String.valueOf(reqDtlInfo.getReqSeq()))
-					.resolve(String.valueOf(reqDtlInfo.getReqDtlSeq()));
-			fileService.deleteFolder(path);
+			reqDtlInfo.getComments().stream()
+				.map(v -> {
+					return Cmt.builder()
+							.reqSeq(v.getReqSeq())
+							.reqDtlSeq(v.getReqDtlSeq())
+							.cmtSeq(v.getCmtSeq())
+							.build()
+							.of(LoginUserInfo.builder()
+									.userSeq(reqDtl.getLoginUserSeq())
+									.build());
+					
+				})
+				.forEach(v -> {
+					List<UploadFileInfo> attachedFiles = fileService.listFileByRef(v.getFileInfo());
+					if(!CollectionUtils.isEmpty(attachedFiles)) {
+						fileService.deleteFiles(attachedFiles, null);
+					}
+				});
 		}
+		
+		// 폴더 삭제
+		fileService.deleteFolder(Paths.get(this.getUploadPath(reqDtlInfo.getReqSeq(), reqDtlInfo.getReqDtlSeq())));
+		
 		return result;
 	}
 
@@ -168,7 +192,6 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 		if(oldStat == newStat) {
         	throw new CommonException(ErrorCode.DUPLICATE_ERROR, "이미 " + newStat.getMessage() + " 상태입니다.");
 		}
-		
 		if(newStat == ReqDtlStatCode.IN_PROGRESS && oldStat != ReqDtlStatCode.RECEIPT) {
         	throw new CommonException(ErrorCode.STATUS_ERROR, "현재 " + oldStat.getMessage() + " 상태입니다. " + ReqDtlStatCode.RECEIPT.getMessage() + " 상태에서만 담당자 확인을 진행할 수 있습니다.");
 		}

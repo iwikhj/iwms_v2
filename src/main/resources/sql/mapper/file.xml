@@ -69,8 +69,8 @@
 	<!-- 참조 파일 정렬 업데이트 -->	
 	<update id="updateOrderNum" parameterType="com.iwi.iwms.api.file.domain.UploadFile">
 		/* updateOrderNum */
-		UPDATE TB_FILE FILE,
-			(SELECT 
+		UPDATE TB_FILE FILE, (
+			SELECT 
 				@ROWNUM:=@ROWNUM + 1 AS ROWNUM
 				, FILE_ORD.FILE_REF_TB
 				, FILE_ORD.FILE_REF_COL
@@ -80,7 +80,8 @@
 			WHERE FILE_ORD.FILE_REF_TB = #{fileRefTb}
 			AND FILE_ORD.FILE_REF_COL = #{fileRefCol}
 			AND FILE_ORD.FILE_REF_SEQ = #{fileRefSeq}
-			ORDER BY FILE_ORD.FILE_SEQ) AS R
+			ORDER BY FILE_ORD.FILE_SEQ
+		) AS R
 		SET 
 			FILE.FILE_ORDER_NO = R.ROWNUM
 		WHERE FILE.FILE_REF_TB = R.FILE_REF_TB
