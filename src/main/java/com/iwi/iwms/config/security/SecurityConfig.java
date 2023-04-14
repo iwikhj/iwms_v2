@@ -106,7 +106,7 @@ public class SecurityConfig {
 		@Override
 		public Collection<GrantedAuthority> convert(Jwt jwt) {
 			JSONArray authorities = (JSONArray) jwt.getClaims().get("authorities");
-			return authorities.stream().map(rn -> rn.toString().toUpperCase())
+			return authorities.stream().map(role -> role.toString().toUpperCase())
 				.map(SimpleGrantedAuthority::new).collect(Collectors.toList());
 		}
 	}
