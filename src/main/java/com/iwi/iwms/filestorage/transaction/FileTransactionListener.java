@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.util.StringUtils;
 
 public class FileTransactionListener implements TransactionSynchronization {
 	   
@@ -39,16 +40,18 @@ public class FileTransactionListener implements TransactionSynchronization {
 					}
 				});
 			
-			try {
-				Files.walk(Paths.get(folderPath.get()))
-					.sorted(Comparator.reverseOrder())
-					.findFirst()
-					.filter(v -> v.toString().equals(folderPath.get()))
-					.map(Path::toFile)
-					.ifPresent(File::delete);
-	        } catch (IOException e) {
-	        	e.printStackTrace();
-	        }
+			if(folderPath.get() != null && StringUtils.hasText(folderPath.get())) {
+				try {
+					Files.walk(Paths.get(folderPath.get()))
+						.sorted(Comparator.reverseOrder())
+						.findFirst()
+						.filter(v -> v.toString().equals(folderPath.get()))
+						.map(Path::toFile)
+						.ifPresent(File::delete);
+		        } catch (IOException e) {
+		        	e.printStackTrace();
+		        }				
+			}
 		}
 	}
 }
