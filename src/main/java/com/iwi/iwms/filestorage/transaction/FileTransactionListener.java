@@ -40,12 +40,12 @@ public class FileTransactionListener implements TransactionSynchronization {
 				});
 			
 			try {
-				if(Files.walk(Paths.get(folderPath.get())).count() == 1) {
-					Files.walk(Paths.get(folderPath.get()))
-						.sorted(Comparator.reverseOrder())
-						.map(Path::toFile)
-						.forEach(File::delete);
-				}
+				Files.walk(Paths.get(folderPath.get()))
+					.sorted(Comparator.reverseOrder())
+					.findFirst()
+					.filter(v -> v.toString().equals(folderPath.get()))
+					.map(Path::toFile)
+					.ifPresent(File::delete);
 	        } catch (IOException e) {
 	        	e.printStackTrace();
 	        }
