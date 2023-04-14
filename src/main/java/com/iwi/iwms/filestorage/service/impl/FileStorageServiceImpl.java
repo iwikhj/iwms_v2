@@ -30,9 +30,9 @@ public class FileStorageServiceImpl implements FileStorageService {
 	private Path storagePath;
 	
     @Value("${storage.file.path}")
-    private void setUploadPath(String uploadPath) throws IOException {
-		this.storagePath = Paths.get(uploadPath).toAbsolutePath();
-		//this.rootPath = Paths.get(System.getProperty("user.dir")).resolve(uploadPath.substring(1)).toAbsolutePath());
+    private void setStoragePath(String storagePath) throws IOException {
+		this.storagePath = Paths.get(storagePath).toAbsolutePath();
+		//this.storagePath = Paths.get(System.getProperty("user.dir")).resolve(storagePath.substring(1)).toAbsolutePath());
 		if (!Files.exists(this.storagePath)) {
     		Files.createDirectories(this.storagePath);
     	}
