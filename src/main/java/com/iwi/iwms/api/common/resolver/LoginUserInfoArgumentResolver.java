@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResolver {
 	
-	@Value("${app.path}/${app.version}/pages")
+	@Value("${app.path}/pages")
 	String pages;
 	
     private final RedisProvider redisProvider;

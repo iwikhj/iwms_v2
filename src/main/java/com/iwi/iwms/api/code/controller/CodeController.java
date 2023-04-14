@@ -33,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RestController
 @PreAuthorize("hasRole('ROLE_IWMS_ADMIN')")
-@RequestMapping("${app.path}/${app.version}/codes")
+@RequestMapping("${app.path}/codes")
 public class CodeController {
 
 	private final CodeService codeService;

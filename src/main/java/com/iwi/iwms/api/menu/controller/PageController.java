@@ -49,7 +49,7 @@ import lombok.extern.slf4j.Slf4j;
 @Tag(name = "Page", description = "IWMS 메뉴별 페이지 정보")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("${app.path}/${app.version}/pages")
+@RequestMapping("${app.path}/pages")
 public class PageController {
 	
 	private static final int DEFAULT_PAGE = 1;

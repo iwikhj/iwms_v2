@@ -43,8 +43,8 @@ public class UploadFileInfo {
 	@Schema(description = "등록자") 
 	private String regNm;
 	
-	//${app.path}/${app.version}/files
+	//${app.path}/files
 	public void setFileDownloadPath(String fileDownloadPath) {
-		this.fileDownloadPath = PropertiesUtil.getProperty("app.path") + "/" + PropertiesUtil.getProperty("app.version") + "/files/download" + fileDownloadPath;
+		this.fileDownloadPath = PropertiesUtil.getProperty("app.path") + "/files/download" + fileDownloadPath;
 	}
 }
