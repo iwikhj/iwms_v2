@@ -14,6 +14,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.MediaTypeFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,11 +27,9 @@ import org.springframework.web.multipart.MultipartFile;
 import com.iwi.iwms.api.common.response.ApiResponse;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
 import com.iwi.iwms.api.file.service.FileService;
-import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.filestorage.FileStorageResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,28 +80,20 @@ public class FileController {
 		Path path = Paths.get(path1).resolve(path2).resolve(filename);
 		Resource resource = fileService.getFileResource(path);
 		
-		File file = resource.getFile();
-		
-		MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
-		String contentType = Files.probeContentType(file.toPath());
-		if(contentType != null) {
-			mediaType = MediaType.parseMediaType(contentType);
-		}
-		log.info("Content Type: {}", mediaType);
+		MediaType contentType = MediaTypeFactory.getMediaType(resource).orElse(MediaType.APPLICATION_OCTET_STREAM);
+		log.info("Content Type: {}", contentType);
 		
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.EXPIRES, "0");
-        headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(file.length()));
+        headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(resource.contentLength()));
         headers.add(HttpHeaders.ACCEPT_RANGES, "bytes");
-        headers.add(HttpHeaders.TRANSFER_ENCODING, "binary");
         
         return ResponseEntity.ok()
         		.cacheControl(CacheControl.noCache())
-                .contentType(mediaType)
+                .contentType(contentType)
                 .headers(headers)
                 .body(resource);
 	}
-    
     
 	@Operation(hidden = true, summary = "파일 다운로드", description = "파일 다운로드")
 	@GetMapping(value = "/download/{fileSeq}")
@@ -111,32 +102,25 @@ public class FileController {
 			, @PathVariable long fileSeq) throws IOException {
 		
 		UploadFileInfo fileInfo = fileService.getFileBySeq(fileSeq);
-		log.info("Download filename: {}", fileInfo.getFileOrgNm());
 		
 		Path path = Paths.get(fileInfo.getFileRealPath()).resolve(fileInfo.getFileRealNm());
 		Resource resource = fileService.getFileResource(path);
 		
-		File file = resource.getFile();
-		
-		MediaType mediaType = MediaType.APPLICATION_OCTET_STREAM;
-		String contentType = Files.probeContentType(file.toPath());
-		if(contentType != null) {
-			mediaType = MediaType.parseMediaType(contentType);
-		}
-		log.info("Content Type: {}", mediaType);
+		MediaType contentType = MediaTypeFactory.getMediaType(resource).orElse(MediaType.APPLICATION_OCTET_STREAM);
+		log.info("Content Type: {}", contentType);
 		
 		String download = URLEncoder.encode(fileInfo.getFileOrgNm(), "UTF-8").replaceAll("\\+", "%20");
-        
+		log.info("Download filename: {}", fileInfo.getFileOrgNm());
+		
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.EXPIRES, "0");
-        headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(file.length()));
+        headers.add(HttpHeaders.CONTENT_LENGTH, String.valueOf(resource.contentLength()));
         headers.add(HttpHeaders.ACCEPT_RANGES, "bytes");
-        headers.add(HttpHeaders.TRANSFER_ENCODING, "binary");
         headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + download + "\"");
         
         return ResponseEntity.ok()
         		.cacheControl(CacheControl.noCache())
-                .contentType(mediaType)
+                .contentType(contentType)
                 .headers(headers)
                 .body(resource);
 	}

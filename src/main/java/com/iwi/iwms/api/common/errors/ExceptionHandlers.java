@@ -3,6 +3,7 @@ package com.iwi.iwms.api.common.errors;
 import java.beans.PropertyEditorSupport;
 import java.util.List;
 
+import org.apache.catalina.connector.ClientAbortException;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -27,13 +28,13 @@ public class ExceptionHandlers {
     public void initBinder(WebDataBinder binder) {
         binder.registerCustomEditor(String.class, new StringTrimmerEditor(true));
         
-        // MultipartFile null 처리
+        // MultipartFile stiring to null
         binder.registerCustomEditor(MultipartFile.class, new PropertyEditorSupport() {
         	@Override
         	public void setAsText(String text) throws IllegalArgumentException {}
         });
         
-        // List<MultipartFile> null 처리
+        // List<MultipartFile> stiring to null
         binder.registerCustomEditor(List.class, "files", new PropertyEditorSupport() {
         	@Override
         	public void setAsText(String text) throws IllegalArgumentException {}
@@ -83,6 +84,11 @@ public class ExceptionHandlers {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<?> handleAccessDeniedException(AccessDeniedException e){
         return responseError(ErrorCode.AUTHORIZATION_FAILED, e.getMessage(), e);
+    }
+    
+    @ExceptionHandler({ClientAbortException.class})
+    public ResponseEntity<?> handleClientAbortException(ClientAbortException e) {
+    	return ResponseEntity.internalServerError().build();
     }
     
     @ExceptionHandler({Exception.class})
