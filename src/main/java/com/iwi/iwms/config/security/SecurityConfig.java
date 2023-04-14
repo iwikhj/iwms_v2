@@ -102,7 +102,7 @@ public class SecurityConfig {
 		return jwtConverter;
 	}
 
-	public class RealmRoleConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
+	private class RealmRoleConverter implements Converter<Jwt, Collection<GrantedAuthority>> {
 		@Override
 		public Collection<GrantedAuthority> convert(Jwt jwt) {
 			JSONArray authorities = (JSONArray) jwt.getClaims().get("authorities");
@@ -112,7 +112,7 @@ public class SecurityConfig {
 	}
 	
 	@Bean
-	JwtDecoder jwtDecoder() {
+	public JwtDecoder jwtDecoder() {
 		return NimbusJwtDecoder.withJwkSetUri(this.jwkSetUri).build();
 	}
 }

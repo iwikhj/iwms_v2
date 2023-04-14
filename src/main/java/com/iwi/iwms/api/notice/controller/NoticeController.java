@@ -70,6 +70,7 @@ public class NoticeController {
     		, @PathVariable long noticeSeq) {
     	
     	NoticeInfo noticeInfo = noticeService.getNoticeBySeq(noticeSeq, loginUserInfo.getUserSeq());
+    	
     	noticeService.updateViewCnt(noticeSeq);
     	
 		return ResponseEntity.ok(ApiResponse.<NoticeInfo>builder()

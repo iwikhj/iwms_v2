@@ -61,9 +61,8 @@ public class FileController {
 		
 		return ResponseEntity.ok(ApiResponse.<FileStorageResponse>builder()
 				.data(FileStorageResponse.builder()
-						.originalFilename(multipartFile.getOriginalFilename())
-						.filename(file.getName())
-						.path(request.getRequestURI().replaceFirst("upload", "link").concat("/" + path.toString().replace("\\", "/") + "/" + file.getName()))
+						.filename(multipartFile.getOriginalFilename())
+						.url(request.getRequestURL().toString().replaceFirst("upload", "link").concat("/" + path.toString().replace("\\", "/") + "/" + file.getName()))
 						.type(Files.probeContentType(file.toPath()))
 						.size(file.length())	
 						.lastModified(sdf.format(file.lastModified()))
