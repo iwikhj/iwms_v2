@@ -10,11 +10,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
 
 @Getter
-@Setter
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
@@ -77,7 +75,7 @@ public class LoginUserInfo {
 	}
 	
 	public void setMenuSelected(String pages, String uri) {
-		//Mapping이 pages가 아니면 무시
+		//Mapping uri가 pages가 아니면 무시
     	if(uri.indexOf(pages) != -1) {
     		
     		//전체 URI에서 /pages까지 경로 제거

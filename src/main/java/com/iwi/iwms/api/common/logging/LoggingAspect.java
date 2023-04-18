@@ -25,7 +25,7 @@ public class LoggingAspect {
     @Around("within(com.iwi.iwms.api.*.controller.*)")
     public Object aspectParameter(final ProceedingJoinPoint pjp) throws Throwable {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        String params = getRequestParams(request); // request 값 가져오기
+        String params = getRequestParams(request);
         
         long startAt = System.currentTimeMillis();
         log.info("[REQUEST] {}[{}] <method={}, path={}, param={}>", pjp.getSignature().getDeclaringTypeName(), pjp.getSignature().getName(), request.getMethod(), request.getRequestURI(), params);
@@ -47,8 +47,7 @@ public class LoggingAspect {
 	private String getRequestParams(HttpServletRequest request) {
 		String params = "[]";
 
-        RequestAttributes requestAttributes = RequestContextHolder
-            .getRequestAttributes();
+        RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
 
         if (requestAttributes != null) {
         	Map<String, String[]> paramMap = request.getParameterMap();

@@ -122,6 +122,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 			reqDtl.setTgtMm(tgtMm);
 			reqDtl.setTask(task);
 			reqDtl.setStatCd(status.getCode());
+			
 			reqDtlMapper.insertReqDtl(reqDtl);
 			
 			His his = His.builder()
@@ -152,20 +153,18 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 		
 		int result = reqDtlMapper.deleteReqDtl(reqDtl);
 		
-		//  요청사항 상세 디렉토리 삭제
+		//  요청사항 상세 코멘트 파일 삭제
 		if(!CollectionUtils.isEmpty(reqDtlInfo.getComments())) {
 			reqDtlInfo.getComments().stream()
-				.map(v -> {
-					return Cmt.builder()
+				.map(v -> Cmt.builder()
 							.reqSeq(v.getReqSeq())
 							.reqDtlSeq(v.getReqDtlSeq())
 							.cmtSeq(v.getCmtSeq())
 							.build()
 							.of(LoginUserInfo.builder()
 									.userSeq(reqDtl.getLoginUserSeq())
-									.build());
-					
-				})
+									.build())
+				)
 				.forEach(v -> {
 					List<UploadFileInfo> attachedFiles = fileService.listFileByRef(v.getFileInfo());
 					if(!CollectionUtils.isEmpty(attachedFiles)) {

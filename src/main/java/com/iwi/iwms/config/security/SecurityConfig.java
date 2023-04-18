@@ -1,6 +1,7 @@
 package com.iwi.iwms.config.security;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -88,16 +89,18 @@ public class SecurityConfig {
 	
 	@Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
+		String [] antMatchers = {"/login", "/reissue", "/popup/login/**", "/files/**"};
 	    return (web) -> web.ignoring()
 	    		.antMatchers("/apidocs/**", "/swagger-ui/**")
-	    		.antMatchers(this.appPath + "/login", this.appPath + "/reissue")
-	    		.antMatchers(this.appPath + "/popup/login/**")
-	    		.antMatchers(this.appPath + "/files/**")
+	    		.antMatchers(List.of(antMatchers).stream()
+	    				.map(v -> this.appPath + v)
+	    				.toArray(String[]::new))
 	    		.requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
 	private Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter() {
 		JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
+		//jwtConverter.setPrincipalClaimName("sub");
 		jwtConverter.setJwtGrantedAuthoritiesConverter(new RealmRoleConverter());
 		return jwtConverter;
 	}
