@@ -17,6 +17,7 @@ import com.iwi.iwms.config.redis.RedisProvider;
 import com.iwi.iwms.config.security.auth.AuthProvider;
 import com.iwi.iwms.config.security.auth.IntrospectResponse;
 import com.iwi.iwms.config.security.auth.ReissueResponse;
+import com.iwi.iwms.config.security.auth.TokenResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +36,7 @@ public class LoginServiceImpl implements LoginService{
     private final ObjectMapper objectMapper;
     
 	@Override
-	public AccessTokenResponse login(Login login) {
+	public TokenResponse login(Login login) {
 		// 등록된 ID 확인
     	UserInfo userInfo = userService.getUserById(login.getUsername());
 		if(userInfo == null) {
@@ -53,9 +54,10 @@ public class LoginServiceImpl implements LoginService{
 		}
 		
 		// 인증 서버 인증 요청
-		AccessTokenResponse accessTokenResponse = null;
+		TokenResponse tokenResponse = new TokenResponse();
 		try {
-			accessTokenResponse = authProvider.grantToken(login.getUsername(), login.getPassword());
+			AccessTokenResponse accessTokenResponse = authProvider.grantToken(login.getUsername(), login.getPassword());
+			tokenResponse = tokenResponse.of(accessTokenResponse);
 		} catch(CommonException e) {
 			if(ErrorCode.LOGIN_FAILED_INCORRECT_ID_PW == e.getCode()) {
 				// 패스워드 불일치로 로그인 실패. LOGIN_ERR_CNT 증가
@@ -85,12 +87,12 @@ public class LoginServiceImpl implements LoginService{
 		
 		// 로그인 사용자 정보 Redis 등록
 		redisProvider.setHash(key, "user", loginUserInfo);
-		redisProvider.setHash(key, "refreshToken", accessTokenResponse.getRefreshToken());
+		redisProvider.setHash(key, "refreshToken", tokenResponse.getRefreshToken());
 		
 		// TTL 설정. 리플레시 토큰의 만료시간과 동일하게 설정(초)
-		redisProvider.setTtl(key, accessTokenResponse.getRefreshExpiresIn());
+		redisProvider.setTtl(key, tokenResponse.getRefreshExpiresIn());
 		
-		return accessTokenResponse;
+		return tokenResponse;
 	}
 	
 	@Override
@@ -111,7 +113,7 @@ public class LoginServiceImpl implements LoginService{
 		if(storedRefreshtoken == null || !storedRefreshtoken.equals(reissue.getRefreshToken())) {
         	throw new CommonException(ErrorCode.AUTHENTICATION_REISSUE_FAILED, "요청한 리프레시 토큰과 서버에 저장된 리프레시 토큰이 일치하지 않습니다.");
 		}
-    	return authProvider.reissue(reissue.getRefreshToken()).of();
+    	return authProvider.reissue(reissue.getRefreshToken());
 	}
 
 }

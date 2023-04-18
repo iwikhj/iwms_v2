@@ -3,7 +3,6 @@ package com.iwi.iwms.api.login.controller;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +17,7 @@ import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.login.domain.Reissue;
 import com.iwi.iwms.api.login.service.LoginService;
 import com.iwi.iwms.config.security.auth.ReissueResponse;
+import com.iwi.iwms.config.security.auth.TokenResponse;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,13 +36,13 @@ public class LoginController {
 	
 	@Operation(summary = "로그인", description = "사용자 로그인")
 	@PostMapping(value = "/login", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-	public ResponseEntity<ApiResponse<AccessTokenResponse>> login(HttpServletRequest request
+	public ResponseEntity<ApiResponse<TokenResponse>> login(HttpServletRequest request
 			, @ModelAttribute @Valid Login login) {
 		
 		login.setLoginIp(request.getRemoteAddr());
-		AccessTokenResponse token = loginService.login(login);
+		TokenResponse token = loginService.login(login);
 		
-		return ResponseEntity.ok(ApiResponse.<AccessTokenResponse>builder()
+		return ResponseEntity.ok(ApiResponse.<TokenResponse>builder()
 				.data(token)
 				.build());
 	}
