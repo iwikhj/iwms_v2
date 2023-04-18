@@ -58,6 +58,7 @@ public class LoginServiceImpl implements LoginService{
 		try {
 			AccessTokenResponse accessTokenResponse = authProvider.grantToken(login.getUsername(), login.getPassword());
 			tokenResponse = tokenResponse.of(accessTokenResponse);
+			
 		} catch(CommonException e) {
 			if(ErrorCode.LOGIN_FAILED_INCORRECT_ID_PW == e.getCode()) {
 				// 패스워드 불일치로 로그인 실패. LOGIN_ERR_CNT 증가

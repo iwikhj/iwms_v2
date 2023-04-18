@@ -1,8 +1,5 @@
 package com.iwi.iwms.config.security.auth;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.beans.BeanUtils;
 
@@ -43,8 +40,7 @@ public class TokenResponse {
     protected String scope;
     
     public TokenResponse of(AccessTokenResponse accessTokenResponse) {
-    	TokenResponse tokenResponse = new TokenResponse(); 
-		BeanUtils.copyProperties(accessTokenResponse, tokenResponse);
-    	return tokenResponse;
+		BeanUtils.copyProperties(accessTokenResponse, this);
+		return this;
     }
 }
