@@ -14,6 +14,7 @@ import com.iwi.iwms.api.common.errors.CommonException;
 import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.file.domain.UploadFile;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
+import com.iwi.iwms.api.file.enums.UploadType;
 import com.iwi.iwms.api.file.service.FileService;
 import com.iwi.iwms.api.notice.domain.Notice;
 import com.iwi.iwms.api.notice.domain.NoticeInfo;
@@ -31,10 +32,6 @@ public class NoticeServiceImpl implements NoticeService {
 	private final NoticeMapper noticeMapper;
 	
 	private final FileService fileService;
-	
-	private String getUploadPath(long noticeSeq) {
-		return "notice/" + noticeSeq;
-	}
 	
 	@Override
 	public List<NoticeInfo> listNotice(Map<String, Object> map) {
@@ -66,7 +63,7 @@ public class NoticeServiceImpl implements NoticeService {
 		if(!CollectionUtils.isEmpty(notice.getFiles())) {
 			UploadFile uploadFile = notice.getFileInfo();
 			uploadFile.setFileRefSeq(notice.getNoticeSeq());
-			uploadFile.setFileRealPath(this.getUploadPath(notice.getNoticeSeq()));
+			uploadFile.setFileRealPath(UploadType.NOTICE.getPath(notice.getNoticeSeq()));
 			fileService.insertFiles(notice.getFiles(), uploadFile);
 		}
 	}
@@ -89,7 +86,7 @@ public class NoticeServiceImpl implements NoticeService {
 		if(!CollectionUtils.isEmpty(notice.getFiles())) {
 			log.info("첨부파일 있음");
 			UploadFile uploadFile = notice.getFileInfo();
-			uploadFile.setFileRealPath(this.getUploadPath(notice.getNoticeSeq()));
+			uploadFile.setFileRealPath(UploadType.NOTICE.getPath(notice.getNoticeSeq()));
 			fileService.insertFiles(notice.getFiles(), uploadFile);
 		}
 		return result;
@@ -110,7 +107,7 @@ public class NoticeServiceImpl implements NoticeService {
 		}
 		
 		// 폴더 삭제
-		fileService.deleteFolder(Paths.get(this.getUploadPath(notice.getNoticeSeq())));
+		fileService.deleteFolder(Paths.get(UploadType.NOTICE.getPath(notice.getNoticeSeq())));
 		
 		return result;
 	}

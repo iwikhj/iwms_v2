@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.iwi.iwms.api.common.logging.LoggingAspect;
+import com.iwi.iwms.api.file.enums.UploadType;
 import com.iwi.iwms.utils.AES256Util;
 
 import lombok.extern.slf4j.Slf4j;
@@ -27,9 +28,9 @@ class IwmsApplicationTests {
 	@Test
 	@DisplayName("간단 테스트")
 	void test() throws Exception {
-		String test = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJmN0pKd2g3aEZDTEt2OVhEaE5NOEFNTlZpRkRZTGZxVmdqUGpXMUN1bEhZIn0."
-				+ "eyJleHAiOjE2ODE4MjM3NjEsImlhdCI6MTY4MTc4Nzc2MSwianRpIjoiNTFmYTIzZTktZjhlNC00ZDVhLWI4YzYtZDY1MDdjODU0Yzg2IiwiaXNzIjoiaHR0cDovL3JlZ2lzdHJ5Lml3aS5jby5rcjo4MTgwL3JlYWxtcy9tYXN0ZXIiLCJzdWIiOiI3YWZjYzlhOC02MzY0LTRhNGQtYjdjZi1hZDM2YWI2MmRhNTMiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJpd21zIiwic2Vzc2lvbl9zdGF0ZSI6IjQwMjgzMmYyLWY2NzEtNGZkMy1hMzU0LTA3NmM4ZDRjMDc3YiIsImFjciI6IjEiLCJzY29wZSI6Iml3bXMiLCJzaWQiOiI0MDI4MzJmMi1mNjcxLTRmZDMtYTM1NC0wNzZjOGQ0YzA3N2IiLCJhdXRob3JpdGllcyI6WyJST0xFX0lXTVNfQURNSU4iXX0."
-				+ "DL5AnEzh0xeHeo_XDo3J3wpC1RS8QLJ9Y1ivm_9XOgnyiXQmab2W_PSLDtvNzB6HYpxTEfYQwawX0EVDCp6LA0lpmSHJxJIofW-G9VMpQYZsyKF5t2osH9D77tk2ml_72nCzZOlJfO04n8ee53CYImMgiSQWochLHfgFfnX13RNyaXRnJP4dvZOneHgqWAVOqu1L6OaanjMfitbgXnMmUKlWhHhNEz3zxt-tg971-npJv8l1fvR2oWRqPsAGBGFYMlovYPbAf4KKPUJrF-dgLe-s6GACD0tsg17aIufZdI9KKz8o8XnKfAAZlo6E-FHrsFpeXzwSUfKSgmvpoqDEfg"; 
+		String test = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJmN0pKd2g3aEZDTEt2OVhEaE5NOEFNTlZpRkRZTGZxVmdqUGpXMUN1bEhZIn0"
+				+ ".eyJleHAiOjE2ODE4MjM3NjEsImlhdCI6MTY4MTc4Nzc2MSwianRpIjoiNTFmYTIzZTktZjhlNC00ZDVhLWI4YzYtZDY1MDdjODU0Yzg2IiwiaXNzIjoiaHR0cDovL3JlZ2lzdHJ5Lml3aS5jby5rcjo4MTgwL3JlYWxtcy9tYXN0ZXIiLCJzdWIiOiI3YWZjYzlhOC02MzY0LTRhNGQtYjdjZi1hZDM2YWI2MmRhNTMiLCJ0eXAiOiJCZWFyZXIiLCJhenAiOiJpd21zIiwic2Vzc2lvbl9zdGF0ZSI6IjQwMjgzMmYyLWY2NzEtNGZkMy1hMzU0LTA3NmM4ZDRjMDc3YiIsImFjciI6IjEiLCJzY29wZSI6Iml3bXMiLCJzaWQiOiI0MDI4MzJmMi1mNjcxLTRmZDMtYTM1NC0wNzZjOGQ0YzA3N2IiLCJhdXRob3JpdGllcyI6WyJST0xFX0lXTVNfQURNSU4iXX0"
+				+ ".DL5AnEzh0xeHeo_XDo3J3wpC1RS8QLJ9Y1ivm_9XOgnyiXQmab2W_PSLDtvNzB6HYpxTEfYQwawX0EVDCp6LA0lpmSHJxJIofW-G9VMpQYZsyKF5t2osH9D77tk2ml_72nCzZOlJfO04n8ee53CYImMgiSQWochLHfgFfnX13RNyaXRnJP4dvZOneHgqWAVOqu1L6OaanjMfitbgXnMmUKlWhHhNEz3zxt-tg971-npJv8l1fvR2oWRqPsAGBGFYMlovYPbAf4KKPUJrF-dgLe-s6GACD0tsg17aIufZdI9KKz8o8XnKfAAZlo6E-FHrsFpeXzwSUfKSgmvpoqDEfg"; 
 		
 		String sub = "7afcc9a8-6364-4a4d-b7cf-ad36ab62da53".replaceAll("-", "");
 		String encSub = AES256Util.encrypt(sub);
@@ -60,5 +61,17 @@ class IwmsApplicationTests {
 		antMatchers = List.of(antMatchers).stream().map(v -> "/iwms/v1" + v).peek(System.out::println).toArray(String[]::new);
 		System.out.println("========================================");
 		List.of(antMatchers).stream().forEach(System.out::println);
+	}
+	
+	@Test
+	@DisplayName("간단 테스트3")
+	void test3() throws Exception {
+		UploadType.REQUEST.getPath(0, null);
+		System.out.println(UploadType.REQUEST.getPath(1));
+		System.out.println(UploadType.REQUEST_CMT.getPath(1, 2));
+		System.out.println(UploadType.REQUEST_TASK.getPath(1, 2));
+		System.out.println(UploadType.REQUEST_TASK_CMT.getPath(1, 2, 3));
+		System.out.println(UploadType.NOTICE.getPath(5));
+		System.out.println(UploadType.PROFILE.getPath(1));
 	}
 }

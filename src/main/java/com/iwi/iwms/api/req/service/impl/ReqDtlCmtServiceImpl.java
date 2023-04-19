@@ -14,6 +14,7 @@ import com.iwi.iwms.api.common.errors.CommonException;
 import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.file.domain.UploadFile;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
+import com.iwi.iwms.api.file.enums.UploadType;
 import com.iwi.iwms.api.file.service.FileService;
 import com.iwi.iwms.api.req.domain.Cmt;
 import com.iwi.iwms.api.req.domain.CmtInfo;
@@ -34,10 +35,6 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 	private final ReqDtlService reqDtlService;
 
 	private final FileService fileService;
-
-	private String getUploadPath(long reqSeq, long reqDtlSeq, long cmtSeq) {
-		return "request/" + reqSeq + "/task/" + reqDtlSeq + "/comment/" + cmtSeq;
-	}
 	
 	@Override
 	public CmtInfo getReqDtlCmtBySeq(long cmtSeq, long loginUserSeq) {
@@ -60,7 +57,7 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 		if(!CollectionUtils.isEmpty(cmt.getFiles())) {
 			UploadFile uploadFile = cmt.getFileInfo();
 			uploadFile.setFileRefSeq(cmt.getCmtSeq());
-			uploadFile.setFileRealPath(this.getUploadPath(cmt.getReqSeq(), cmt.getReqDtlSeq(), cmt.getCmtSeq()));
+			uploadFile.setFileRealPath(UploadType.REQUEST_TASK_CMT.getPath(cmt.getReqSeq(), cmt.getReqDtlSeq(), cmt.getCmtSeq()));
 			fileService.insertFiles(cmt.getFiles(), uploadFile);
 		}
 		
@@ -83,7 +80,7 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 		// 첨부파일 저장
 		if(!CollectionUtils.isEmpty(cmt.getFiles())) {
 			UploadFile uploadFile = cmt.getFileInfo();
-			uploadFile.setFileRealPath(this.getUploadPath(cmt.getReqSeq(), cmt.getReqDtlSeq(), cmt.getCmtSeq()));
+			uploadFile.setFileRealPath(UploadType.REQUEST_TASK_CMT.getPath(cmt.getReqSeq(), cmt.getReqDtlSeq(), cmt.getCmtSeq()));
 			fileService.insertFiles(cmt.getFiles(), uploadFile);
 		}
 		
@@ -105,7 +102,7 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 		}
 		
 		// 폴더 삭제
-		fileService.deleteFolder(Paths.get(this.getUploadPath(cmt.getReqSeq(), cmt.getReqDtlSeq(), cmt.getCmtSeq())));
+		fileService.deleteFolder(Paths.get(UploadType.REQUEST_TASK_CMT.getPath(cmt.getReqSeq(), cmt.getReqDtlSeq(), cmt.getCmtSeq())));
 		
 		return result;
 	}

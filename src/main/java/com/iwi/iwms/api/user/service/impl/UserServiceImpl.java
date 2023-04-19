@@ -17,6 +17,7 @@ import com.iwi.iwms.api.common.errors.CommonException;
 import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.file.domain.UploadFile;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
+import com.iwi.iwms.api.file.enums.UploadType;
 import com.iwi.iwms.api.file.service.FileService;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.user.domain.User;
@@ -45,10 +46,6 @@ public class UserServiceImpl implements UserService {
 	private final AuthProvider keycloakProvider;
 	
 	private final FileService fileService;
-	
-	private String getUploadPath(long userSeq) {
-		return "profile/" + userSeq;
-	}
 	
 	@Override
 	public List<UserInfo> listUser(Map<String, Object> map) {
@@ -109,7 +106,7 @@ public class UserServiceImpl implements UserService {
 				}
 				UploadFile uploadFile = user.getFileInfo();
 				uploadFile.setFileRefSeq(user.getUserSeq());
-				uploadFile.setFileRealPath(this.getUploadPath(user.getUserSeq()));
+				uploadFile.setFileRealPath(UploadType.PROFILE.getPath(user.getUserSeq()));
 				fileService.insertFiles(Arrays.asList(user.getFile()), uploadFile);
 			}
 		} catch(CommonException e) {
@@ -161,7 +158,7 @@ public class UserServiceImpl implements UserService {
 					throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "프로필 사진은 이미지 파일만 업로드 가능합니다.");
 				}
 				UploadFile uploadFile = userUpdate.getFileInfo();
-				uploadFile.setFileRealPath(this.getUploadPath(userUpdate.getUserSeq()));
+				uploadFile.setFileRealPath(UploadType.PROFILE.getPath(userUpdate.getUserSeq()));
 				fileService.insertFiles(Arrays.asList(userUpdate.getFile()), uploadFile);
 			}
 		} else {
@@ -171,7 +168,7 @@ public class UserServiceImpl implements UserService {
 					throw new CommonException(ErrorCode.PARAMETER_MALFORMED, "프로필 사진은 이미지 파일만 업로드 가능합니다.");
 				}
 				UploadFile uploadFile = userUpdate.getFileInfo();
-				uploadFile.setFileRealPath(this.getUploadPath(userUpdate.getUserSeq()));
+				uploadFile.setFileRealPath(UploadType.PROFILE.getPath(userUpdate.getUserSeq()));
 				fileService.insertFiles(Arrays.asList(userUpdate.getFile()), uploadFile);
 			}
 		}
@@ -197,7 +194,7 @@ public class UserServiceImpl implements UserService {
 			}
 			
 			// 폴더 삭제
-			fileService.deleteFolder(Paths.get(getUploadPath(user.getUserSeq())));
+			fileService.deleteFolder(Paths.get(UploadType.PROFILE.getPath(user.getUserSeq())));
 		}
 		return result;
 	}

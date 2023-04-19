@@ -16,6 +16,7 @@ import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.comp.domain.DeptInfo;
 import com.iwi.iwms.api.file.domain.UploadFile;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
+import com.iwi.iwms.api.file.enums.UploadType;
 import com.iwi.iwms.api.file.service.FileService;
 import com.iwi.iwms.api.req.domain.His;
 import com.iwi.iwms.api.req.domain.Req;
@@ -36,10 +37,6 @@ public class ReqServiceImpl implements ReqService {
 	
 	private final FileService fileService;
     
-	private String getUploadPath(long reqSeq) {
-		return "request/" + reqSeq;
-	}
-	
 	@Override
 	public List<ReqInfo> listReq(Map<String, Object> map) {
 		return reqMapper.listReq(map);
@@ -88,7 +85,7 @@ public class ReqServiceImpl implements ReqService {
 			if(!CollectionUtils.isEmpty(req.getFiles())) {
 				UploadFile uploadFile = req.getFileInfo();
 				uploadFile.setFileRefSeq(req.getReqSeq());
-				uploadFile.setFileRealPath(this.getUploadPath(req.getReqSeq()));
+				uploadFile.setFileRealPath(UploadType.REQUEST.getPath(req.getReqSeq()));
 				fileService.insertFiles(req.getFiles(), uploadFile);
 			}
 		}
@@ -110,7 +107,7 @@ public class ReqServiceImpl implements ReqService {
 		// 첨부파일 저장
 		if(!CollectionUtils.isEmpty(req.getFiles())) {
 			UploadFile uploadFile = req.getFileInfo();
-			uploadFile.setFileRealPath(this.getUploadPath(req.getReqSeq()));
+			uploadFile.setFileRealPath(UploadType.REQUEST.getPath(req.getReqSeq()));
 			fileService.insertFiles(req.getFiles(), uploadFile);
 		}
 		return result;		
@@ -130,7 +127,7 @@ public class ReqServiceImpl implements ReqService {
 		}
 		
 		// 폴더 삭제
-		fileService.deleteFolder(Paths.get(this.getUploadPath(req.getReqSeq())));
+		fileService.deleteFolder(Paths.get(UploadType.REQUEST.getPath(req.getReqSeq())));
 		
 		return result;
 	}

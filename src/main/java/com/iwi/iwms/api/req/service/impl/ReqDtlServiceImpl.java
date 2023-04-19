@@ -1,12 +1,10 @@
 package com.iwi.iwms.api.req.service.impl;
 
-import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +13,7 @@ import org.springframework.util.CollectionUtils;
 import com.iwi.iwms.api.common.errors.CommonException;
 import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
+import com.iwi.iwms.api.file.enums.UploadType;
 import com.iwi.iwms.api.file.service.FileService;
 import com.iwi.iwms.api.login.domain.LoginUserInfo;
 import com.iwi.iwms.api.req.domain.Cmt;
@@ -45,10 +44,6 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 	private final FileService fileService;
 	
 	private final UserService userService;
-	
-	private String getUploadPath(long reqSeq, long reqDtlSeq) {
-		return "request/" + reqSeq + "/task/" + reqDtlSeq;
-	}
 	
 	@Override
 	public ReqDtlInfo getReqDtlByReqSeq(long reqSeq, long loginUserSeq) {
@@ -174,7 +169,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 		}
 		
 		// 폴더 삭제
-		fileService.deleteFolder(Paths.get(this.getUploadPath(reqDtlInfo.getReqSeq(), reqDtlInfo.getReqDtlSeq())));
+		fileService.deleteFolder(Paths.get(UploadType.REQUEST_TASK.getPath(reqDtlInfo.getReqSeq(), reqDtlInfo.getReqDtlSeq())));
 		
 		return result;
 	}
