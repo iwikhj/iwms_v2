@@ -21,8 +21,8 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.iwi.iwms.config.security.auth.AuthenticationEntryPointHandler;
 import com.iwi.iwms.config.security.auth.AuthenticationFilter;
@@ -69,7 +69,7 @@ public class SecurityConfig {
 			.oauth2ResourceServer()
 			.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
 			.and()
-			.addFilterBefore(new AuthenticationFilter(jwtDecoder()), BearerTokenAuthenticationFilter.class);
+			.addFilterBefore(new AuthenticationFilter(jwtDecoder()), UsernamePasswordAuthenticationFilter.class);
 		
 		return http.build();
 	}
