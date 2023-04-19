@@ -9,7 +9,6 @@ import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -22,8 +21,8 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.iwi.iwms.config.security.auth.AuthenticationEntryPointHandler;
 import com.iwi.iwms.config.security.auth.AuthenticationFilter;
@@ -44,10 +43,15 @@ public class SecurityConfig {
 	@Value("${keycloak.jwk-set-uri}")
 	private String jwkSetUri;
 	
+	@Value("${spring.security.ignore.pattern.static}")
+	private String [] ignorePatternStatic;
+	
+	@Value("${spring.security.ignore.pattern.api}")
+	private String [] ignorePatternApi;
+	
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		//matchUrlAndAuthority(http);
-		
 		http
 			.csrf().disable()
 			.exceptionHandling()
@@ -65,12 +69,13 @@ public class SecurityConfig {
 			.oauth2ResourceServer()
 			.jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
 			.and()
-			.addFilterBefore(new AuthenticationFilter(jwtDecoder()), UsernamePasswordAuthenticationFilter.class);
+			.addFilterBefore(new AuthenticationFilter(jwtDecoder()), BearerTokenAuthenticationFilter.class);
 		
 		return http.build();
 	}
 	
 	private void matchUrlAndAuthority(HttpSecurity http) throws Exception {
+		//sample
 		/*
 		List<SecurityUrlMatcher> urlMatchers = repository.findAll();
         for (SecurityUrlMatcher matcher : urlMatchers) {
@@ -78,29 +83,24 @@ public class SecurityConfig {
                 .authorizeRequests()
                 .antMatchers(matcher.getUrl()).hasAuthority(matcher.getAuthority());
         }
-        */
-		
-		//sample
 		http
 		 	.authorizeRequests()
 		 	.antMatchers(HttpMethod.POST, this.appPath + "/auths/**").hasRole("IWMS_ADMIN")
 		 	.antMatchers(this.appPath + "/notices/**").hasAnyRole("IWMS_PM");
+		 */
 	}
 	
 	@Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-		String [] antMatchers = {"/login", "/reissue", "/popup/login/**", "/files/**"};
 	    return (web) -> web.ignoring()
-	    		.antMatchers("/apidocs/**", "/swagger-ui/**")
-	    		.antMatchers(List.of(antMatchers).stream()
-	    				.map(v -> this.appPath + v)
-	    				.toArray(String[]::new))
+	    		.antMatchers(this.ignorePatternStatic)
+	    		.antMatchers(List.of(this.ignorePatternApi).stream().map(v -> this.appPath + v).toArray(String[]::new))
 	    		.requestMatchers(PathRequest.toStaticResources().atCommonLocations());
     }
 
 	private Converter<Jwt, ? extends AbstractAuthenticationToken> jwtAuthenticationConverter() {
 		JwtAuthenticationConverter jwtConverter = new JwtAuthenticationConverter();
-		//jwtConverter.setPrincipalClaimName("sub");
+		//jwtConverter.setPrincipalClaimName("sid");
 		jwtConverter.setJwtGrantedAuthoritiesConverter(new RealmRoleConverter());
 		return jwtConverter;
 	}

@@ -66,7 +66,6 @@ class IwmsApplicationTests {
 	@Test
 	@DisplayName("간단 테스트3")
 	void test3() throws Exception {
-		UploadType.REQUEST.getPath(0, null);
 		System.out.println(UploadType.REQUEST.getPath(1));
 		System.out.println(UploadType.REQUEST_CMT.getPath(1, 2));
 		System.out.println(UploadType.REQUEST_TASK.getPath(1, 2));

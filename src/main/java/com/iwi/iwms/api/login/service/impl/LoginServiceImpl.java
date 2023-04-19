@@ -72,6 +72,11 @@ public class LoginServiceImpl implements LoginService{
 		String key = userInfo.getSsoKey();
 		log.info("USERNAME: [{}], KEY: [{}]", login.getUsername(), key);
 		
+		// Redis에 key가 존재하는지 확인하고 있으면 삭제
+		if(redisProvider.hasKey(key)) {
+			redisProvider.delete(key);
+		}
+		
 		// 사용자의 접속 정보 저장 및 LOGIN_ERR_CNT 초기화
 		userService.updateLoginSuccess(User.builder()
 				.loginIp(login.getLoginIp())
@@ -80,11 +85,6 @@ public class LoginServiceImpl implements LoginService{
 		
 		// 로그인 사용자 정보 불러오기
 		LoginUserInfo loginUserInfo = userService.getLoginUser(key);
-		
-		// Redis에 key가 존재하는지 확인하고 있으면 삭제
-		if(redisProvider.hasKey(key)) {
-			redisProvider.delete(key);
-		}
 		
 		// 로그인 사용자 정보 Redis 등록
 		redisProvider.setHash(key, "user", loginUserInfo);
