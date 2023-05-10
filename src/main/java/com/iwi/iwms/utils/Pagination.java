@@ -24,7 +24,7 @@ public class Pagination {
 	private int currentPage;
 	
 	@Schema(description = "현재 블럭")
-	private int currBlock;
+	private int currentBlock;
 	
 	@Schema(description = "전체 페이지 수")
 	private int totalPage;
@@ -42,7 +42,7 @@ public class Pagination {
 			this.limitPerPage = limitPerPage;
 			this.pagePerBlock = 10;
 			this.currentPage = currentPage;
-			this.currBlock = (int) Math.ceil((double) currentPage / pagePerBlock);
+			this.currentBlock = (int) Math.ceil((double) currentPage / pagePerBlock);
 			this.totalCount = totalCount;
 			this.totalPage = (int) Math.ceil((double) totalCount / limitPerPage);
 			this.totalBlock = (int) Math.ceil((double) totalPage / pagePerBlock);
