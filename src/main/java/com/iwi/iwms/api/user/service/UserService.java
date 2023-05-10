@@ -3,7 +3,7 @@ package com.iwi.iwms.api.user.service;
 import java.util.List;
 import java.util.Map;
 
-import com.iwi.iwms.api.login.domain.LoginUserInfo;
+import com.iwi.iwms.api.login.domain.LoginInfo;
 import com.iwi.iwms.api.user.domain.User;
 import com.iwi.iwms.api.user.domain.UserFindId;
 import com.iwi.iwms.api.user.domain.UserInfo;
@@ -40,7 +40,7 @@ public interface UserService {
 	
 	int updateNotiCheck(long userSeq);
 	
-	LoginUserInfo getLoginUser(String ssoKey);
+	LoginInfo getLoginUser(String ssoKey);
 	
 	String getUserIdByNameTelComp(UserFindId userFindId);
 	

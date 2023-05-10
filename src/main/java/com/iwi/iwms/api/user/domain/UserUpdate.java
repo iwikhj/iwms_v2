@@ -7,7 +7,7 @@ import javax.validation.constraints.Pattern;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.iwi.iwms.api.file.domain.UploadFile;
-import com.iwi.iwms.api.login.domain.LoginUserInfo;
+import com.iwi.iwms.api.login.domain.LoginInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -93,14 +93,14 @@ public class UserUpdate {
 	@Schema(hidden = true, description = "로그인 사용자 SEQ") 
 	private long loginUserSeq;
 	
-	public UserUpdate of(final LoginUserInfo loginUserInfo) {
-		this.loginUserSeq = loginUserInfo.getUserSeq();
+	public UserUpdate of(final LoginInfo loginInfo) {
+		this.loginUserSeq = loginInfo.getUserSeq();
 		
 		this.fileInfo = new UploadFile();
 		this.fileInfo.setFileRefTb("TB_USER");
 		this.fileInfo.setFileRefCol("USER_SEQ");
 		this.fileInfo.setFileRefSeq(this.userSeq);
-		this.fileInfo.setLoginUserSeq(loginUserInfo.getUserSeq());
+		this.fileInfo.setLoginUserSeq(loginInfo.getUserSeq());
 		return this;
 	}
 	

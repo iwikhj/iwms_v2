@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.iwi.iwms.api.file.domain.UploadFile;
-import com.iwi.iwms.api.login.domain.LoginUserInfo;
+import com.iwi.iwms.api.login.domain.LoginInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -53,8 +53,8 @@ public class Cmt {
 	@Schema(hidden = true, description = "로그인 사용자 SEQ") 
 	private long loginUserSeq;
 	
-	public Cmt of(final LoginUserInfo loginUserInfo) {
-		this.loginUserSeq = loginUserInfo.getUserSeq();
+	public Cmt of(final LoginInfo loginInfo) {
+		this.loginUserSeq = loginInfo.getUserSeq();
 		
 		this.fileInfo = new UploadFile();
 		if(this.reqDtlSeq == null) {
@@ -69,7 +69,7 @@ public class Cmt {
 			this.fileInfo.setFileRefSeq(this.cmtSeq);
 		}
 		
-		this.fileInfo.setLoginUserSeq(loginUserInfo.getUserSeq());
+		this.fileInfo.setLoginUserSeq(loginInfo.getUserSeq());
 		return this;
 	}
 }

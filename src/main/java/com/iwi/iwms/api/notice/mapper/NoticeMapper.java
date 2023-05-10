@@ -23,5 +23,5 @@ public interface NoticeMapper {
 	
 	int deleteNotice(Notice notice);
 	
-	int updateViewCnt(long noticeSeq);
+	int updateViewCnt(Notice notice);
 }

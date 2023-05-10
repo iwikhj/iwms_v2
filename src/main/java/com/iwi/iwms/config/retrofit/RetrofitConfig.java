@@ -40,7 +40,7 @@ public class RetrofitConfig {
 	}
 	
 	@Bean
-	public AuthTokenApi mediaServerApi(Retrofit retrofit) {
+	public AuthTokenApi authTokenApi(Retrofit retrofit) {
 		return retrofit.create(AuthTokenApi.class);
 	}
 	

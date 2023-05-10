@@ -1,3 +1,4 @@
+/*
 package com.iwi.iwms.utils;
 
 import org.springframework.beans.BeansException;
@@ -30,3 +31,4 @@ public class PropertiesUtil implements ApplicationContextAware {
 	}
 
 }
+*/

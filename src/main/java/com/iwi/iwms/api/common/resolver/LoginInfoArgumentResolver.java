@@ -16,7 +16,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwi.iwms.api.common.errors.CommonException;
 import com.iwi.iwms.api.common.errors.ErrorCode;
-import com.iwi.iwms.api.login.domain.LoginUserInfo;
+import com.iwi.iwms.api.login.domain.LoginInfo;
 import com.iwi.iwms.config.redis.RedisProvider;
 
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResolver {
+public class LoginInfoArgumentResolver implements HandlerMethodArgumentResolver {
 	
 	@Value("${app.path}/pages")
 	String pages;
@@ -36,7 +36,7 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
 	
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
-        return parameter.getParameterType().equals(LoginUserInfo.class);
+        return parameter.getParameterType().equals(LoginInfo.class);
 	}
 
 	@Override
@@ -57,7 +57,7 @@ public class LoginUserInfoArgumentResolver implements HandlerMethodArgumentResol
 			return null;
 		}
 		
-		return Optional.ofNullable(objectMapper.convertValue(redisProvider.getHash(ssoKey, "user"), LoginUserInfo.class))
+		return Optional.ofNullable(objectMapper.convertValue(redisProvider.getHash(ssoKey, "user"), LoginInfo.class))
 				.map(v -> {v.setMenuSelected(pages, uri); return v;})
 				.orElseThrow(() -> new CommonException(ErrorCode.AUTHENTICATION_FAILED, "로그인 필요."));
 	}

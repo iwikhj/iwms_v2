@@ -1,4 +1,4 @@
-package com.iwi.iwms.config.security.auth;
+package com.iwi.iwms.api.login.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -12,7 +12,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReissueResponse {
+public class ReissueInfo {
 
 	@Schema(description = "액세스 토큰")
 	@JsonProperty("accessToken")

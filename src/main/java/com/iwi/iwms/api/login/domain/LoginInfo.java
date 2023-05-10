@@ -16,7 +16,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class LoginUserInfo {
+public class LoginInfo {
 	
 	@Schema(description = "사용자 SEQ")
 	private long userSeq;
@@ -70,18 +70,18 @@ public class LoginUserInfo {
 	private List<AuthMenuInfo> menus;
 	
 	@Builder
-	LoginUserInfo(long userSeq) {
+	LoginInfo(long userSeq) {
 		this.userSeq = userSeq;
 	}
 	
-	public void setMenuSelected(String pages, String uri) {
-		//Mapping uri가 pages가 아니면 무시
-    	if(uri.indexOf(pages) != -1) {
+	public void setMenuSelected(String pages, String path) {
+		//path가 pages가 아니면 무시
+    	if(path.indexOf(pages) != -1) {
     		
-    		//전체 URI에서 /pages까지 경로 제거
-    	   	String page = uri.replaceFirst(pages, "");
+    		//path에서 /pages까지 경로 제거
+    	   	String page = path.replaceFirst(pages, "");
     	   	
-    	   	//URI에서 /detail이후 경로 제외
+    	   	//path에서 /detail이후 경로 제외
     	   	page = page.substring(0, page.lastIndexOf("/detail") == -1 ? page.length() : page.lastIndexOf("/detail"));
     	   	
     	   	//gnb menu 추출

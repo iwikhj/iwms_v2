@@ -18,7 +18,7 @@
 			, FN_GET_CODE_NM('REQ_TYPE_CD', REQ.REQ_TYPE_CD) AS reqType
 			, REQ.REQ_GB_CD AS reqGbCd
 			, FN_GET_CODE_NM('REQ_GB_CD', REQ.REQ_GB_CD) AS reqGb
-			, FN_GET_USER_NM(DTL.REQ_DTL_USER_SEQ) AS reqDtlUser
+			, FN_GET_USER_NM(DTL.REQ_DTL_USER_SEQ) AS reqDtlUserNm
 			, DTL.BUSI_ROLL_CD AS busiRollCd
 			, FN_GET_CODE_NM('BUSI_ROLL_CD', DTL.BUSI_ROLL_CD) AS busiRoll
 			, CASE WHEN DHIS.REQ_DTL_SEQ IS NULL THEN HIS.REQ_STAT_CD ELSE DHIS.REQ_DTL_STAT_CD END AS statCd
@@ -64,30 +64,32 @@
 			<include refid="selectReq"></include>
 		) t1
 		WHERE 1 = 1		
-		<if test='busiRollCd != null and busiRollCd != ""'>
-			AND t1.busiRollCd = #{busiRollCd}
+		<if test='keykind != null and keykind != "" and keyword != null and keyword != ""'>
+			<if test='keykind == "busiRollCd"'>
+				AND t1.busiRollCd = #{keyword}
+			</if>	
+			<if test='keykind == "statCd"'>	
+				AND t1.statCd = #{keyword}
+			</if>	
+			<if test='keykind == "siteSeq"'>			
+				AND t1.siteSeq = #{keyword}
+			</if>	
+			<if test='keykind == "reqStdYmd"'>			
+				AND t1.reqYmd &gt;= #{keyword}
+			</if>	
+			<if test='keykind == "reqEndYmd"'>
+				AND t1.reqYmd &lt;= #{keyword}
+			</if>	
+			<if test='keykind == "reqTitle"'>	
+				AND LOWER(t1.reqTitle) LIKE CONCAT('%', LOWER(#{keyword}), '%') 
+			</if>	
+			<if test='keykind == "regNm"'>			
+				AND LOWER(t1.regNm) LIKE CONCAT('%', LOWER(#{keyword}), '%') 
+			</if>	
+			<if test='keykind == "reqDtlUserNm"'>			
+				AND LOWER(t1.reqDtlUserNm) LIKE CONCAT('%', LOWER(#{keyword}), '%') 
+			</if>				
 		</if>		
-		<if test='statCd != null and statCd != ""'>
-			AND t1.statCd = #{statCd}
-		</if>			
-		<if test='siteSeq != null and siteSeq != ""'>
-			AND t1.siteSeq = #{siteSeq}
-		</if>			
-		<if test='reqStdYmd != null and reqStdYmd != ""'>
-			AND t1.reqYmd &gt;= #{reqStdYmd}
-		</if>	
-		<if test='reqEndYmd != null and reqEndYmd != ""'>
-			AND t1.reqYmd &lt;= #{reqEndYmd}
-		</if>				
-		<if test='reqTitle != null and reqTitle != ""'>
-			AND LOWER(t1.reqTitle) LIKE CONCAT('%', LOWER(#{reqTitle}), '%') 
-		</if>	
-		<if test='regNm != null and regNm != ""'>
-			AND LOWER(t1.regNm) LIKE CONCAT('%', LOWER(#{regNm}), '%') 
-		</if>
-		<if test='reqDtlUser != null and reqDtlUser != ""'>
-			AND LOWER(t1.reqDtlUser) LIKE CONCAT('%', LOWER(#{reqDtlUser}), '%') 
-		</if>
 		ORDER BY t1.reqSeq DESC
 		<if test='pagination != null and pagination != ""'>
 			LIMIT #{pagination.limitPerPage} OFFSET #{pagination.offset}
@@ -105,30 +107,32 @@
 			<include refid="selectReq"></include>
 		) t1	
 		WHERE 1 = 1			
-		<if test='busiRollCd != null and busiRollCd != ""'>
-			AND t1.busiRollCd = #{busiRollCd}
-		</if>		
-		<if test='statCd != null and statCd != ""'>
-			AND t1.statCd = #{statCd}
-		</if>			
-		<if test='siteSeq != null and siteSeq != ""'>
-			AND t1.siteSeq = #{siteSeq}
-		</if>			
-		<if test='reqStdYmd != null and reqStdYmd != ""'>
-			AND t1.reqYmd &gt;= #{reqStdYmd}
+		<if test='keykind != null and keykind != "" and keyword != null and keyword != ""'>
+			<if test='keykind == "busiRollCd"'>
+				AND t1.busiRollCd = #{keyword}
+			</if>	
+			<if test='keykind == "statCd"'>	
+				AND t1.statCd = #{keyword}
+			</if>	
+			<if test='keykind == "siteSeq"'>			
+				AND t1.siteSeq = #{keyword}
+			</if>	
+			<if test='keykind == "reqStdYmd"'>			
+				AND t1.reqYmd &gt;= #{keyword}
+			</if>	
+			<if test='keykind == "reqEndYmd"'>
+				AND t1.reqYmd &lt;= #{keyword}
+			</if>	
+			<if test='keykind == "reqTitle"'>	
+				AND LOWER(t1.reqTitle) LIKE CONCAT('%', LOWER(#{keyword}), '%') 
+			</if>	
+			<if test='keykind == "regNm"'>			
+				AND LOWER(t1.regNm) LIKE CONCAT('%', LOWER(#{keyword}), '%') 
+			</if>	
+			<if test='keykind == "reqDtlUserNm"'>			
+				AND LOWER(t1.reqDtlUserNm) LIKE CONCAT('%', LOWER(#{keyword}), '%') 
+			</if>				
 		</if>	
-		<if test='reqEndYmd != null and reqEndYmd != ""'>
-			AND t1.reqYmd &lt;= #{reqEndYmd}
-		</if>				
-		<if test='reqTitle != null and reqTitle != ""'>
-			AND LOWER(t1.reqTitle) LIKE CONCAT('%', LOWER(#{reqTitle}), '%') 
-		</if>	
-		<if test='regNm != null and regNm != ""'>
-			AND LOWER(t1.regNm) LIKE CONCAT('%', LOWER(#{regNm}), '%') 
-		</if>
-		<if test='reqDtlUser != null and reqDtlUser != ""'>
-			AND LOWER(t1.reqDtlUser) LIKE CONCAT('%', LOWER(#{reqDtlUser}), '%') 
-		</if>		
 	</select>	
 	
 	<resultMap id="resultGetReqMap" type="com.iwi.iwms.api.req.domain.ReqInfo">

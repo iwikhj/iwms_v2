@@ -15,7 +15,7 @@ import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.file.domain.UploadFileInfo;
 import com.iwi.iwms.api.file.enums.UploadType;
 import com.iwi.iwms.api.file.service.FileService;
-import com.iwi.iwms.api.login.domain.LoginUserInfo;
+import com.iwi.iwms.api.login.domain.LoginInfo;
 import com.iwi.iwms.api.req.domain.Cmt;
 import com.iwi.iwms.api.req.domain.His;
 import com.iwi.iwms.api.req.domain.ReqDtl;
@@ -156,7 +156,7 @@ public class ReqDtlServiceImpl implements ReqDtlService {
 							.reqDtlSeq(v.getReqDtlSeq())
 							.cmtSeq(v.getCmtSeq())
 							.build()
-							.of(LoginUserInfo.builder()
+							.of(LoginInfo.builder()
 									.userSeq(reqDtl.getLoginUserSeq())
 									.build())
 				)

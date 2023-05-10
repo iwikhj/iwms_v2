@@ -19,9 +19,11 @@
 		FROM TB_AUTH AUTH
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE AUTH.USE_YN = 'Y' END)	
-		<if test='useYn != null and useYn != ""'>
-			AND AUTH.USE_YN = #{useYn}
-		</if>			
+		<if test='keykind != null and keykind != "" and keyword != null and keyword != ""'>
+			<if test='keykind == "useYn"'>
+				AND AUTH.USE_YN = #{keyword}
+			</if>	
+		</if>		
 		ORDER BY AUTH.AUTH_SEQ
 		<if test='pagination != null and pagination != ""'>
 			LIMIT #{pagination.limitPerPage} OFFSET #{pagination.offset}
@@ -37,8 +39,10 @@
 		FROM TB_AUTH AUTH
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE AUTH.USE_YN = 'Y' END)
-		<if test='useYn != null and useYn != ""'>
-			AND AUTH.USE_YN = #{useYn}
+		<if test='keykind != null and keykind != "" and keyword != null and keyword != ""'>
+			<if test='keykind == "useYn"'>
+				AND AUTH.USE_YN = #{keyword}
+			</if>	
 		</if>			
 	</select>	
 

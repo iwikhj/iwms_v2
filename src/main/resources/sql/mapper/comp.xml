@@ -29,12 +29,14 @@
 		FROM TB_COMPANY COMP
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE COMP.DEL_YN = 'N' AND COMP.USE_YN = 'Y' END)	
-		<if test='compNm != null and compNm != ""'>
-			AND LOWER(COMP.COMP_NM) LIKE CONCAT('%', LOWER(#{compNm}), '%') 
-		</if>	
-		<if test='useYn != null and useYn != ""'>
-			AND COMP.USE_YN = #{useYn}
-		</if>			
+		<if test='keykind != null and keykind != "" and keyword != null and keyword != ""'>
+			<if test='keykind == "compNm"'>
+				AND LOWER(COMP.COMP_NM) LIKE CONCAT('%', LOWER(#{keyword}), '%') 
+			</if>	
+			<if test='keykind == "useYn"'>	
+				AND COMP.USE_YN = #{keyword}
+			</if>	
+		</if>		
 		ORDER BY COMP.COMP_SEQ
 		<if test='pagination != null and pagination != ""'>
 			LIMIT #{pagination.limitPerPage} OFFSET #{pagination.offset}
@@ -50,11 +52,13 @@
 		FROM TB_COMPANY COMP
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE COMP.DEL_YN = 'N' AND COMP.USE_YN = 'Y' END)		
-		<if test='compNm != null and compNm != ""'>
-			AND LOWER(COMP.COMP_NM) LIKE CONCAT('%', LOWER(#{compNm}), '%') 
-		</if>	
-		<if test='useYn != null and useYn != ""'>
-			AND COMP.USE_YN = #{useYn}
+		<if test='keykind != null and keykind != "" and keyword != null and keyword != ""'>
+			<if test='keykind == "compNm"'>
+				AND LOWER(COMP.COMP_NM) LIKE CONCAT('%', LOWER(#{keyword}), '%') 
+			</if>	
+			<if test='keykind == "useYn"'>	
+				AND COMP.USE_YN = #{keyword}
+			</if>	
 		</if>						
 	</select>	
 
@@ -216,9 +220,6 @@
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE DEPT.USE_YN = 'Y' END)
 			AND DEPT.COMP_SEQ = #{compSeq}
-		<if test='useYn != null and useYn != ""'>
-			AND DEPT.USE_YN = #{useYn}
-		</if>		
 		ORDER BY DEPT.DEPT_ORDER_NO		
 	</select>		
 	

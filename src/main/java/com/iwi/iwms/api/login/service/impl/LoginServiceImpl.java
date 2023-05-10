@@ -7,8 +7,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.iwi.iwms.api.common.errors.CommonException;
 import com.iwi.iwms.api.common.errors.ErrorCode;
 import com.iwi.iwms.api.login.domain.Login;
-import com.iwi.iwms.api.login.domain.LoginUserInfo;
+import com.iwi.iwms.api.login.domain.LoginInfo;
 import com.iwi.iwms.api.login.domain.Reissue;
+import com.iwi.iwms.api.login.domain.ReissueInfo;
+import com.iwi.iwms.api.login.domain.TokenInfo;
 import com.iwi.iwms.api.login.service.LoginService;
 import com.iwi.iwms.api.user.domain.User;
 import com.iwi.iwms.api.user.domain.UserInfo;
@@ -16,8 +18,6 @@ import com.iwi.iwms.api.user.service.UserService;
 import com.iwi.iwms.config.redis.RedisProvider;
 import com.iwi.iwms.config.security.auth.AuthProvider;
 import com.iwi.iwms.config.security.auth.IntrospectResponse;
-import com.iwi.iwms.config.security.auth.ReissueResponse;
-import com.iwi.iwms.config.security.auth.TokenResponse;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +36,7 @@ public class LoginServiceImpl implements LoginService{
     private final ObjectMapper objectMapper;
     
 	@Override
-	public TokenResponse login(Login login) {
+	public TokenInfo login(Login login) {
 		// 등록된 ID 확인
     	UserInfo userInfo = userService.getUserById(login.getUsername());
 		if(userInfo == null) {
@@ -54,10 +54,10 @@ public class LoginServiceImpl implements LoginService{
 		}
 		
 		// 인증 서버 인증 요청
-		TokenResponse tokenResponse = new TokenResponse();
+		TokenInfo tokenInfo = new TokenInfo();
 		try {
 			AccessTokenResponse accessTokenResponse = authProvider.grantToken(login.getUsername(), login.getPassword());
-			tokenResponse = tokenResponse.of(accessTokenResponse);
+			tokenInfo = tokenInfo.of(accessTokenResponse);
 			
 		} catch(CommonException e) {
 			if(ErrorCode.LOGIN_FAILED_INCORRECT_ID_PW == e.getCode()) {
@@ -84,20 +84,20 @@ public class LoginServiceImpl implements LoginService{
 				.build());	
 		
 		// 로그인 사용자 정보 불러오기
-		LoginUserInfo loginUserInfo = userService.getLoginUser(key);
+		LoginInfo loginInfo = userService.getLoginUser(key);
 		
 		// 로그인 사용자 정보 Redis 등록
-		redisProvider.setHash(key, "user", loginUserInfo);
-		redisProvider.setHash(key, "refreshToken", tokenResponse.getRefreshToken());
+		redisProvider.setHash(key, "user", loginInfo);
+		redisProvider.setHash(key, "refreshToken", tokenInfo.getRefreshToken());
 		
 		// TTL 설정. 리플레시 토큰의 만료시간과 동일하게 설정(초)
-		redisProvider.setTtl(key, tokenResponse.getRefreshExpiresIn());
+		redisProvider.setTtl(key, tokenInfo.getRefreshExpiresIn());
 		
-		return tokenResponse;
+		return tokenInfo;
 	}
 	
 	@Override
-	public ReissueResponse reissue(Reissue reissue) {
+	public ReissueInfo reissue(Reissue reissue) {
         IntrospectResponse introspect = authProvider.tokenIntrospect(reissue.getRefreshToken());
         log.info("[INTROSPECT RESULT] <{}>", introspect);
         
@@ -105,8 +105,8 @@ public class LoginServiceImpl implements LoginService{
 			throw new CommonException(ErrorCode.AUTHENTICATION_REISSUE_FAILED, "리플레시 토큰 검증 실패.");
         }
         
-        LoginUserInfo loginUserInfo = objectMapper.convertValue(redisProvider.getHash(introspect.getSub(), "user"), LoginUserInfo.class);
-        if(loginUserInfo == null || loginUserInfo.getLoginIp() == null || reissue.getLoginIp() == null || !loginUserInfo.getLoginIp().equals(reissue.getLoginIp())) {
+        LoginInfo loginInfo = objectMapper.convertValue(redisProvider.getHash(introspect.getSub(), "user"), LoginInfo.class);
+        if(loginInfo == null || loginInfo.getLoginIp() == null || reissue.getLoginIp() == null || !loginInfo.getLoginIp().equals(reissue.getLoginIp())) {
         	throw new CommonException(ErrorCode.AUTHENTICATION_REISSUE_FAILED, "로그인 아이피와 요청 아이피가 일치하지 않습니다.");
         }
         

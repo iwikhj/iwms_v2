@@ -1,4 +1,4 @@
-package com.iwi.iwms.config.security.auth;
+package com.iwi.iwms.api.login.domain;
 
 import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.beans.BeanUtils;
@@ -16,7 +16,7 @@ import lombok.ToString;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class TokenResponse {
+public class TokenInfo {
 
 	@JsonProperty("accessToken")
     protected String token;
@@ -39,7 +39,7 @@ public class TokenResponse {
     @JsonProperty("scope")
     protected String scope;
     
-    public TokenResponse of(AccessTokenResponse accessTokenResponse) {
+    public TokenInfo of(AccessTokenResponse accessTokenResponse) {
 		BeanUtils.copyProperties(accessTokenResponse, this);
 		return this;
     }

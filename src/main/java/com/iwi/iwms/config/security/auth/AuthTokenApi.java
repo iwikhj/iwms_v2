@@ -1,5 +1,7 @@
 package com.iwi.iwms.config.security.auth;
 
+import com.iwi.iwms.api.login.domain.ReissueInfo;
+
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
@@ -9,7 +11,7 @@ public interface AuthTokenApi {
 
 	@FormUrlEncoded
 	@POST("protocol/openid-connect/token") 
-	Call<ReissueResponse> reissue(@Field("grant_type") String grant_type, @Field("refresh_token") String refresh_token, @Field("client_id") String client_id);
+	Call<ReissueInfo> reissue(@Field("grant_type") String grant_type, @Field("refresh_token") String refresh_token, @Field("client_id") String client_id);
 	
 	@FormUrlEncoded
 	@POST("protocol/openid-connect/token/introspect") 

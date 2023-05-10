@@ -8,9 +8,17 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class AES256Util {
 	
+	 /**
+     * AES 128 : 16byte fixed
+     * AES 192 : 24byte fixed
+     * AES 256 : 32byte fixed
+     */
     private static String key = "01234567890123456789012345678901";
     
-    private static String iv = key.substring(0, 16); // 16byte
+	 /**
+     * IV = 16byte fixed
+     */
+    private static String iv = key.substring(0, 16);
 
     public static String encrypt(String text) throws Exception  {
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");

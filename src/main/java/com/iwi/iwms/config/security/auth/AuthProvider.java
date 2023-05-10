@@ -26,6 +26,7 @@ import org.springframework.util.StringUtils;
 
 import com.iwi.iwms.api.common.errors.CommonException;
 import com.iwi.iwms.api.common.errors.ErrorCode;
+import com.iwi.iwms.api.login.domain.ReissueInfo;
 import com.iwi.iwms.config.retrofit.RetrofitProvider;
 
 import lombok.RequiredArgsConstructor;
@@ -90,8 +91,8 @@ public class AuthProvider {
 	 * @param refreshToken
 	 * @return ReissueResponse
 	 */
-	public ReissueResponse reissue(@NotNull String refreshToken) {
-    	Call<ReissueResponse> call = authTokenApi.reissue(OAuth2Constants.REFRESH_TOKEN, refreshToken, authClientId);
+	public ReissueInfo reissue(@NotNull String refreshToken) {
+    	Call<ReissueInfo> call = authTokenApi.reissue(OAuth2Constants.REFRESH_TOKEN, refreshToken, authClientId);
 		return retrofitProvider.execute(call);
 	}
 	

@@ -1,7 +1,6 @@
 package com.iwi.iwms.api.file.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.iwi.iwms.utils.PropertiesUtil;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -45,6 +44,6 @@ public class UploadFileInfo {
 	
 	//${app.path}/files
 	public void setFileDownloadPath(String fileDownloadPath) {
-		this.fileDownloadPath = PropertiesUtil.getProperty("app.path") + "/files/download" + fileDownloadPath;
+		this.fileDownloadPath = "/files/download" + fileDownloadPath;
 	}
 }

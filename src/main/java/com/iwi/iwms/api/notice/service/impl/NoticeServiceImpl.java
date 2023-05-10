@@ -60,7 +60,7 @@ public class NoticeServiceImpl implements NoticeService {
 		noticeMapper.insertNotice(notice);
 		
 		// 첨부파일 저장
-		if(!CollectionUtils.isEmpty(notice.getFiles())) {
+		if(!CollectionUtils.isEmpty(notice.getFiles()) && !notice.getFiles().stream().findFirst().get().isEmpty()) {
 			UploadFile uploadFile = notice.getFileInfo();
 			uploadFile.setFileRefSeq(notice.getNoticeSeq());
 			uploadFile.setFileRealPath(UploadType.NOTICE.getPath(notice.getNoticeSeq()));
@@ -83,7 +83,7 @@ public class NoticeServiceImpl implements NoticeService {
 		}
 		
 		// 첨부파일 저장
-		if(!CollectionUtils.isEmpty(notice.getFiles())) {
+		if(!CollectionUtils.isEmpty(notice.getFiles()) && !notice.getFiles().stream().findFirst().get().isEmpty()) {
 			log.info("첨부파일 있음");
 			UploadFile uploadFile = notice.getFileInfo();
 			uploadFile.setFileRealPath(UploadType.NOTICE.getPath(notice.getNoticeSeq()));
@@ -113,7 +113,9 @@ public class NoticeServiceImpl implements NoticeService {
 	}
 
 	@Override
-	public int updateViewCnt(long noticeSeq) {
-		return noticeMapper.updateViewCnt(noticeSeq);
+	public int updateViewCnt(Notice notice) {
+		this.getNoticeBySeq(notice.getNoticeSeq(), notice.getLoginUserSeq());
+		
+		return noticeMapper.updateViewCnt(notice);
 	}
 }

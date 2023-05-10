@@ -54,7 +54,7 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 		reqDtlCmtMapper.insertReqDtlCmt(cmt);
 		
 		// 첨부파일 저장
-		if(!CollectionUtils.isEmpty(cmt.getFiles())) {
+		if(!CollectionUtils.isEmpty(cmt.getFiles()) && !cmt.getFiles().stream().findFirst().get().isEmpty()) {
 			UploadFile uploadFile = cmt.getFileInfo();
 			uploadFile.setFileRefSeq(cmt.getCmtSeq());
 			uploadFile.setFileRealPath(UploadType.REQUEST_TASK_CMT.getPath(cmt.getReqSeq(), cmt.getReqDtlSeq(), cmt.getCmtSeq()));
@@ -78,7 +78,7 @@ public class ReqDtlCmtServiceImpl implements ReqDtlCmtService {
 		}
 		
 		// 첨부파일 저장
-		if(!CollectionUtils.isEmpty(cmt.getFiles())) {
+		if(!CollectionUtils.isEmpty(cmt.getFiles()) && !cmt.getFiles().stream().findFirst().get().isEmpty()) {
 			UploadFile uploadFile = cmt.getFileInfo();
 			uploadFile.setFileRealPath(UploadType.REQUEST_TASK_CMT.getPath(cmt.getReqSeq(), cmt.getReqDtlSeq(), cmt.getCmtSeq()));
 			fileService.insertFiles(cmt.getFiles(), uploadFile);

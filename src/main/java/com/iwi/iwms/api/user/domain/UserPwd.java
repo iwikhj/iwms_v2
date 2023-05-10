@@ -1,7 +1,7 @@
 package com.iwi.iwms.api.user.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.iwi.iwms.api.login.domain.LoginUserInfo;
+import com.iwi.iwms.api.login.domain.LoginInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -32,8 +32,8 @@ public class UserPwd {
 	@Schema(hidden = true, description = "로그인 사용자 SEQ") 
 	private long loginUserSeq;
 	
-	public UserPwd of(final LoginUserInfo loginUserInfo) {
-		this.loginUserSeq = loginUserInfo.getUserSeq();
+	public UserPwd of(final LoginInfo loginInfo) {
+		this.loginUserSeq = loginInfo.getUserSeq();
 		return this;
 	}
 }

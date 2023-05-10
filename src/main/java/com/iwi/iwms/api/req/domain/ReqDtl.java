@@ -2,7 +2,7 @@ package com.iwi.iwms.api.req.domain;
 
 import java.util.List;
 
-import com.iwi.iwms.api.login.domain.LoginUserInfo;
+import com.iwi.iwms.api.login.domain.LoginInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -60,8 +60,8 @@ public class ReqDtl {
 	@Schema(hidden = true, description = "로그인 사용자 SEQ") 
 	private long loginUserSeq;;
 	
-	public ReqDtl of(final LoginUserInfo loginUserInfo) {
-		this.loginUserSeq = loginUserInfo.getUserSeq();
+	public ReqDtl of(final LoginInfo loginInfo) {
+		this.loginUserSeq = loginInfo.getUserSeq();
 		return this;
 	}
 }

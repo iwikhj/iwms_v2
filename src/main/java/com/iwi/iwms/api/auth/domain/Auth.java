@@ -4,7 +4,7 @@ import java.util.List;
 
 import javax.validation.constraints.NotNull;
 
-import com.iwi.iwms.api.login.domain.LoginUserInfo;
+import com.iwi.iwms.api.login.domain.LoginInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -48,8 +48,8 @@ public class Auth {
 	@Schema(hidden = true, description = "로그인 사용자 SEQ") 
 	private long loginUserSeq;
 	
-	public Auth of(final LoginUserInfo loginUserInfo) {
-		this.loginUserSeq = loginUserInfo.getUserSeq();
+	public Auth of(final LoginInfo loginInfo) {
+		this.loginUserSeq = loginInfo.getUserSeq();
 		return this;
 	}
 	

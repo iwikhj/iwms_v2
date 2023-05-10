@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class FileStorageServiceImpl implements FileStorageService {
-	
+
 	private Path storagePath;
 	
     @Value("${storage.file.path}")

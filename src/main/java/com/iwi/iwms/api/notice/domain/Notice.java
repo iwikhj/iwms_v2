@@ -5,7 +5,7 @@ import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.iwi.iwms.api.file.domain.UploadFile;
-import com.iwi.iwms.api.login.domain.LoginUserInfo;
+import com.iwi.iwms.api.login.domain.LoginInfo;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -60,8 +60,8 @@ public class Notice {
 	@Schema(hidden = true, description = "로그인 사용자 SEQ") 
 	private long loginUserSeq;
 	
-	public Notice of(final LoginUserInfo loginUserInfo) {
-		this.loginUserSeq = loginUserInfo.getUserSeq();
+	public Notice of(final LoginInfo loginInfo) {
+		this.loginUserSeq = loginInfo.getUserSeq();
 		
 		this.fileInfo = new UploadFile();
 		this.fileInfo.setFileRefTb("TB_NOTICE");
@@ -69,7 +69,7 @@ public class Notice {
 		if(this.noticeSeq != null && this.noticeSeq != 0) {
 			this.fileInfo.setFileRefSeq(this.noticeSeq);
 		}
-		this.fileInfo.setLoginUserSeq(loginUserInfo.getUserSeq());
+		this.fileInfo.setLoginUserSeq(loginInfo.getUserSeq());
 		return this;
 	}
 

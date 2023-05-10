@@ -82,7 +82,7 @@ public class ReqServiceImpl implements ReqService {
 			reqMapper.insertReqHis(his);
 			
 			// 첨부파일 저장
-			if(!CollectionUtils.isEmpty(req.getFiles())) {
+			if(!CollectionUtils.isEmpty(req.getFiles()) && !req.getFiles().stream().findFirst().get().isEmpty()) {
 				UploadFile uploadFile = req.getFileInfo();
 				uploadFile.setFileRefSeq(req.getReqSeq());
 				uploadFile.setFileRealPath(UploadType.REQUEST.getPath(req.getReqSeq()));
@@ -105,7 +105,7 @@ public class ReqServiceImpl implements ReqService {
 		}
 		
 		// 첨부파일 저장
-		if(!CollectionUtils.isEmpty(req.getFiles())) {
+		if(!CollectionUtils.isEmpty(req.getFiles()) && !req.getFiles().stream().findFirst().get().isEmpty()) {
 			UploadFile uploadFile = req.getFileInfo();
 			uploadFile.setFileRealPath(UploadType.REQUEST.getPath(req.getReqSeq()));
 			fileService.insertFiles(req.getFiles(), uploadFile);

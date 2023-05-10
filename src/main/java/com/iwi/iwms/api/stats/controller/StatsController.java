@@ -13,10 +13,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.iwi.iwms.api.common.response.ApiListResponse;
-import com.iwi.iwms.api.login.domain.LoginUserInfo;
+import com.iwi.iwms.api.login.domain.LoginInfo;
 import com.iwi.iwms.api.stats.domain.ReqRegStatsInfo;
 import com.iwi.iwms.api.stats.service.StatsService;
-import com.iwi.iwms.utils.PredicateMap;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -36,9 +35,11 @@ public class StatsController {
 	@Operation(summary = "유지 보수 현황", description = "유지 보수 현황. 현황 구분: [01:요청, 02:접수, 03:진행중, 04:완료]")
 	@GetMapping(value = "/total")
 	public ResponseEntity<ApiListResponse<Map<String, Object>>> listStatsReqRegByMonth(HttpServletRequest request
-			, @Parameter(hidden = true) LoginUserInfo loginUserInfo) {
+			, @Parameter(hidden = true) LoginInfo loginInfo) {
 		
-		Map<String, Object> map = PredicateMap.make(request, loginUserInfo);
+		Map<String, Object> map = new HashMap<>();
+		map.put("loginUserSeq", loginInfo.getUserSeq()); 
+		
 		Map<String, Object> resultMap = statsService.listStatsReq(map);
 						
 		return ResponseEntity.ok(ApiListResponse.<Map<String, Object>>builder()
@@ -50,13 +51,14 @@ public class StatsController {
 	@Operation(summary = "월별 등록 건수", description = "월별 등록 건수")
 	@GetMapping(value = "/monthly")
 	public ResponseEntity<ApiListResponse<List<ReqRegStatsInfo>>> listStatsReqRegByMonth(HttpServletRequest request
-			, @Parameter(hidden = true) LoginUserInfo loginUserInfo
+			, @Parameter(hidden = true) LoginInfo loginInfo
 			, @RequestParam(value = "statsStartYm", required = false, defaultValue = "202301") String statsStartYm
 			, @RequestParam(value = "statsEndYm", required = false, defaultValue = "202312") String statsEndYm) {
 		
 		Map<String, Object> map = new HashMap<>();
 		map.put("statsStartYmd", statsStartYm);
 		map.put("statsEndYmd", statsEndYm);
+		map.put("loginUserSeq", loginInfo.getUserSeq()); 
 
 		List<ReqRegStatsInfo> listStatsReqRegByMonth = statsService.listStatsReqRegByMonth(map);
 		

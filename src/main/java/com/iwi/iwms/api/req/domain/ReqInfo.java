@@ -63,8 +63,8 @@ public class ReqInfo {
 	@Schema(description = "요청사항 구분") 
 	private String reqGb;
 	
-	@Schema(description = "담당자") 
-	private String reqDtlUser;
+	@Schema(description = "담당자 이름") 
+	private String reqDtlUserNm;
 	
 	@Schema(description = "작업 구분 코드") 
 	private String busiRollCd;

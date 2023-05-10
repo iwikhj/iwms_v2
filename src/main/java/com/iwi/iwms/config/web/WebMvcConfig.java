@@ -10,7 +10,7 @@ import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.iwi.iwms.api.common.resolver.LoginUserInfoArgumentResolver;
+import com.iwi.iwms.api.common.resolver.LoginInfoArgumentResolver;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +20,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
 	private static final String TIMEZONE = "Asia/Seoul";
 	
-	private final LoginUserInfoArgumentResolver loginUserInfoArgumentResolver;
+	private final LoginInfoArgumentResolver loginInfoArgumentResolver;
 	
 	@PostConstruct
 	public void timezone() {
@@ -33,7 +33,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
 	
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
-        resolvers.add(loginUserInfoArgumentResolver);
+        resolvers.add(loginInfoArgumentResolver);
     }
 
 }

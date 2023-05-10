@@ -60,18 +60,20 @@
 		resultMap="resultUserMap">
 		/* listUser */
 		<include refid="selectUser"></include>
-		<if test='userNm != null and userNm != ""'>
-			AND LOWER(USER.USER_NM) LIKE CONCAT('%', LOWER(#{userNm}), '%') 
-		</if>	
-		<if test='compNm != null and compNm != ""'>
-			AND LOWER(COMP.COMP_NM) LIKE CONCAT('%', LOWER(#{compNm}), '%') 
-		</if>	
-		<if test='busiRollCd != null and busiRollCd != ""'>
-			AND USER.BUSI_ROLL_CD = #{busiRollCd}
-		</if>	
-		<if test='useYn != null and useYn != ""'>
-			AND USER.USE_YN = #{useYn}
-		</if>			
+		<if test='keykind != null and keykind != "" and keyword != null and keyword != ""'>
+			<if test='keykind == "userNm"'>
+				AND LOWER(USER.USER_NM) LIKE CONCAT('%', LOWER(#{keyword}), '%') 
+			</if>	
+			<if test='keykind == "compNm"'>	
+				AND LOWER(COMP.COMP_NM) LIKE CONCAT('%', LOWER(#{keyword}), '%') 
+			</if>	
+			<if test='keykind == "busiRollCd"'>			
+				AND USER.BUSI_ROLL_CD = #{keyword}
+			</if>	
+			<if test='keykind == "useYn"'>			
+				AND USER.USE_YN = #{keyword}
+			</if>		
+		</if>		
 		ORDER BY USER.USER_SEQ DESC
 		<if test='pagination != null and pagination != ""'>
 			LIMIT #{pagination.limitPerPage} OFFSET #{pagination.offset}
@@ -90,17 +92,19 @@
 		LEFT JOIN TB_DEPT DEPT ON USER.DEPT_SEQ = DEPT.DEPT_SEQ  
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE USER.DEL_YN = 'N' AND USER.USE_YN = 'Y' END)	
-		<if test='userNm != null and userNm != ""'>
-			AND LOWER(USER.USER_NM) LIKE CONCAT('%', LOWER(#{userNm}), '%') 
-		</if>	
-		<if test='compNm != null and compNm != ""'>
-			AND LOWER(COMP.COMP_NM) LIKE CONCAT('%', LOWER(#{compNm}), '%') 
-		</if>	
-		<if test='busiRollCd != null and busiRollCd != ""'>
-			AND USER.BUSI_ROLL_CD = #{busiRollCd}
-		</if>	
-		<if test='useYn != null and useYn != ""'>
-			AND USER.USE_YN = #{useYn}
+		<if test='keykind != null and keykind != "" and keyword != null and keyword != ""'>
+			<if test='keykind == "userNm"'>
+				AND LOWER(USER.USER_NM) LIKE CONCAT('%', LOWER(#{keyword}), '%') 
+			</if>	
+			<if test='keykind == "compNm"'>	
+				AND LOWER(COMP.COMP_NM) LIKE CONCAT('%', LOWER(#{keyword}), '%') 
+			</if>	
+			<if test='keykind == "busiRollCd"'>			
+				AND USER.BUSI_ROLL_CD = #{keyword}
+			</if>	
+			<if test='keykind == "useYn"'>			
+				AND USER.USE_YN = #{keyword}
+			</if>		
 		</if>			
 	</select>	
 	
@@ -248,7 +252,7 @@
 		WHERE USER_SEQ = #{userSeq}	
 	</update>		
 
-	<resultMap id="resultLoginUserMap" type="com.iwi.iwms.api.login.domain.LoginUserInfo">
+	<resultMap id="resultLoginUserMap" type="com.iwi.iwms.api.login.domain.LoginInfo">
 	   	<collection property="menus" column="authSeq"  
 			ofType="com.iwi.iwms.api.auth.domain.AuthMenuInfo" select="com.iwi.iwms.api.auth.mapper.AuthMapper.getAuthMenuByAuthSeq"/>
 	</resultMap>

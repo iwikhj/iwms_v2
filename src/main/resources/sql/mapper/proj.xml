@@ -25,20 +25,22 @@
 		INNER JOIN TB_COMPANY COMP ON PROJ.COMP_SEQ = COMP.COMP_SEQ
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE COMP.DEL_YN = 'N' AND COMP.USE_YN = 'Y' AND PROJ.USE_YN = 'Y' END)	
-		<if test='compSeq != null and compSeq != ""'>
-			AND PROJ.COMP_SEQ = #{compSeq}
-		</if>
-		<if test='projNm != null and projNm != ""'>
-			AND LOWER(PROJ.PROJ_NM) LIKE CONCAT('%', LOWER(#{projNm}), '%') 
-		</if>		
-		<if test='projStdYmd != null and projStdYmd != ""'>
-			AND PROJ.PROJ_STD_YMD &gt;= #{projStdYmd}
-		</if>	
-		<if test='projEndYmd != null and projEndYmd != ""'>
-			AND PROJ.PROJ_END_YMD &lt;= #{projEndYmd}
-		</if>			
-		<if test='useYn != null and useYn != ""'>
-			AND PROJ.USE_YN = #{useYn}
+		<if test='keykind != null and keykind != "" and keyword != null and keyword != ""'>
+			<if test='keykind == "compSeq"'>
+				AND PROJ.COMP_SEQ = #{keyword}
+			</if>	
+			<if test='keykind == "projNm"'>	
+				AND LOWER(PROJ.PROJ_NM) LIKE CONCAT('%', LOWER(#{keyword}), '%') 
+			</if>	
+			<if test='keykind == "projStdYmd"'>			
+				AND PROJ.PROJ_STD_YMD &gt;= #{keyword}
+			</if>	
+			<if test='keykind == "projEndYmd"'>			
+				AND PROJ.PROJ_END_YMD &lt;= #{keyword}
+			</if>		
+			<if test='keykind == "useYn"'>			
+				AND PROJ.USE_YN = #{keyword}
+			</if>	
 		</if>		
 		ORDER BY PROJ.PROJ_SEQ DESC
 		<if test='pagination != null and pagination != ""'>
@@ -56,20 +58,22 @@
 		INNER JOIN TB_COMPANY COMP ON PROJ.COMP_SEQ = COMP.COMP_SEQ
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE COMP.DEL_YN = 'N' AND COMP.USE_YN = 'Y' AND PROJ.USE_YN = 'Y' END)
-		<if test='compSeq != null and compSeq != ""'>
-			AND PROJ.COMP_SEQ = #{compSeq}
-		</if>
-		<if test='projNm != null and projNm != ""'>
-			AND LOWER(PROJ.PROJ_NM) LIKE CONCAT('%', LOWER(#{projNm}), '%') 
-		</if>			
-		<if test='projStdYmd != null and projStdYmd != ""'>
-			AND PROJ.PROJ_STD_YMD &gt;= #{projStdYmd}
-		</if>	
-		<if test='projEndYmd != null and projEndYmd != ""'>
-			AND PROJ.PROJ_END_YMD &lt;= #{projEndYmd}
-		</if>			
-		<if test='useYn != null and useYn != ""'>
-			AND PROJ.USE_YN = #{useYn}
+		<if test='keykind != null and keykind != "" and keyword != null and keyword != ""'>
+			<if test='keykind == "compSeq"'>
+				AND PROJ.COMP_SEQ = #{keyword}
+			</if>	
+			<if test='keykind == "projNm"'>	
+				AND LOWER(PROJ.PROJ_NM) LIKE CONCAT('%', LOWER(#{keyword}), '%') 
+			</if>	
+			<if test='keykind == "projStdYmd"'>			
+				AND PROJ.PROJ_STD_YMD &gt;= #{keyword}
+			</if>	
+			<if test='keykind == "projEndYmd"'>			
+				AND PROJ.PROJ_END_YMD &lt;= #{keyword}
+			</if>		
+			<if test='keykind == "useYn"'>			
+				AND PROJ.USE_YN = #{keyword}
+			</if>	
 		</if>				
 	</select>		
 
@@ -305,9 +309,11 @@
 		/* listSite */
 		<include refid="selectSite"></include>
 			AND SITE.PROJ_SEQ = #{projSeq}
-		<if test='useYn != null and useYn != ""'>
-			AND SITE.USE_YN = #{useYn}
-		</if>			
+			<if test='keykind != null and keykind != "" and keyword != null and keyword != ""'>
+				<if test='keykind == "useYn"'>
+					AND SITE.USE_YN = #{keyword}
+				</if>	
+			</if>			
 		ORDER BY SITE.SITE_SEQ DESC
 		<if test='pagination != null and pagination != ""'>
 			LIMIT #{pagination.limitPerPage} OFFSET #{pagination.offset}
@@ -326,9 +332,11 @@
 		LEFT JOIN TB_USER LOGIN ON LOGIN.USER_SEQ = #{loginUserSeq}
 		WHERE (CASE WHEN LOGIN.AUTH_SEQ = 1 THEN TRUE ELSE COMP.USE_YN = 'Y' AND PROJ.USE_YN = 'Y' AND SITE.USE_YN = 'Y' END)	
 			AND SITE.PROJ_SEQ = #{projSeq}
-		<if test='useYn != null and useYn != ""'>
-			AND SITE.USE_YN = #{useYn}
-		</if>				
+			<if test='keykind != null and keykind != "" and keyword != null and keyword != ""'>
+				<if test='keykind == "useYn"'>
+					AND SITE.USE_YN = #{keyword}
+				</if>	
+			</if>				
 	</select>	
 
 	<!-- 사이트 단일 조회 -->	
