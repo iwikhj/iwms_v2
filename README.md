@@ -22,7 +22,7 @@
 4. RedisTemplate
 	
  - Controller
-5. @Valid
+5. @Validation
 6. Logging: @Aspect
 7. Business logic
 8. Response
