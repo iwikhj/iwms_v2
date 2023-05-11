@@ -26,6 +26,4 @@
 6. Logging: @Aspect
 7. Business logic
 8. Response
- - Ok: ResponseEntity<T>
- - Error: ExceptionHandler -> ResponseEntity<ErrorResponse>
 
