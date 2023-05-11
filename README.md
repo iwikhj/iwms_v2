@@ -4,6 +4,7 @@
  - spring boot: 2.7.8
    - spring-core: 5.3.25
    - lombok: 1.18.24
+ - maven: 3.8.7 
  - java: 11
  - mariaDB: 10.10.2
  - tomcat: 9.0.71 (Embedded)
