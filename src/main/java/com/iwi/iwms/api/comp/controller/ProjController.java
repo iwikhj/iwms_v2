@@ -49,7 +49,7 @@ public class ProjController {
 	public ResponseEntity<ApiListResponse<List<ProjInfo>>> listProj(HttpServletRequest request
 			, @Parameter(hidden = true) LoginInfo loginInfo
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
-			, @RequestParam(value = "size", required = false, defaultValue = "15") int size
+			, @RequestParam(value = "size", required = false, defaultValue = "10") int size
 			, @RequestParam(value = "keykind", required = false) String keykind
 			, @RequestParam(value = "keyword", required = false) String keyword) {			
 		
@@ -160,7 +160,7 @@ public class ProjController {
 			, @Parameter(hidden = true) LoginInfo loginInfo		
 			, @PathVariable long projSeq
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
-			, @RequestParam(value = "size", required = false, defaultValue = "15") int size
+			, @RequestParam(value = "size", required = false, defaultValue = "10") int size
 			, @RequestParam(value = "keykind", required = false) String keykind
 			, @RequestParam(value = "keyword", required = false) String keyword) {			
 		

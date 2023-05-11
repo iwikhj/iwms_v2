@@ -46,7 +46,7 @@ public class NoticeController {
 	public ResponseEntity<ApiListResponse<List<NoticeInfo>>> listNotice(HttpServletRequest request
 			, @Parameter(hidden = true) LoginInfo loginInfo
 			, @RequestParam(value = "page", required = false, defaultValue = "1") int page
-			, @RequestParam(value = "size", required = false, defaultValue = "15") int size
+			, @RequestParam(value = "size", required = false, defaultValue = "10") int size
 			, @RequestParam(value = "keykind", required = false) String keykind
 			, @RequestParam(value = "keyword", required = false) String keyword) {
 		
