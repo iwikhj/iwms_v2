@@ -119,7 +119,7 @@ public class NoticeController {
 	}
     
     @Operation(summary = "공지사항 조회수 증가", description = "공지사항 조회수 증가")
-	@PatchMapping(value = "/{noticeSeq}")
+	@PatchMapping(value = "/{noticeSeq}/increase-views")
 	public ResponseEntity<ApiResponse<Boolean>> updateNoticeViewCnt(HttpServletRequest request
     		, @Parameter(hidden = true) LoginInfo loginInfo
     		, @PathVariable long noticeSeq
