@@ -49,13 +49,15 @@ public class PagePopupController {
     @GetMapping(value = "/login/find-id")
     public ResponseEntity<PageResponse<Map<String, Object>>> findIdPopup(HttpServletRequest request) {
     	
-		List<CompInfo> compList = compService.listComp(new HashMap<>());
+    	Map<String, Object> resultMap = new HashMap<>();
+    	Map<String, Object> paramMap = new HashMap<>();
     	
-		Map<String, Object> data = new HashMap<>();
-		data.put("compList", compList);
+		List<CompInfo> compList = compService.listComp(paramMap);
+		
+		resultMap.put("compList", compList);
     	
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.build());
     }
     
@@ -64,17 +66,18 @@ public class PagePopupController {
     public ResponseEntity<PageResponse<Map<String, Object>>> requestPopup(HttpServletRequest request
     		, @Parameter(hidden = true) LoginInfo loginInfo) {
     	
+    	Map<String, Object> resultMap = new HashMap<>();
+    	
     	List<UserSiteInfo> siteList = userService.listSiteByUserSeq(loginInfo.getUserSeq());
     	List<CodeInfo> reqGbCdList =  codeService.listCodeByUpCode("REQ_GB_CD");
     	List<CodeInfo> reqTypeCdList =  codeService.listCodeByUpCode("REQ_TYPE_CD");
     	
-    	Map<String, Object> data = new HashMap<>();
-    	data.put("siteList", siteList);
-    	data.put("reqGbCdList", reqGbCdList);
-    	data.put("reqTypeCdList", reqTypeCdList);
+    	resultMap.put("siteList", siteList);
+    	resultMap.put("reqGbCdList", reqGbCdList);
+    	resultMap.put("reqTypeCdList", reqTypeCdList);
 
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.build());
     }
     
@@ -83,10 +86,10 @@ public class PagePopupController {
     public ResponseEntity<PageResponse<Map<String, Object>>> requestTaskPopup(HttpServletRequest request
     		, @Parameter(hidden = true) LoginInfo loginInfo) {
     	
-    	Map<String, Object> data = new HashMap<>();
+    	Map<String, Object> resultMap = new HashMap<>();
 
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.build());
     }   
   
@@ -95,18 +98,20 @@ public class PagePopupController {
     @GetMapping(value = "/system/user")
     public ResponseEntity<PageResponse<Map<String, Object>>> userPopup(HttpServletRequest request
     		, @Parameter(hidden = true) LoginInfo loginInfo) {
-		
-    	Map<String, Object> map = new HashMap<>();
     	
-		List<CompInfo> compList = compService.listComp(map);
+    	Map<String, Object> resultMap = new HashMap<>();
+    	Map<String, Object> paramMap = new HashMap<>();
+    	
+    	paramMap.put("loginUserSeq", loginInfo.getUserSeq()); 
+		List<CompInfo> compList = compService.listComp(paramMap);
 		List<DeptInfo> deptList = null;
 		
     	if(!CollectionUtils.isEmpty(compList)) {
-    		map.put("compSeq", compList.get(0).getCompSeq());
-    		deptList = compService.listDept(map);
+    		paramMap.put("compSeq", compList.get(0).getCompSeq());
+    		deptList = compService.listDept(paramMap);
     	}
     	
-    	List<CodeInfo> authCdList = authService.listAuth(map).stream()
+    	List<CodeInfo> authCdList = authService.listAuth(paramMap).stream()
 	    		.map(v -> CodeInfo.builder()
 	    					.codeCd(v.getAuthCd())
 	    					.codeNm(v.getAuthNm())
@@ -116,15 +121,15 @@ public class PagePopupController {
     	List<CodeInfo> userGbCdList =  codeService.listCodeByUpCode("USER_GB_CD");
     	List<CodeInfo> busiRollCdList =  codeService.listCodeByUpCode("BUSI_ROLL_CD");
     	
-    	Map<String, Object> data = new HashMap<>();
-    	data.put("compList", compList);
-    	data.put("deptList", deptList);
-    	data.put("authCdList", authCdList);
-    	data.put("userGbCdList", userGbCdList);
-    	data.put("busiRollCdList", busiRollCdList);
+    	
+    	resultMap.put("compList", compList);
+    	resultMap.put("deptList", deptList);
+    	resultMap.put("authCdList", authCdList);
+    	resultMap.put("userGbCdList", userGbCdList);
+    	resultMap.put("busiRollCdList", busiRollCdList);
     	
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.build());
     }
     
@@ -133,13 +138,14 @@ public class PagePopupController {
     public ResponseEntity<PageResponse<Map<String, Object>>> companyPopup(HttpServletRequest request
     		, @Parameter(hidden = true) LoginInfo loginInfo) {
     	
+    	Map<String, Object> resultMap = new HashMap<>();
+    	
     	List<CodeInfo> compGbCdList =  codeService.listCodeByUpCode("COMP_GB_CD");
     	
-    	Map<String, Object> data = new HashMap<>();
-    	data.put("compGbCdList", compGbCdList);
+    	resultMap.put("compGbCdList", compGbCdList);
     	
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.build());
     }
     
@@ -149,13 +155,16 @@ public class PagePopupController {
     public ResponseEntity<PageResponse<Map<String, Object>>> projPopup(HttpServletRequest request
     		, @Parameter(hidden = true) LoginInfo loginInfo) {
     	
-       	List<CompInfo> compList = compService.listComp(new HashMap<>());
+    	Map<String, Object> resultMap = new HashMap<>();
+    	Map<String, Object> paramMap = new HashMap<>();
+    	
+    	paramMap.put("loginUserSeq", loginInfo.getUserSeq()); 
+       	List<CompInfo> compList = compService.listComp(paramMap);
     		
-    	Map<String, Object> data = new HashMap<>();
-    	data.put("compList", compList);
+       	resultMap.put("compList", compList);
 
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.build());
     }
     

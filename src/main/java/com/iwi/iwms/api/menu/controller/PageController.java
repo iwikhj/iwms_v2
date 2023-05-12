@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.iwi.iwms.api.code.domain.CodeInfo;
 import com.iwi.iwms.api.code.service.CodeService;
 import com.iwi.iwms.api.common.response.PageResponse;
+import com.iwi.iwms.api.comp.domain.CompInfo;
+import com.iwi.iwms.api.comp.service.CompService;
 import com.iwi.iwms.api.login.domain.LoginInfo;
 import com.iwi.iwms.api.user.domain.UserSiteInfo;
 import com.iwi.iwms.api.user.service.UserService;
@@ -37,6 +39,8 @@ public class PageController {
 	
 	private final UserService userService;
 	
+	private final CompService compService;
+	
 	/**
 	 * 메뉴 홈
 	 */
@@ -45,10 +49,10 @@ public class PageController {
     public ResponseEntity<PageResponse<Map<String, Object>>> home(HttpServletRequest request
     		, @Parameter(hidden = true) LoginInfo loginInfo) {
     	
-    	Map<String, Object> data = new HashMap<>();
+    	Map<String, Object> resultMap = new HashMap<>();
     	
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.loginInfo(loginInfo)
 				.build());
     }
@@ -61,10 +65,16 @@ public class PageController {
     public ResponseEntity<PageResponse<Map<String, Object>>> notice(HttpServletRequest request
     		, @Parameter(hidden = true) LoginInfo loginInfo) {
     	
-    	Map<String, Object> data = new HashMap<>();
+    	Map<String, Object> resultMap = new HashMap<>();
+    	Map<String, Object> paramMap = new HashMap<>();
+    	
+    	paramMap.put("loginUserSeq", loginInfo.getUserSeq()); 
+		List<CompInfo> compList = compService.listComp(paramMap);
+		
+		resultMap.put("compList", compList);
     	
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.loginInfo(loginInfo)
 				.build());
     }
@@ -74,10 +84,10 @@ public class PageController {
     public ResponseEntity<PageResponse<Map<String, Object>>> noticeDetail(HttpServletRequest request
     		, @Parameter(hidden = true) LoginInfo loginInfo) {
     	
-    	Map<String, Object> data = new HashMap<>();
+    	Map<String, Object> resultMap = new HashMap<>();
     	
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.loginInfo(loginInfo)
 				.build());
     }
@@ -90,7 +100,7 @@ public class PageController {
     public ResponseEntity<PageResponse<Map<String, Object>>> maintainRequest(HttpServletRequest request
     		, @Parameter(hidden = true) LoginInfo loginInfo) {
     	
-    	Map<String, Object> data = new HashMap<>();
+    	Map<String, Object> resultMap = new HashMap<>();
     	
     	List<UserSiteInfo> siteList = userService.listSiteByUserSeq(loginInfo.getUserSeq());
     	List<CodeInfo> reqStatCdList =  codeService.listCodeByUpCode("REQ_STAT_CD");
@@ -101,14 +111,14 @@ public class PageController {
     	List<CodeInfo> reqTypeCdList =  codeService.listCodeByUpCode("REQ_TYPE_CD");
     	List<CodeInfo> busiRollCdList =  codeService.listCodeByUpCode("BUSI_ROLL_CD");
     	
-    	data.put("siteList", siteList);
-    	data.put("reqStatCdList", reqStatCdList);
-    	data.put("reqGbCdList", reqGbCdList);
-    	data.put("reqTypeCdList", reqTypeCdList);
-    	data.put("busiRollCdList", busiRollCdList);
+    	resultMap.put("siteList", siteList);
+    	resultMap.put("reqStatCdList", reqStatCdList);
+    	resultMap.put("reqGbCdList", reqGbCdList);
+    	resultMap.put("reqTypeCdList", reqTypeCdList);
+    	resultMap.put("busiRollCdList", busiRollCdList);
     	
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.loginInfo(loginInfo)
 				.build());
     }
@@ -120,10 +130,10 @@ public class PageController {
     		, @RequestParam(value = "rSeq", required = true) long reqSeq
     		, @RequestParam(value = "dSeq", required = false) Long reqDtlSeq) {
     	
-    	Map<String, Object> data = new HashMap<>();
+    	Map<String, Object> resultMap = new HashMap<>();
     	
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.loginInfo(loginInfo)
 				.build());
     }
@@ -133,10 +143,10 @@ public class PageController {
     public ResponseEntity<PageResponse<Map<String, Object>>> maintainDevelop(HttpServletRequest request
     		, @Parameter(hidden = true) LoginInfo loginInfo) {
     	
-    	Map<String, Object> data = new HashMap<>();
+    	Map<String, Object> resultMap = new HashMap<>();
     	
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.loginInfo(loginInfo)
 				.build());
     }
@@ -146,10 +156,10 @@ public class PageController {
     public ResponseEntity<PageResponse<Map<String, Object>>> maintainSchedule(HttpServletRequest request
     		, @Parameter(hidden = true) LoginInfo loginInfo) {
     	
-    	Map<String, Object> data = new HashMap<>();
+    	Map<String, Object> resultMap = new HashMap<>();
     	
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.loginInfo(loginInfo)
 				.build());
     }
@@ -159,10 +169,10 @@ public class PageController {
     public ResponseEntity<PageResponse<Map<String, Object>>> maintainStatistics(HttpServletRequest request
     		, @Parameter(hidden = true) LoginInfo loginInfo) {
 
-    	Map<String, Object> data = new HashMap<>();	
+    	Map<String, Object> resultMap = new HashMap<>();	
     	
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.loginInfo(loginInfo)
 				.build());
     }
@@ -175,10 +185,10 @@ public class PageController {
     public ResponseEntity<PageResponse<Map<String, Object>>> project(HttpServletRequest request
     		, @Parameter(hidden = true) LoginInfo loginInfo) {
     	
-    	Map<String, Object> data = new HashMap<>();	
+    	Map<String, Object> resultMap = new HashMap<>();	
     	
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.loginInfo(loginInfo)
 				.build());
     }
@@ -191,10 +201,10 @@ public class PageController {
     public ResponseEntity<PageResponse<Map<String, Object>>> history(HttpServletRequest request
     		, @Parameter(hidden = true) LoginInfo loginInfo) {
     	
-    	Map<String, Object> data = new HashMap<>();	
+    	Map<String, Object> resultMap = new HashMap<>();	
     	
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.loginInfo(loginInfo)
 				.build());
     }
@@ -208,10 +218,10 @@ public class PageController {
     public ResponseEntity<PageResponse<Map<String, Object>>> deploy(HttpServletRequest request
     		, @Parameter(hidden = true) LoginInfo loginInfo) {
     	
-    	Map<String, Object> data = new HashMap<>();	
+    	Map<String, Object> resultMap = new HashMap<>();	
     	
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.loginInfo(loginInfo)
 				.build());
     }
@@ -226,14 +236,18 @@ public class PageController {
     public ResponseEntity<PageResponse<Map<String, Object>>> systemUser(HttpServletRequest request
     		, @Parameter(hidden = true) LoginInfo loginInfo) {
 
-    	Map<String, Object> data = new HashMap<>();	    
+    	Map<String, Object> resultMap = new HashMap<>();	    
+    	Map<String, Object> paramMap = new HashMap<>();
     	
+    	paramMap.put("loginUserSeq", loginInfo.getUserSeq()); 
+		List<CompInfo> compList = compService.listComp(paramMap);	
     	List<CodeInfo> busiRollCdList =  codeService.listCodeByUpCode("BUSI_ROLL_CD");
     	
-    	data.put("busiRollCdList", busiRollCdList);
+    	resultMap.put("compList", compList);
+    	resultMap.put("busiRollCdList", busiRollCdList);
     	
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.loginInfo(loginInfo)
 				.build());
     }
@@ -244,14 +258,14 @@ public class PageController {
     public ResponseEntity<PageResponse<Map<String, Object>>> systemCompany(HttpServletRequest request
     		, @Parameter(hidden = true) LoginInfo loginInfo) {
     	
-    	Map<String, Object> data = new HashMap<>();
+    	Map<String, Object> resultMap = new HashMap<>();
     	
     	List<CodeInfo> compGbCdList =  codeService.listCodeByUpCode("COMP_GB_CD");
     	
-    	data.put("compGbCdList", compGbCdList);
+    	resultMap.put("compGbCdList", compGbCdList);
     	
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.loginInfo(loginInfo)
 				.build());
     }
@@ -262,10 +276,10 @@ public class PageController {
     public ResponseEntity<PageResponse<Map<String, Object>>> systemProject(HttpServletRequest request
     		, @Parameter(hidden = true) LoginInfo loginInfo) {
     	
-    	Map<String, Object> data = new HashMap<>();
+    	Map<String, Object> resultMap = new HashMap<>();
     	
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.loginInfo(loginInfo)
 				.build());
     }
@@ -276,10 +290,10 @@ public class PageController {
     public ResponseEntity<PageResponse<Map<String, Object>>> systemAuth(HttpServletRequest request
     		, @Parameter(hidden = true) LoginInfo loginInfo) {
     	
-    	Map<String, Object> data = new HashMap<>();
+    	Map<String, Object> resultMap = new HashMap<>();
 
 		return ResponseEntity.ok(PageResponse.<Map<String, Object>>builder()
-				.data(data)
+				.data(resultMap)
 				.loginInfo(loginInfo)
 				.build());
     }
